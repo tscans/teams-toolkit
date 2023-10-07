@@ -19,7 +19,7 @@
     "prepack": "npm run package",
     "test:unit": "nyc --no-clean mocha \"tests/unit/**/*.tests.ts\" ",
     "test:e2e": "npm run test:e2e:clean && npm run test:e2e:parallel",
-    "test:e2e:clean": "NODE_OPTIONS=\"--unhandled-rejections=strict\" ts-node tests/e2e/clean.ts",
+    "test:e2e:clean": "ts-node tests/e2e/clean.ts",
     "test:e2e:parallel": "nyc mocha \"tests/e2e/frontend/BasicTabHappyPath.tests.ts\"",
     "test:helper": "nyc --no-clean mocha \"tests/unit/helper.tests.ts\" ",
     "test:engine": "nyc --no-clean mocha \"tests/unit/engine.tests.ts\" ",
