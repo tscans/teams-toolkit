@@ -573,7 +573,7 @@ export namespace AppStudioClient {
       }
       sendSuccessEvent(APP_STUDIO_API_NAMES.UPDATE_OWNER);
     } catch (err) {
-      if (err?.message?.indexOf("Request failed with status code 400") >= 0) {
+      if ((err as Error)?.message?.indexOf("Request failed with status code 400") >= 0) {
         requester = createRequesterWithToken(appStudioToken, region);
         await requester.post(`/api/appdefinitions/${teamsAppId}/owner`, app.userList);
       } else {
