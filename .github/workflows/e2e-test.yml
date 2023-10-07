@@ -224,230 +224,230 @@ jobs:
             echo "can't find target case in $file"
             exit 1
           else
-            npx mocha --reporter mochawesome --timeout 1200000 $file
+            nyc mocha $file
           fi
 
-      - name: get report name
-        id: get-report-name
-        if: ${{ always() }}
-        run: |
-          name="${{ matrix.cases }}"
-          name="${name//'.tests.ts'/}"
-          name="${name//.\//}"
-          name="${name//\//_}"
-          echo "name=$name" >> $GITHUB_OUTPUT
+      # - name: get report name
+      #   id: get-report-name
+      #   if: ${{ always() }}
+      #   run: |
+      #     name="${{ matrix.cases }}"
+      #     name="${name//'.tests.ts'/}"
+      #     name="${name//.\//}"
+      #     name="${name//\//_}"
+      #     echo "name=$name" >> $GITHUB_OUTPUT
 
-      - name: Upload test report
-        uses: actions/upload-artifact@v3
-        if: ${{ github.event_name != 'schedule' || success() || (failure() && github.run_attempt >= 5) }}
-        with:
-          name: test-result-${{ steps.get-report-name.outputs.name }}
-          path: |
-            ./packages/tests/src/e2e/mochawesome-report/mochawesome.json
+      # - name: Upload test report
+      #   uses: actions/upload-artifact@v3
+      #   if: ${{ github.event_name != 'schedule' || success() || (failure() && github.run_attempt >= 5) }}
+      #   with:
+      #     name: test-result-${{ steps.get-report-name.outputs.name }}
+      #     path: |
+      #       ./packages/tests/src/e2e/mochawesome-report/mochawesome.json
       
-      - name: Download TestPlan
-        if: ${{ always() && github.event.inputs.target-testplan-name != '' }}
-        uses: actions/download-artifact@v3
-        with:
-          name: testplan
-          path: ./packages/tests
+      # - name: Download TestPlan
+      #   if: ${{ always() && github.event.inputs.target-testplan-name != '' }}
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: testplan
+      #     path: ./packages/tests
 
-      - name: Sync to Azure DevOps Test Plan
-        if: ${{ always() && github.event.inputs.target-testplan-name != '' }}
-        working-directory: packages/tests
-        run: |
-          npx ts-node src/scripts/testPlan.ts report ./testplan.json src/e2e/mochawesome-report/mochawesome.json
+      # - name: Sync to Azure DevOps Test Plan
+      #   if: ${{ always() && github.event.inputs.target-testplan-name != '' }}
+      #   working-directory: packages/tests
+      #   run: |
+      #     npx ts-node src/scripts/testPlan.ts report ./testplan.json src/e2e/mochawesome-report/mochawesome.json
 
-  tear-down:
-    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'teamsfx-bot/TeamsFx')  }}
-    needs: execute-case
-    runs-on: ubuntu-latest
-    env:
-      AZURE_ACCOUNT_NAME: ${{ secrets.TEST_USER_NAME }}
-      AZURE_ACCOUNT_OBJECT_ID: ${{ secrets.TEST_USER_OBJECT_ID }}
-      AZURE_ACCOUNT_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.TEST_SUBSCRIPTION_ID }}
-      AZURE_TENANT_ID: ${{ secrets.TEST_TENANT_ID }}
-      M365_ACCOUNT_NAME: ${{ secrets.TEST_USER_NAME }}
-      M365_ACCOUNT_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-      M365_TENANT_ID: ${{ secrets.TEST_TENANT_ID_2 }}
-      CI_ENABLED: "true"
-      M365_ACCOUNT_COLLABORATOR: ${{ secrets.TEST_COLLABORATOR_USER_NAME }}
-      AZURE_DEVOPS_EXT_PAT: ${{ secrets.ADO_PAT }}
-    steps:
-      - name: Checkout (dev)
-        uses: actions/checkout@v3
+  # tear-down:
+  #   if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'teamsfx-bot/TeamsFx')  }}
+  #   needs: execute-case
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     AZURE_ACCOUNT_NAME: ${{ secrets.TEST_USER_NAME }}
+  #     AZURE_ACCOUNT_OBJECT_ID: ${{ secrets.TEST_USER_OBJECT_ID }}
+  #     AZURE_ACCOUNT_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+  #     AZURE_SUBSCRIPTION_ID: ${{ secrets.TEST_SUBSCRIPTION_ID }}
+  #     AZURE_TENANT_ID: ${{ secrets.TEST_TENANT_ID }}
+  #     M365_ACCOUNT_NAME: ${{ secrets.TEST_USER_NAME }}
+  #     M365_ACCOUNT_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+  #     M365_TENANT_ID: ${{ secrets.TEST_TENANT_ID_2 }}
+  #     CI_ENABLED: "true"
+  #     M365_ACCOUNT_COLLABORATOR: ${{ secrets.TEST_COLLABORATOR_USER_NAME }}
+  #     AZURE_DEVOPS_EXT_PAT: ${{ secrets.ADO_PAT }}
+  #   steps:
+  #     - name: Checkout (dev)
+  #       uses: actions/checkout@v3
 
-      - name: setup project
-        uses: ./.github/actions/setup-project
+  #     - name: setup project
+  #       uses: ./.github/actions/setup-project
 
-      - name: E2E Test clean
-        working-directory: packages/tests
-        run: |
-          npm run test:e2e:clean
+  #     - name: E2E Test clean
+  #       working-directory: packages/tests
+  #       run: |
+  #         npm run test:e2e:clean
 
-  rerun:
-    needs: tear-down
-    if: ${{ (github.event_name == 'schedule' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'teamsfx-bot/TeamsFx')) && failure() && github.run_attempt < 5 }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: rerun
-        run: |
-          curl \
-           -X POST \
-           -H "Accept: application/vnd.github+json" \
-           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"\
-           -H "X-GitHub-Api-Version: 2022-11-28" \
-           https://api.github.com/repos/${{ github.repository }}/actions/workflows/rerun.yml/dispatches \
-           -d '{"ref":"${{ github.ref_name }}","inputs":{"run_id":"${{ github.run_id }}", "max_attempts":"5"}}'
+  # rerun:
+  #   needs: tear-down
+  #   if: ${{ (github.event_name == 'schedule' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'teamsfx-bot/TeamsFx')) && failure() && github.run_attempt < 5 }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: rerun
+  #       run: |
+  #         curl \
+  #          -X POST \
+  #          -H "Accept: application/vnd.github+json" \
+  #          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"\
+  #          -H "X-GitHub-Api-Version: 2022-11-28" \
+  #          https://api.github.com/repos/${{ github.repository }}/actions/workflows/rerun.yml/dispatches \
+  #          -d '{"ref":"${{ github.ref_name }}","inputs":{"run_id":"${{ github.run_id }}", "max_attempts":"5"}}'
 
-  report:
-    needs: execute-case
-    if: ${{ github.event_name == 'schedule' && (success() || (failure() && github.run_attempt >= 5)) }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  # report:
+  #   needs: execute-case
+  #   if: ${{ github.event_name == 'schedule' && (success() || (failure() && github.run_attempt >= 5)) }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Install Dateutils
-        run: |
-          sudo apt install dateutils
+  #     - name: Install Dateutils
+  #       run: |
+  #         sudo apt install dateutils
 
-      - uses: actions/download-artifact@v3
-        with:
-          path: ~/artifacts
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         path: ~/artifacts
 
-      - name: List jobs
-        id: list-jobs
-        working-directory: packages/tests
-        run: |
-          page=1
-          jobs="[]"
+  #     - name: List jobs
+  #       id: list-jobs
+  #       working-directory: packages/tests
+  #       run: |
+  #         page=1
+  #         jobs="[]"
 
-          while :
-          do
+  #         while :
+  #         do
 
-            url=https://api.github.com/repos/OfficeDev/TeamsFx/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}/jobs\?per_page\=100\&page\=$page
-            resp=`curl -H "Accept: application/vnd.github.v3+json" -u:${{ secrets.GITHUB_TOKEN }} $url`
+  #           url=https://api.github.com/repos/OfficeDev/TeamsFx/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}/jobs\?per_page\=100\&page\=$page
+  #           resp=`curl -H "Accept: application/vnd.github.v3+json" -u:${{ secrets.GITHUB_TOKEN }} $url`
 
-            new_jobs=`echo $resp | jq -cr '.jobs'`
+  #           new_jobs=`echo $resp | jq -cr '.jobs'`
 
-            jobs=`jq -cr --slurp 'add' <(echo "$jobs") <(echo "$new_jobs")`
+  #           jobs=`jq -cr --slurp 'add' <(echo "$jobs") <(echo "$new_jobs")`
 
-            has_next=`curl -I -H "Accept: application/vnd.github.v3+json" -u:${{ secrets.GITHUB_TOKEN }} $url | grep -Fi "link:" | grep "rel=\"last\"" || true`
-            if [ -z "$has_next" ]; then
-              break
-            fi
+  #           has_next=`curl -I -H "Accept: application/vnd.github.v3+json" -u:${{ secrets.GITHUB_TOKEN }} $url | grep -Fi "link:" | grep "rel=\"last\"" || true`
+  #           if [ -z "$has_next" ]; then
+  #             break
+  #           fi
 
-            page=$((page+1))
-          done
+  #           page=$((page+1))
+  #         done
 
-          cases=`echo $jobs| jq -r '.[] | select(.name | contains("tests.ts")) | .name'`
+  #         cases=`echo $jobs| jq -r '.[] | select(.name | contains("tests.ts")) | .name'`
 
-          passed=0
-          failed=0
-          skipped=0
-          passed_lists=""
-          failed_lists=""
-          skipped_lists=""
+  #         passed=0
+  #         failed=0
+  #         skipped=0
+  #         passed_lists=""
+  #         failed_lists=""
+  #         skipped_lists=""
 
-          emails="teamsfxqa@microsoft.com;"
-          while IFS= read -r case;
-          do
-            if [ -z "$case" ]; then
-              continue
-            fi
+  #         emails="teamsfxqa@microsoft.com;"
+  #         while IFS= read -r case;
+  #         do
+  #           if [ -z "$case" ]; then
+  #             continue
+  #           fi
 
-            file="src/e2e/$case"
-            elegant_path="${file//.\//}"
+  #           file="src/e2e/$case"
+  #           elegant_path="${file//.\//}"
 
-            started_at=`echo $jobs | jq --arg case $case -r '.[] | select(.name == $case ) | .steps[] | select(.name == "run test") | .started_at'`
-            completed_at=`echo $jobs | jq --arg case $case -r '.[] | select(.name == $case ) | .steps[] | select(.name == "run test") | .completed_at'`
-            duration=`dateutils.ddiff $started_at $completed_at -f "%Mm %Ss"`
+  #           started_at=`echo $jobs | jq --arg case $case -r '.[] | select(.name == $case ) | .steps[] | select(.name == "run test") | .started_at'`
+  #           completed_at=`echo $jobs | jq --arg case $case -r '.[] | select(.name == $case ) | .steps[] | select(.name == "run test") | .completed_at'`
+  #           duration=`dateutils.ddiff $started_at $completed_at -f "%Mm %Ss"`
 
-            email=""
-            if grep -q "@author" $file; then
-              email=`grep '@author' $file | grep -i -o '[A-Z0-9._%+-]\+@[A-Z0-9.-]\+\.[A-Z]\{2,4\}'`
-            fi
+  #           email=""
+  #           if grep -q "@author" $file; then
+  #             email=`grep '@author' $file | grep -i -o '[A-Z0-9._%+-]\+@[A-Z0-9.-]\+\.[A-Z]\{2,4\}'`
+  #           fi
 
-            author=""
-            if [ -z "$email" ]; then
-              author="N/A"
-            else
-              author="<a href=\\\"mailto:$email\\\"><span>$email</span></a>"
-            fi
+  #           author=""
+  #           if [ -z "$email" ]; then
+  #             author="N/A"
+  #           else
+  #             author="<a href=\\\"mailto:$email\\\"><span>$email</span></a>"
+  #           fi
 
-            url=`echo $jobs | jq --arg case $case -r '.[] | select(.name == $case ) | .html_url'`
-            url="<a href=\\\"$url\\\">$elegant_path</a>"
+  #           url=`echo $jobs | jq --arg case $case -r '.[] | select(.name == $case ) | .html_url'`
+  #           url="<a href=\\\"$url\\\">$elegant_path</a>"
 
-            target_type="TS/JS"
-            if [[ $case == *".dotnet."* ]]; then
-              target_type=".NET"
-            fi
+  #           target_type="TS/JS"
+  #           if [[ $case == *".dotnet."* ]]; then
+  #             target_type=".NET"
+  #           fi
 
-            name="${case//'.tests.ts'/}"
-            name="${name//.\//}"
-            name="${name//\//_}"
-            job_id=`echo $jobs | jq --arg case $case -r '.[] | select(.name == $case ) | .id'`
-            report_file=`find ~/artifacts -wholename "*${name}*/mochawesome.json"`
-            if [ ! -z "$report_file" ]; then
-              echo "Found the $report_file with $job_id and $name"
-              tests=`cat $report_file | jq -cr '[ .. | objects | with_entries(select(.key=="tests")) | select(. != {}) | select(.tests | type=="array") ] | map(.tests | .[]) | .[]'`
-              lable=""
-              while IFS= read -r test;
-              do
-                name=`echo $test | jq -cr .fullTitle`
-                duration=`echo $test | jq -cr .duration`
-                if [[ ! -z `echo $test | jq 'select(.pass==true)'` ]]; then
-                  passed=$((passed+1))
-                  label="<span style=\\\"background-color:#2aa198;color:white;font-weight:bold;\\\">PASSED</span>"
-                elif [[ ! -z `echo $test | jq 'select(.fail==true)'` ]]; then
-                  failed=$((failed+1))
-                  label="<span style=\\\"background-color: #dc322f;color:white;font-weight:bold;\\\">FAILED</span>"
-                  if [[ ! -z "$email" && ! "$emails" == *"$email"* ]]; then
-                    emails="$emails;$email;zhendr@microsoft.com"
-                  fi
-                elif [[ ! -z `echo $test | jq 'select(.skipped==true)'` || ! -z `echo $test | jq 'select(.pending==true)'` ]]; then
-                  skipped=$((skipped+1))
-                  label="<span style=\\\"background-color: #b58900;color:white;font-weight:bold;\\\">SKIPPED</span>"
-                fi
+  #           name="${case//'.tests.ts'/}"
+  #           name="${name//.\//}"
+  #           name="${name//\//_}"
+  #           job_id=`echo $jobs | jq --arg case $case -r '.[] | select(.name == $case ) | .id'`
+  #           report_file=`find ~/artifacts -wholename "*${name}*/mochawesome.json"`
+  #           if [ ! -z "$report_file" ]; then
+  #             echo "Found the $report_file with $job_id and $name"
+  #             tests=`cat $report_file | jq -cr '[ .. | objects | with_entries(select(.key=="tests")) | select(. != {}) | select(.tests | type=="array") ] | map(.tests | .[]) | .[]'`
+  #             lable=""
+  #             while IFS= read -r test;
+  #             do
+  #               name=`echo $test | jq -cr .fullTitle`
+  #               duration=`echo $test | jq -cr .duration`
+  #               if [[ ! -z `echo $test | jq 'select(.pass==true)'` ]]; then
+  #                 passed=$((passed+1))
+  #                 label="<span style=\\\"background-color:#2aa198;color:white;font-weight:bold;\\\">PASSED</span>"
+  #               elif [[ ! -z `echo $test | jq 'select(.fail==true)'` ]]; then
+  #                 failed=$((failed+1))
+  #                 label="<span style=\\\"background-color: #dc322f;color:white;font-weight:bold;\\\">FAILED</span>"
+  #                 if [[ ! -z "$email" && ! "$emails" == *"$email"* ]]; then
+  #                   emails="$emails;$email;zhendr@microsoft.com"
+  #                 fi
+  #               elif [[ ! -z `echo $test | jq 'select(.skipped==true)'` || ! -z `echo $test | jq 'select(.pending==true)'` ]]; then
+  #                 skipped=$((skipped+1))
+  #                 label="<span style=\\\"background-color: #b58900;color:white;font-weight:bold;\\\">SKIPPED</span>"
+  #               fi
                 
-                row="<tr> <td style=\\\"text-align: left;\\\">$url</td> <td style=\\\"text-align: left;\\\">$name</td> <td style=\\\"text-align: center;\\\">$target_type</td> <td style=\\\"text-align: center;\\\">$label</td> <td style=\\\"text-align: center;\\\">$author</td> <td>$((duration/1000)) sec</td> </tr>"
-                if [[ ! -z `echo $test | jq 'select(.pass==true)'` ]]; then
-                  passed_lists="$passed_lists $row"
-                elif [[ ! -z `echo $test | jq 'select(.fail==true)'` ]]; then
-                  failed_lists="$failed_lists $row"
-                elif [[ ! -z `echo $test | jq 'select(.skipped==true)'` || ! -z `echo $test | jq 'select(.pending==true)'` ]]; then
-                  skipped_lists="$skipped_lists $row"
-                fi
-              done <<< $tests
-            else
-              echo "Failed to find the $report_file with $job_id and $name"
-            fi
+  #               row="<tr> <td style=\\\"text-align: left;\\\">$url</td> <td style=\\\"text-align: left;\\\">$name</td> <td style=\\\"text-align: center;\\\">$target_type</td> <td style=\\\"text-align: center;\\\">$label</td> <td style=\\\"text-align: center;\\\">$author</td> <td>$((duration/1000)) sec</td> </tr>"
+  #               if [[ ! -z `echo $test | jq 'select(.pass==true)'` ]]; then
+  #                 passed_lists="$passed_lists $row"
+  #               elif [[ ! -z `echo $test | jq 'select(.fail==true)'` ]]; then
+  #                 failed_lists="$failed_lists $row"
+  #               elif [[ ! -z `echo $test | jq 'select(.skipped==true)'` || ! -z `echo $test | jq 'select(.pending==true)'` ]]; then
+  #                 skipped_lists="$skipped_lists $row"
+  #               fi
+  #             done <<< $tests
+  #           else
+  #             echo "Failed to find the $report_file with $job_id and $name"
+  #           fi
 
-          done <<< $cases
+  #         done <<< $cases
 
-          body="<table class=\\\"w3-table w3-striped w3-bordered\\\"> <tr> <th>PATH</th> <th>CASE</th> <th>TARGET TYPE</th> <th>STATUS</th> <th>AUTHOR</th> <th>DURATION</th> </tr> $failed_lists $skipped_lists $passed_lists </table> <br />"
+  #         body="<table class=\\\"w3-table w3-striped w3-bordered\\\"> <tr> <th>PATH</th> <th>CASE</th> <th>TARGET TYPE</th> <th>STATUS</th> <th>AUTHOR</th> <th>DURATION</th> </tr> $failed_lists $skipped_lists $passed_lists </table> <br />"
 
-          total=$((passed+failed+skipped))
+  #         total=$((passed+failed+skipped))
 
-          subject="TeamsFx E2E V3 Test Report ($passed/$total Passed, $failed/$total Failed, $skipped/$total Skipped)"
-          if [ $failed -gt 0 ]; then
-            subject="[FAILED] $subject"
-          else
-            subject="[PASSED] $subject"
-          fi
+  #         subject="TeamsFx E2E V3 Test Report ($passed/$total Passed, $failed/$total Failed, $skipped/$total Skipped)"
+  #         if [ $failed -gt 0 ]; then
+  #           subject="[FAILED] $subject"
+  #         else
+  #           subject="[PASSED] $subject"
+  #         fi
 
-          echo "body=$body" >> $GITHUB_OUTPUT
-          echo "to=$emails" >> $GITHUB_OUTPUT
-          echo "subject=$subject" >> $GITHUB_OUTPUT
+  #         echo "body=$body" >> $GITHUB_OUTPUT
+  #         echo "to=$emails" >> $GITHUB_OUTPUT
+  #         echo "subject=$subject" >> $GITHUB_OUTPUT
           
-      - name: Send E-mail to the whole team
-        uses: ./.github/actions/send-email-report
-        env:
-          TO: ${{ steps.list-jobs.outputs.to }}
-          BODY: '"${{ steps.list-jobs.outputs.body }}"'
-          SUBJECT: ${{ steps.list-jobs.outputs.subject }}
-          MAIL_CLIENT_ID: ${{ secrets.TEST_CLEAN_CLIENT_ID }}
-          MAIL_CLIENT_SECRET: ${{ secrets.TEST_CLEAN_CLIENT_SECRET }}
-          MAIL_TENANT_ID: ${{ secrets.TEST_CLEAN_TENANT_ID }}
+  #     - name: Send E-mail to the whole team
+  #       uses: ./.github/actions/send-email-report
+  #       env:
+  #         TO: ${{ steps.list-jobs.outputs.to }}
+  #         BODY: '"${{ steps.list-jobs.outputs.body }}"'
+  #         SUBJECT: ${{ steps.list-jobs.outputs.subject }}
+  #         MAIL_CLIENT_ID: ${{ secrets.TEST_CLEAN_CLIENT_ID }}
+  #         MAIL_CLIENT_SECRET: ${{ secrets.TEST_CLEAN_CLIENT_SECRET }}
+  #         MAIL_TENANT_ID: ${{ secrets.TEST_CLEAN_TENANT_ID }}
