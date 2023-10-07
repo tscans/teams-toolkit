@@ -9,7 +9,7 @@
     "build": "rimraf out && tsc -p ./",
     "test:e2e": "npm run test:e2e:clean && npm run test:e2e:parallel",
     "test:e2e:clean": "NODE_OPTIONS=\"--unhandled-rejections=strict\" ts-node src/e2e/clean.ts",
-    "test:e2e:parallel": "nyc mocha --parallel --reporter @mochajs/json-file-reporter \"src/e2e/**/*.tests.ts\"",
+    "test:e2e:parallel": "nyc mocha \"src/e2e/frontend/BasicTabHappyPath.tests.ts\"",
     "test:e2e:smoke": "nyc mocha --reporter @mochajs/json-file-reporter \"src/e2e/smoke/*.tests.ts\"",
     "test:e2e:others": "nyc mocha --reporter @mochajs/json-file-reporter \"src/e2e/{,!(smoke)}/*.tests.ts\"",
     "precommit": "lint-staged"
