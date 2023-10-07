@@ -334,6 +334,6 @@ export async function listDevTunnels(token: string): Promise<Result<Tunnel[], Fx
     const tunnels = await tunnelManagementClientImpl.listTunnels(undefined, undefined, options);
     return ok(tunnels);
   } catch (error) {
-    return err(new SystemError("DevTunnels", "ListDevTunnelsFailed", error.message));
+    return err(new SystemError("DevTunnels", "ListDevTunnelsFailed", (error as Error).message));
   }
 }
