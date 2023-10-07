@@ -241,6 +241,15 @@ importers:
 
   packages/cli:
     dependencies:
+      '@azure/arm-apimanagement':
+        specifier: ^8.0.0
+        version: 8.0.0
+      '@azure/arm-resources':
+        specifier: 5.0.1
+        version: 5.0.1
+      '@azure/arm-sql':
+        specifier: ^9.0.0
+        version: 9.0.0
       '@azure/arm-subscriptions':
         specifier: ^5.0.0
         version: 5.0.0
@@ -265,9 +274,15 @@ importers:
       '@microsoft/teamsfx-api':
         specifier: workspace:*
         version: link:../api
+      '@microsoft/teamsfx-cli':
+        specifier: ^2.0.2
+        version: 'link:'
       '@microsoft/teamsfx-core':
         specifier: workspace:*
         version: link:../fx-core
+      '@types/semver':
+        specifier: ^7.3.8
+        version: 7.3.8
       ansi-escapes:
         specifier: ^4.3.2
         version: 4.3.2
@@ -277,6 +292,12 @@ importers:
       async-mutex:
         specifier: ^0.3.1
         version: 0.3.1
+      axios:
+        specifier: ^0.21.1
+        version: 0.21.4(debug@4.3.4)
+      azure-arm-resource:
+        specifier: ^7.4.0
+        version: 7.4.0
       chalk:
         specifier: ^4.1.0
         version: 4.1.0
@@ -295,15 +316,27 @@ importers:
       fs-extra:
         specifier: ^9.1.0
         version: 9.1.0
+      is-wsl:
+        specifier: ^2.2.0
+        version: 2.2.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
+      md5:
+        specifier: ^2.3.0
+        version: 2.3.0
+      ms-rest-azure:
+        specifier: ^3.0.1
+        version: 3.0.1
       node-machine-id:
         specifier: ^1.1.12
         version: 1.1.12
       open:
         specifier: ^8.2.1
         version: 8.2.1
+      querystring:
+        specifier: ^0.2.1
+        version: 0.2.1
       semver:
         specifier: ^7.5.4
         version: 7.5.4
@@ -330,6 +363,21 @@ importers:
       '@istanbuljs/nyc-config-typescript':
         specifier: ^1.0.1
         version: 1.0.2(nyc@15.1.0)
+      '@microsoft/dev-tunnels-connections':
+        specifier: ~1.0.7360
+        version: 1.0.7360
+      '@microsoft/dev-tunnels-contracts':
+        specifier: ~1.0.7360
+        version: 1.0.7360
+      '@microsoft/dev-tunnels-management':
+        specifier: ~1.0.7360
+        version: 1.0.7360
+      '@microsoft/dev-tunnels-ssh':
+        specifier: ~3.11.1
+        version: 3.11.1
+      '@microsoft/extra-shot-mocha':
+        specifier: 0.0.1
+        version: 0.0.1(mocha@10.2.0)(mochawesome@7.0.1)
       '@microsoft/metrics-ts':
         specifier: workspace:*
         version: link:../metrics-ts
@@ -345,21 +393,30 @@ importers:
       '@types/fs-extra':
         specifier: ^8.0.1
         version: 8.0.1
+      '@types/glob':
+        specifier: ^7.1.3
+        version: 7.1.3
       '@types/keytar':
         specifier: ^4.4.2
         version: 4.4.2
       '@types/lodash':
         specifier: ^4.14.170
         version: 4.14.181
+      '@types/md5':
+        specifier: ^2.3.0
+        version: 2.3.0
       '@types/mocha':
         specifier: ^8.0.4
         version: 8.2.3
+      '@types/mochawesome':
+        specifier: ^6.2.1
+        version: 6.2.1
+      '@types/mssql':
+        specifier: ^8.1.2
+        version: 8.1.2
       '@types/node':
         specifier: ^14.14.21
         version: 14.17.4
-      '@types/semver':
-        specifier: ^7.5.1
-        version: 7.5.1
       '@types/sinon':
         specifier: ^9.0.10
         version: 9.0.10
@@ -384,6 +441,9 @@ importers:
       chai-as-promised:
         specifier: ^7.1.1
         version: 7.1.1(chai@4.3.4)
+      chai-spies:
+        specifier: ^1.0.0
+        version: 1.0.0(chai@4.3.4)
       copy-webpack-plugin:
         specifier: ^9.0.0
         version: 9.0.0(webpack@5.62.1)
@@ -393,6 +453,9 @@ importers:
       css-loader:
         specifier: ^5.2.5
         version: 5.2.5(webpack@5.62.1)
+      env-cmd:
+        specifier: ^10.1.0
+        version: 10.1.0
       eslint:
         specifier: ^7.9.0
         version: 7.29.0
@@ -408,21 +471,45 @@ importers:
       eslint-plugin-prettier:
         specifier: ^4.0.0
         version: 4.0.0(eslint-config-prettier@8.3.0)(eslint@7.29.0)(prettier@2.5.1)
+      glob:
+        specifier: ^7.1.6
+        version: 7.1.6
       html-webpack-plugin:
         specifier: ^5.3.1
         version: 5.3.1(webpack@5.62.1)
+      husky:
+        specifier: ^8.0.3
+        version: 8.0.3
       lint-staged:
         specifier: ^10.5.4
         version: 10.5.4
       mocha:
         specifier: ^10.2.0
         version: 10.2.0
+      mocha-junit-reporter:
+        specifier: ^2.0.2
+        version: 2.0.2(mocha@10.2.0)
+      mochawesome:
+        specifier: 7.0.1
+        version: 7.0.1(mocha@10.2.0)
+      mock-fs:
+        specifier: ^5.1.2
+        version: 5.2.0
       mocked-env:
         specifier: ^1.3.5
         version: 1.3.5(supports-color@9.4.0)
+      mssql:
+        specifier: ^9.1.1
+        version: 9.1.1
+      mustache:
+        specifier: ^4.2.0
+        version: 4.2.0
       nyc:
         specifier: ^15.1.0
         version: 15.1.0(supports-color@9.4.0)
+      playwright:
+        specifier: ^1.22.2
+        version: 1.22.2
       prettier:
         specifier: ^2.4.1
         version: 2.5.1
@@ -462,6 +549,9 @@ importers:
       uuid:
         specifier: ^8.3.2
         version: 8.3.2
+      vscode-extension-tester:
+        specifier: ^5.9.1
+        version: 5.9.1(mocha@10.2.0)(typescript@4.5.5)
       webpack:
         specifier: ^5.38.1
         version: 5.62.1(webpack-cli@4.7.2)
@@ -8447,10 +8537,6 @@ packages:
   /@types/semver@7.3.8:
     resolution: {integrity: sha512-D/2EJvAlCEtYFEYmmlGwbGXuK886HzyCc3nZX/tkFTQdEU8jZDAgiv08P162yB17y4ZXZoq7yFAnW4GDBb9Now==}
 
-  /@types/semver@7.5.0:
-    resolution: {integrity: sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==}
-    dev: true
-
   /@types/semver@7.5.1:
     resolution: {integrity: sha512-cJRQXpObxfNKkFAZbJl2yjWtJCqELQIdShsogr1d2MilP8dKD9TE/nEKHkJgUNHdGKCQaf9HbIynuV2csLGVLg==}
     dev: true
@@ -9591,7 +9677,7 @@ packages:
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@7.29.0)
       '@types/json-schema': 7.0.12
-      '@types/semver': 7.5.0
+      '@types/semver': 7.5.1
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.0.4)
@@ -9611,7 +9697,7 @@ packages:
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.15.0)
       '@types/json-schema': 7.0.12
-      '@types/semver': 7.5.0
+      '@types/semver': 7.5.1
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.2.2)
@@ -19980,6 +20066,21 @@ packages:
     resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
     dev: false
 
+  /monaco-page-objects@3.9.1(selenium-webdriver@4.10.0)(typescript@4.5.5):
+    resolution: {integrity: sha512-Y/haEkl0U5MPH2krk6hyOpSqUdzqY9VIW4NPz48i6QHP1hSCInW2ffXl1zisStv0vBWBrDr8hu5n6Q1i7z99PQ==}
+    peerDependencies:
+      selenium-webdriver: ^4.6.1
+      typescript: '>=4.6.2'
+    dependencies:
+      clipboardy: 3.0.0
+      clone-deep: 4.0.1
+      compare-versions: 6.1.0
+      fs-extra: 11.1.1
+      selenium-webdriver: 4.10.0
+      ts-essentials: 9.3.2(typescript@4.5.5)
+      typescript: 4.5.5
+    dev: true
+
   /monaco-page-objects@3.9.1(selenium-webdriver@4.10.0)(typescript@5.0.4):
     resolution: {integrity: sha512-Y/haEkl0U5MPH2krk6hyOpSqUdzqY9VIW4NPz48i6QHP1hSCInW2ffXl1zisStv0vBWBrDr8hu5n6Q1i7z99PQ==}
     peerDependencies:
@@ -24832,6 +24933,14 @@ packages:
       typescript: 5.2.2
     dev: true
 
+  /ts-essentials@9.3.2(typescript@4.5.5):
+    resolution: {integrity: sha512-JxKJzuWqH1MmH4ZFHtJzGEhkfN3QvVR3C3w+4BIoWeoY68UVVoA2Np/Bca9z0IPSErVCWhv439aT0We4Dks8kQ==}
+    peerDependencies:
+      typescript: '>=4.1.0'
+    dependencies:
+      typescript: 4.5.5
+    dev: true
+
   /ts-essentials@9.3.2(typescript@5.0.4):
     resolution: {integrity: sha512-JxKJzuWqH1MmH4ZFHtJzGEhkfN3QvVR3C3w+4BIoWeoY68UVVoA2Np/Bca9z0IPSErVCWhv439aT0We4Dks8kQ==}
     peerDependencies:
@@ -26063,8 +26172,37 @@ packages:
       monaco-page-objects: ^3.9.1
       selenium-webdriver: ^4.6.1
     dependencies:
-      monaco-page-objects: 3.9.1(selenium-webdriver@4.10.0)(typescript@5.0.4)
+      monaco-page-objects: 3.9.1(selenium-webdriver@4.10.0)(typescript@4.5.5)
       selenium-webdriver: 4.10.0
+    dev: true
+
+  /vscode-extension-tester@5.9.1(mocha@10.2.0)(typescript@4.5.5):
+    resolution: {integrity: sha512-dWUUZWiLbjch9yXrdd1GH/LdjZodn4FbNDraffFyON1qEIVio0Z3hwUunKmLBNFQWRseCJfFs5peBqoF5bGo0g==}
+    hasBin: true
+    peerDependencies:
+      mocha: '>=5.2.0'
+      typescript: '>=4.6.2'
+    dependencies:
+      '@types/selenium-webdriver': 4.1.15
+      '@vscode/vsce': 2.20.1
+      commander: 11.0.0
+      compare-versions: 6.1.0
+      fs-extra: 11.1.1
+      glob: 8.1.0
+      got: 13.0.0
+      hpagent: 1.2.0
+      js-yaml: 4.1.0
+      mocha: 10.2.0
+      monaco-page-objects: 3.9.1(selenium-webdriver@4.10.0)(typescript@4.5.5)
+      sanitize-filename: 1.6.3
+      selenium-webdriver: 4.10.0
+      targz: 1.0.1
+      typescript: 4.5.5
+      unzipper: 0.10.14
+      vscode-extension-tester-locators: 3.7.1(monaco-page-objects@3.9.1)(selenium-webdriver@4.10.0)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
     dev: true
 
   /vscode-extension-tester@5.9.1(mocha@10.2.0)(typescript@5.0.4):
@@ -26335,7 +26473,7 @@ packages:
     dependencies:
       bufferutil: 4.0.7
       debug: 2.6.9(supports-color@9.4.0)
-      es5-ext: 0.10.53
+      es5-ext: 0.10.62
       typedarray-to-buffer: 3.1.5
       utf-8-validate: 5.0.10
       yaeti: 0.0.6

@@ -53,7 +53,7 @@ jobs:
       - name: List cases for schedule
         id: schedule-cases
         if: ${{  github.event_name == 'schedule' }}
-        working-directory: packages/tests/src/e2e
+        working-directory: packages/cli/tests/e2e
         run: |
           cases=`find . -wholename "*.tests.ts" | jq -Rsc '[split("\n") | .[]| select(.!="")]'`
           echo "cases=$cases" >> $GITHUB_OUTPUT
@@ -61,7 +61,7 @@ jobs:
       - name: List cases for dispatch
         id: dispatch-cases
         if: ${{  github.event_name == 'workflow_dispatch' }}
-        working-directory: packages/tests/src/e2e
+        working-directory: packages/cli/tests/e2e
         run: |
           inputCases='${{ github.event.inputs.cases }}'
           if [ -z "$inputCases" ]; then
@@ -74,7 +74,7 @@ jobs:
       - name: List cases for pull request
         id: pr-cases
         if: ${{  github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'teamsfx-bot/TeamsFx'  }}
-        working-directory: packages/tests/src/e2e
+        working-directory: packages/cli/tests/e2e
         run: |
           cases=`find ./bot ./frontend -path "*.tests.ts" -and \
             -not '(' -path '*/*.dotnet.tests.ts' -or -path '*/Blazor*' ')' \
@@ -82,17 +82,17 @@ jobs:
           echo "cases=$cases" >> $GITHUB_OUTPUT
 
       - name: E2E Test clean
-        working-directory: packages/tests
+        working-directory: packages/cli
         run: |
           npm run test:e2e:clean
 
       - name: Archive Test Plan
         if: ${{ github.event.inputs.target-testplan-name != '' }}
-        working-directory: ./packages/tests
+        working-directory: ./packages/cli
         run: |
           pnpm install
-          testplanid=`npx ts-node src/scripts/testPlan.ts obtain vscode ${{ github.event.inputs.target-testplan-name }}`
-          npx ts-node src/scripts/testPlan.ts archive $testplanid
+          testplanid=`npx ts-node scripts/testPlan.ts obtain vscode ${{ github.event.inputs.target-testplan-name }}`
+          npx ts-node scripts/testPlan.ts archive $testplanid
   
       - name: Upload testplan to artifact
         if: ${{ github.event.inputs.target-testplan-name != '' }}
@@ -100,7 +100,7 @@ jobs:
         with:
           name: testplan
           path: |
-            ./packages/tests/testplan.json
+            ./packages/cli/testplan.json
 
 
   execute-case:
@@ -190,7 +190,7 @@ jobs:
         with:
           repository: OfficeDev/TeamsFx-Samples
           ref: dev
-          path: packages/tests/src/e2e/resource
+          path: packages/cli/tests/e2e/resource
 
       - name: Download samples(rc)
         if: github.event_name == 'workflow_dispatch' && startsWith(matrix.cases, './samples/') && contains(matrix.cases, 'ProactiveMessage') == false && contains(matrix.cases, 'SignatureOutlook') == false
@@ -198,7 +198,7 @@ jobs:
         with:
           repository: OfficeDev/TeamsFx-Samples
           ref: v3
-          path: packages/tests/src/e2e/resource
+          path: packages/cli/tests/e2e/resource
 
       - name: Download samples from another repo
         if: startsWith(matrix.cases, './samples/') && contains(matrix.cases, 'ProactiveMessage')
@@ -206,7 +206,7 @@ jobs:
         with:
           repository: OfficeDev/Microsoft-Teams-Samples
           ref: main
-          path: packages/tests/src/e2e/resource
+          path: packages/cli/tests/e2e/resource
       
       - name: Download samples from office repo
         if: startsWith(matrix.cases, './samples/') && contains(matrix.cases, 'SignatureOutlook')
@@ -214,10 +214,10 @@ jobs:
         with:
           repository: OfficeDev/Office-Add-in-samples
           ref: main
-          path: packages/tests/src/e2e/resource
+          path: packages/cli/tests/e2e/resource
 
       - name: run test
-        working-directory: packages/tests
+        working-directory: packages/cli
         run: |
           npm run test:e2e:parallel
 
