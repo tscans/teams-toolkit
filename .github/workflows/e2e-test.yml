@@ -82,7 +82,7 @@ jobs:
           echo "cases=$cases" >> $GITHUB_OUTPUT
 
       - name: E2E Test clean
-        working-directory: packages/cli
+        working-directory: packages/tests
         run: |
           npm run test:e2e:clean
 
