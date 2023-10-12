@@ -18,5 +18,5 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 process.env.TEAMSFX_CLI_BIN_NAME = "teamsapp";
-const cli = require("./lib");
+const cli = require("./src/index");
 cli.start("teamsapp");

@@ -1,7 +1,12 @@
 {
   "extends": "@istanbuljs/nyc-config-typescript",
   "all": true,
-  "include": ["src/**/*.ts", "src/**/*.js"],
+  "include": [
+    "src/**/*.ts", 
+    "src/**/*.js",
+    "node_modules/@microsoft/teamsfx-core/src/**/*.ts",
+    "node_modules/@microsoft/teamsfx-core/src/**/*.js"
+  ],
   "exclude": [
     "src/cmds/preview/depsChecker/**/*",
     "src/cmds/preview/preview.ts",
@@ -17,5 +22,6 @@
   ],
   "reporter": ["html", "text", "json-summary", "cobertura", "lcov"],
   "check-coverage": true,
-  "lines": 80
+  "lines": 80,
+  "excludeNodeModules": false
 }

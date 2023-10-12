@@ -10,7 +10,7 @@ const asyncLocalStorage = new AsyncLocalStorage<string>();
 export class Correlator {
   static run<T extends unknown[], R>(work: (...args: [...T]) => R, ...args: [...T]): R {
     const id = uuid.v4();
-    return asyncLocalStorage.run<R>(id, () => work(...args));
+    return asyncLocalStorage.run<R, any[]>(id, () => work(...args));
   }
 
   static runWithId<T extends unknown[], R>(
@@ -19,7 +19,7 @@ export class Correlator {
     ...args: [...T]
   ): R {
     id = id ? id : uuid.v4();
-    return asyncLocalStorage.run<R>(id, () => work(...args));
+    return asyncLocalStorage.run<R, any[]>(id, () => work(...args));
   }
 
   static getId(): string {
