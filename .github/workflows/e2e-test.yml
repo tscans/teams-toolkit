@@ -24,39 +24,39 @@ on:
   pull_request_target:
 
 jobs:
-  setup:
-    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'teamsfx-bot/TeamsFx') }}
-    runs-on: ubuntu-latest
-    outputs:
-      cases: ${{ steps.schedule-cases.outputs.cases || steps.dispatch-cases.outputs.cases || steps.pr-cases.outputs.cases }}
-    env:
-      AZURE_ACCOUNT_NAME: ${{ secrets.TEST_USER_NAME }}
-      AZURE_ACCOUNT_OBJECT_ID: ${{ secrets.TEST_USER_OBJECT_ID }}
-      AZURE_ACCOUNT_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.TEST_SUBSCRIPTION_ID }}
-      AZURE_TENANT_ID: ${{ secrets.TEST_TENANT_ID }}
-      M365_ACCOUNT_NAME: ${{ secrets.TEST_USER_NAME }}
-      M365_ACCOUNT_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-      M365_TENANT_ID: ${{ secrets.TEST_TENANT_ID_2 }}
-      CI_ENABLED: "true"
-      M365_ACCOUNT_COLLABORATOR: ${{ secrets.TEST_COLLABORATOR_USER_NAME }}
-      AZURE_DEVOPS_EXT_PAT: ${{ secrets.ADO_PAT }}
-      AUTO_TEST_PLAN_ID: ${{ github.event.inputs.target-testplan-name }}
-      ADO_TOKEN: ${{ secrets.ADO_PAT }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  # setup:
+  #   if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'teamsfx-bot/TeamsFx') }}
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     cases: ${{ steps.schedule-cases.outputs.cases || steps.dispatch-cases.outputs.cases || steps.pr-cases.outputs.cases }}
+  #   env:
+  #     AZURE_ACCOUNT_NAME: ${{ secrets.TEST_USER_NAME }}
+  #     AZURE_ACCOUNT_OBJECT_ID: ${{ secrets.TEST_USER_OBJECT_ID }}
+  #     AZURE_ACCOUNT_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+  #     AZURE_SUBSCRIPTION_ID: ${{ secrets.TEST_SUBSCRIPTION_ID }}
+  #     AZURE_TENANT_ID: ${{ secrets.TEST_TENANT_ID }}
+  #     M365_ACCOUNT_NAME: ${{ secrets.TEST_USER_NAME }}
+  #     M365_ACCOUNT_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+  #     M365_TENANT_ID: ${{ secrets.TEST_TENANT_ID_2 }}
+  #     CI_ENABLED: "true"
+  #     M365_ACCOUNT_COLLABORATOR: ${{ secrets.TEST_COLLABORATOR_USER_NAME }}
+  #     AZURE_DEVOPS_EXT_PAT: ${{ secrets.ADO_PAT }}
+  #     AUTO_TEST_PLAN_ID: ${{ github.event.inputs.target-testplan-name }}
+  #     ADO_TOKEN: ${{ secrets.ADO_PAT }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18
       
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
+  #     - uses: pnpm/action-setup@v2
+  #       with:
+  #         version: 8
 
-      - name: setup project
-        uses: ./.github/actions/setup-project
+  #     - name: setup project
+  #       uses: ./.github/actions/setup-project
 
       # - name: List cases for schedule
       #   id: schedule-cases
@@ -149,16 +149,17 @@ jobs:
 
       - name: Setup project
         run: |
-          npm run setup
+          pnpm install
+          pnpm run build -F @microsoft/teamsfx-cli...
 
       - name: print system info
         run: |
           lscpu
 
       - name: run test
-        working-directory: packages/cli
+        working-directory: packages/fx-core
         run: |
-          npx nyc mocha --reporter @mochajs/json-file-reporter src/e2e/bot/EchoBotHappyPath.tests.ts
+          npx nyc mocha ../cli/tests/e2e/bot/EchoBotHappyPath.tests.ts
 
       # - name: get report name
       #   id: get-report-name
