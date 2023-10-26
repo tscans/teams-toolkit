@@ -130,9 +130,7 @@ jobs:
       SIDELOADING_SERVICE_ENDPOINT: ${{ secrets.SIDELOADING_SERVICE_ENDPOINT }}
       SIDELOADING_SERVICE_SCOPE: ${{ secrets.SIDELOADING_SERVICE_SCOPE }}
       ADO_TOKEN: ${{ secrets.ADO_PAT }}
-    needs: setup
     runs-on: ubuntu-latest
-    name: test coverage for E2E
 
     steps:
       - name: Checkout
