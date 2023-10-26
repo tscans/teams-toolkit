@@ -112,7 +112,6 @@ jobs:
 
 
   execute-case:
-    if: ${{ needs.setup.outputs.cases }}
     env:
       AZURE_ACCOUNT_NAME: ${{ secrets.TEST_USER_NAME }}
       AZURE_ACCOUNT_OBJECT_ID: ${{ secrets.TEST_USER_OBJECT_ID }}
