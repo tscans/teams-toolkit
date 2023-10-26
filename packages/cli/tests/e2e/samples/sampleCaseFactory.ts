@@ -21,7 +21,7 @@ import { Cleaner } from "../../commonlib/cleaner";
 import { TemplateProjectFolder } from "../../utils/constants";
 import { environmentNameManager } from "@microsoft/teamsfx-core";
 import { AadValidator, FrontendValidator, BotValidator, FunctionValidator } from "../../commonlib";
-import m365Login from "@microsoft/teamsfx-cli/src/commonlib/m365Login";
+import m365Login from "../../../src/commonlib/m365Login";
 
 export abstract class CaseFactory {
   public sampleName: TemplateProjectFolder;

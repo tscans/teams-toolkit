@@ -8,7 +8,7 @@ import axios from "axios";
 
 import { M365TokenProvider } from "@microsoft/teamsfx-api";
 
-import MockM365TokenProvider from "@microsoft/teamsfx-cli/src/commonlib/m365LoginUserPassword";
+import MockM365TokenProvider from "../../src/commonlib/m365LoginUserPassword";
 import { IAADDefinition, IAadObject, IAadObjectLocal } from "./interfaces/IAADDefinition";
 import { AppStudioScopes } from "@microsoft/teamsfx-core/build/common/tools";
 import { EnvConstants } from "../commonlib/constants";

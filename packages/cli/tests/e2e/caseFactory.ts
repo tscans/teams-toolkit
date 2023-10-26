@@ -21,7 +21,7 @@ import { Cleaner } from "../commonlib/cleaner";
 import { Capability } from "../utils/constants";
 import { environmentNameManager, ProgrammingLanguage } from "@microsoft/teamsfx-core";
 import { AadValidator, FrontendValidator, BotValidator, FunctionValidator } from "../commonlib";
-import m365Login from "@microsoft/teamsfx-cli/src/commonlib/m365Login";
+import m365Login from "../../src/commonlib/m365Login";
 
 export abstract class CaseFactory {
   public capability: Capability;

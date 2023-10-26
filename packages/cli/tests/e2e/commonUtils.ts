@@ -19,8 +19,8 @@ import path from "path";
 import { promisify } from "util";
 import { v4 as uuidv4 } from "uuid";
 import { YAMLMap, YAMLSeq, parseDocument } from "yaml";
-import MockAzureAccountProvider from "@microsoft/teamsfx-cli/src/commonlib/azureLoginUserPassword";
-import m365Login from "@microsoft/teamsfx-cli/src/commonlib/m365Login";
+import MockAzureAccountProvider from "../../src/commonlib/azureLoginUserPassword";
+import m365Login from "../../src/commonlib/m365Login";
 import {
   AadManager,
   AadValidator,
