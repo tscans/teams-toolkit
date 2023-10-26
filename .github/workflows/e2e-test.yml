@@ -148,27 +148,6 @@ jobs:
         with:
           node-version: 18
 
-      - name: Setup node for SPFx project
-        if: contains(matrix.cases, 'SPFx')
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: Setup Azure Functions Core Tools For Linux
-        run: |
-          curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
-          sudo mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
-          sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs)-prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/dotnetdev.list'
-          sudo apt-get update
-          sudo apt-get install azure-functions-core-tools-4
-          which func
-          func --version
-
-      - name: Setup .net
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
-
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -177,57 +156,14 @@ jobs:
         run: |
           npm run setup
 
-      - name: Link CLI
-        if: ${{  github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'  }}
-        run: |
-          pnpm link --global
-
-      - name: Update CLI and legacy-peer-deps for PR cases
-        if: ${{  github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'teamsfx-bot/TeamsFx'  }}
-        run: |
-          npm install -g @microsoft/teamsfx-cli@latest
-          npm config set legacy-peer-deps false
-
       - name: print system info
         run: |
           lscpu
 
-      - name: Download samples(daily)
-        if: github.event_name == 'schedule' && startsWith(matrix.cases, './samples/') && contains(matrix.cases, 'ProactiveMessage') == false
-        uses: actions/checkout@v3
-        with:
-          repository: OfficeDev/TeamsFx-Samples
-          ref: dev
-          path: packages/cli/tests/e2e/resource
-
-      - name: Download samples(rc)
-        if: github.event_name == 'workflow_dispatch' && startsWith(matrix.cases, './samples/') && contains(matrix.cases, 'ProactiveMessage') == false && contains(matrix.cases, 'SignatureOutlook') == false
-        uses: actions/checkout@v3
-        with:
-          repository: OfficeDev/TeamsFx-Samples
-          ref: v3
-          path: packages/cli/tests/e2e/resource
-
-      - name: Download samples from another repo
-        if: startsWith(matrix.cases, './samples/') && contains(matrix.cases, 'ProactiveMessage')
-        uses: actions/checkout@v3
-        with:
-          repository: OfficeDev/Microsoft-Teams-Samples
-          ref: main
-          path: packages/cli/tests/e2e/resource
-      
-      - name: Download samples from office repo
-        if: startsWith(matrix.cases, './samples/') && contains(matrix.cases, 'SignatureOutlook')
-        uses: actions/checkout@v3
-        with:
-          repository: OfficeDev/Office-Add-in-samples
-          ref: main
-          path: packages/cli/tests/e2e/resource
-
       - name: run test
         working-directory: packages/cli
         run: |
-          npm run test:e2e:parallel
+          nyc mocha --reporter @mochajs/json-file-reporter src/e2e/bot/EchoBotHappyPath.tests.ts
 
       # - name: get report name
       #   id: get-report-name

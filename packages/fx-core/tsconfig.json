@@ -8,7 +8,7 @@
     "outDir": "build",
     "lib": ["es6", "dom.iterable", "dom"],
     "allowJs": true,
-    "importHelpers": true,
+    "importHelpers": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
