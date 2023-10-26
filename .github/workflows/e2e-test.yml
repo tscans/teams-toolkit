@@ -58,36 +58,36 @@ jobs:
       - name: setup project
         uses: ./.github/actions/setup-project
 
-      - name: List cases for schedule
-        id: schedule-cases
-        if: ${{  github.event_name == 'schedule' }}
-        working-directory: packages/cli/tests/e2e
-        run: |
-          cases=`find . -wholename "*.tests.ts" | jq -Rsc '[split("\n") | .[]| select(.!="")]'`
-          echo "cases=$cases" >> $GITHUB_OUTPUT
+      # - name: List cases for schedule
+      #   id: schedule-cases
+      #   if: ${{  github.event_name == 'schedule' }}
+      #   working-directory: packages/cli/tests/e2e
+      #   run: |
+      #     cases=`find . -wholename "*.tests.ts" | jq -Rsc '[split("\n") | .[]| select(.!="")]'`
+      #     echo "cases=$cases" >> $GITHUB_OUTPUT
 
-      - name: List cases for dispatch
-        id: dispatch-cases
-        if: ${{  github.event_name == 'workflow_dispatch' }}
-        working-directory: packages/cli/tests/e2e
-        run: |
-          inputCases='${{ github.event.inputs.cases }}'
-          if [ -z "$inputCases" ]; then
-            allCases=`find . -wholename "*.tests.ts" | jq -Rsc '[split("\n") | .[]| select(.!="")]'`
-            echo "cases=$allCases" >> $GITHUB_OUTPUT
-          else
-            echo "cases=$inputCases" >> $GITHUB_OUTPUT
-          fi
+      # - name: List cases for dispatch
+      #   id: dispatch-cases
+      #   if: ${{  github.event_name == 'workflow_dispatch' }}
+      #   working-directory: packages/cli/tests/e2e
+      #   run: |
+      #     inputCases='${{ github.event.inputs.cases }}'
+      #     if [ -z "$inputCases" ]; then
+      #       allCases=`find . -wholename "*.tests.ts" | jq -Rsc '[split("\n") | .[]| select(.!="")]'`
+      #       echo "cases=$allCases" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "cases=$inputCases" >> $GITHUB_OUTPUT
+      #     fi
 
-      - name: List cases for pull request
-        id: pr-cases
-        if: ${{  github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'teamsfx-bot/TeamsFx'  }}
-        working-directory: packages/cli/tests/e2e
-        run: |
-          cases=`find ./bot ./frontend -path "*.tests.ts" -and \
-            -not '(' -path '*/*.dotnet.tests.ts' -or -path '*/Blazor*' ')' \
-            | jq -Rsc '[split("\n") | .[]| select(.!="")]'`
-          echo "cases=$cases" >> $GITHUB_OUTPUT
+      # - name: List cases for pull request
+      #   id: pr-cases
+      #   if: ${{  github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'teamsfx-bot/TeamsFx'  }}
+      #   working-directory: packages/cli/tests/e2e
+      #   run: |
+      #     cases=`find ./bot ./frontend -path "*.tests.ts" -and \
+      #       -not '(' -path '*/*.dotnet.tests.ts' -or -path '*/Blazor*' ')' \
+      #       | jq -Rsc '[split("\n") | .[]| select(.!="")]'`
+      #     echo "cases=$cases" >> $GITHUB_OUTPUT
 
       # - name: E2E Test clean
       #   working-directory: packages/tests
@@ -163,7 +163,7 @@ jobs:
       - name: run test
         working-directory: packages/cli
         run: |
-          nyc mocha --reporter @mochajs/json-file-reporter src/e2e/bot/EchoBotHappyPath.tests.ts
+          npx nyc mocha --reporter @mochajs/json-file-reporter src/e2e/bot/EchoBotHappyPath.tests.ts
 
       # - name: get report name
       #   id: get-report-name
