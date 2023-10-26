@@ -148,7 +148,7 @@ jobs:
       - name: Setup project
         run: |
           pnpm install
-          pnpm run build -F @microsoft/teamsfx-cli...
+          pnpm -F @microsoft/teamsfx-cli... build
 
       - name: print system info
         run: |
