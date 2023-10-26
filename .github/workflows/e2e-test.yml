@@ -132,11 +132,7 @@ jobs:
       ADO_TOKEN: ${{ secrets.ADO_PAT }}
     needs: setup
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        cases: ${{ fromJson(needs.setup.outputs.cases) }}
-    name: ${{ matrix.cases }}
+    name: test coverage for E2E
 
     steps:
       - name: Checkout
