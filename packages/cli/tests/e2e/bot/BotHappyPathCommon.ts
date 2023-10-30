@@ -63,64 +63,67 @@ export async function happyPathTest(
   console.log(`[Successfully] scaffold to ${projectPath}`);
 
   // set subscription
-  await CliHelper.setSubscription(subscription, projectPath, env);
+  // await CliHelper.setSubscription(subscription, projectPath, env);
 
   console.log(`[Successfully] set subscription for ${projectPath}`);
 
-  // {
-  //   // provision
-  //   const result = await createResourceGroup(appName + "-rg", "eastus");
-  //   expect(result).to.be.true;
-  //   process.env["AZURE_RESOURCE_GROUP_NAME"] = appName + "-rg";
-  //   const { success } = await Executor.provision(projectPath, envName);
-  //   expect(success).to.be.true;
-  //   console.log(`[Successfully] provision for ${projectPath}`);
-  // }
+  {
+    // provision
+    const result = await createResourceGroup(appName + "-rg", "eastus");
+    expect(result).to.be.true;
+    process.env["AZURE_RESOURCE_GROUP_NAME"] = appName + "-rg";
+    const { success } = await Executor.provision(projectPath, envName);
+    expect(success).to.be.true;
+    console.log(`[Successfully] provision for ${projectPath}`);
+  }
 
-  // {
-  //   // Validate provision
-  //   // Get context
-  //   const context = await readContextMultiEnvV3(projectPath, envName);
+  {
+    // Validate provision
+    // Get context
+    const context = await readContextMultiEnvV3(projectPath, envName);
 
-  //   // Validate Bot Provision
-  //   const bot = new BotValidator(context, projectPath, envName);
-  //   await bot.validateProvisionV3(false);
-  // }
+    // Validate Bot Provision
+    const bot = new BotValidator(context, projectPath, envName);
+    await bot.validateProvisionV3(false);
+  }
 
-  // // deploy
+  // deploy
   // const cmdStr = `${prefixCmd} deploy`;
   // await execAsyncWithRetry(cmdStr, {
   //   cwd: projectPath,
   //   env: env,
   //   timeout: 0,
   // });
-  // console.log(`[Successfully] deploy for ${projectPath}`);
+  await runCommand(`deploy --folder projectPath`);
+  console.log(`[Successfully] deploy for ${projectPath}`);
 
-  // {
-  //   // Validate deployment
+  {
+    // Validate deployment
 
-  //   // Get context
-  //   const context = await readContextMultiEnvV3(projectPath, envName);
+    // Get context
+    const context = await readContextMultiEnvV3(projectPath, envName);
 
-  //   // Validate Bot Deploy
-  //   const bot = new BotValidator(context, projectPath, envName);
-  //   await bot.validateDeploy();
-  // }
+    // Validate Bot Deploy
+    const bot = new BotValidator(context, projectPath, envName);
+    await bot.validateDeploy();
+  }
 
-  // // test (validate)
+  // test (validate)
   // await execAsyncWithRetry(`${prefixCmd} validate --env ${envName}`, {
   //   cwd: projectPath,
   //   env: env,
   //   timeout: 0,
   // });
+  await runCommand(`validate --folder projectPath --env ${envName}`);
 
-  // // package
+  // package
   // await execAsyncWithRetry(`${prefixCmd} package --env ${envName}`, {
   //   cwd: projectPath,
   //   env: env,
   //   timeout: 0,
   // });
+  await runCommand(`package --env ${envName} --folder ${projectPath}`);
 
   console.log(`[Successfully] start to clean up for ${projectPath}`);
-  // await cleanUp(appName, projectPath, false, true, false);
+  await cleanUp(appName, projectPath, false, true, false);
 }
