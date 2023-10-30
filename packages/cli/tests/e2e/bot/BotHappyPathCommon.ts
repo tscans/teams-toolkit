@@ -23,6 +23,7 @@ import { expect } from "chai";
 import { CliHelper } from "../../commonlib/cliHelper";
 
 async function runCommand(cmd: string) {
+  console.log('---------------- command: ', cmd)
   process.argv = [
     "node", // Not used but a value is required at this index in the array
     "cli.js", // Not used but a value is required at this index in the array
