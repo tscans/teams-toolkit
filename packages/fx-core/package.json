@@ -63,7 +63,7 @@
     "lint:fix": "eslint --fix \"src/**/*.ts\" \"tests/**/*.ts\"",
     "postbuild": "node ./scripts/download-templates-zip.js $(git tag -l templates*)",
     "prepublishOnly": "npm run build",
-    "package": "rimraf build && webpack --mode production --config ./webpack.config.js",
+    "package": "rimraf build && webpack --config ./webpack.config.js",
     "check-sensitive": "npx eslint --plugin 'no-secrets' --cache --ignore-pattern 'package.json' --ignore-pattern 'package-lock.json'",
     "precommit": "npm run check-sensitive && lint-staged",
     "install:tabs": "cd tabs && npm install",

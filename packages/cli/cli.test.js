@@ -26,6 +26,10 @@ describe("cli", async () => {
   });
 });
 
+const result = JSON.stringify(global.__coverage__);
+console.log("============================== bb test ==============================");
+console.log("result:", result);
+
 /**
  * Programmatically set arguments and execute the CLI script
  *
