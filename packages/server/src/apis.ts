@@ -177,6 +177,10 @@ export interface IServerConnection {
     inputs: Inputs,
     token: CancellationToken
   ) => Promise<Result<ApiOperation[], FxError>>;
+  checkAndInstallTestTool: (
+    inputs: Inputs,
+    token: CancellationToken
+  ) => Promise<Result<string, FxError>>;
 }
 
 /**

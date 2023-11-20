@@ -52,10 +52,15 @@ export interface FuncInstallOptions {
   version: string;
 }
 
-export interface TestToolInstallOptions {
+export interface NpmTestToolInstallOptions {
   symlinkDir: string;
   projectPath: string;
   versionRange: string;
 }
+export interface BinaryTestToolInstallOptions {
+  majorVersion: string;
+}
+
+type TestToolInstallOptions = NpmTestToolInstallOptions | BinaryTestToolInstallOptions;
 
 export type InstallOptions = BaseInstallOptions | FuncInstallOptions | TestToolInstallOptions;
