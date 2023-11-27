@@ -52,6 +52,10 @@ export class LaunchTeamsClientTerminal extends BaseTaskTerminal {
     );
   }
 
+  protected recommendTestTool(): boolean {
+    return false;
+  }
+
   private async _do(): Promise<Result<Void, FxError>> {
     if (!this.args?.manifestPath) {
       throw BaseTaskTerminal.taskDefinitionError("manifestPath");

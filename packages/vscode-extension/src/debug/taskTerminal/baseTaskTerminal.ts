@@ -18,6 +18,8 @@ import * as commonUtils from "../commonUtils";
 import { TelemetryProperty } from "../../telemetry/extTelemetryEvents";
 import { performance } from "perf_hooks";
 import { Correlator } from "@microsoft/teamsfx-core";
+import { openTestToolDisplayMessage, openTestToolMessage } from "../constants";
+import { isTestToolEnabledProject } from "@microsoft/teamsfx-core";
 
 const ControlCodes = {
   CtrlC: "\u0003",
@@ -68,6 +70,14 @@ export abstract class BaseTaskTerminal implements vscode.Pseudoterminal {
       // TODO: add color
       this.writeEmitter.fire(`${error?.message as string}\r\n`);
       const fxError = assembleError(error);
+      if (this.recommendTestTool()) {
+        const recommendTestToolMessage = openTestToolMessage();
+        const recommendTestToolDisplayMessage = openTestToolDisplayMessage();
+        this.writeEmitter.fire(recommendTestToolMessage);
+        fxError.message += ` ${recommendTestToolMessage}`;
+        fxError.displayMessage += ` ${recommendTestToolDisplayMessage}`;
+      }
+
       if (outputError) {
         showError(fxError).catch(() => {
           // ignore
@@ -86,6 +96,13 @@ export abstract class BaseTaskTerminal implements vscode.Pseudoterminal {
   }
 
   protected abstract do(): Promise<Result<Void, FxError>>;
+
+  protected recommendTestTool(): boolean {
+    return !!(
+      globalVariables.workspaceUri?.fsPath &&
+      isTestToolEnabledProject(globalVariables.workspaceUri.fsPath)
+    );
+  }
 
   protected getDurationInSeconds(): number | undefined {
     if (!this.startTime) {

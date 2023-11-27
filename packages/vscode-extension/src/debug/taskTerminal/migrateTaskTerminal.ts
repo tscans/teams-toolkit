@@ -1,7 +1,5 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
 import * as vscode from "vscode";
 
@@ -17,5 +15,9 @@ export class MigrateTaskTerminal extends BaseTaskTerminal {
   async do(): Promise<Result<Void, FxError>> {
     await commonUtils.triggerV3Migration();
     return ok(Void);
+  }
+
+  protected recommendTestTool(): boolean {
+    return false;
   }
 }

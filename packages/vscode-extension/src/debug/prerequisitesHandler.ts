@@ -15,6 +15,7 @@ import {
   err,
   ok,
 } from "@microsoft/teamsfx-api";
+import { isTestToolEnabledProject } from "@microsoft/teamsfx-core";
 import {
   AppStudioScopes,
   DependencyStatus,
@@ -51,6 +52,8 @@ import * as commonUtils from "./commonUtils";
 import { Step } from "./commonUtils";
 import {
   DisplayMessages,
+  openTestToolDisplayMessage,
+  openTestToolMessage,
   prerequisiteCheckForGetStartedDisplayMessages,
   v3PrerequisiteCheckTaskDisplayMessages,
 } from "./constants";
@@ -519,7 +522,7 @@ function checkM365Account(
     additionalTelemetryProperties,
     async (): Promise<CheckResult> => {
       let result = ResultStatus.success;
-      let error = undefined;
+      let error: FxError | undefined = undefined;
       let loginHint = undefined;
       const failureMsg = Checker.M365Account;
       try {
@@ -736,13 +739,13 @@ async function handleCheckResults(
 
     if (shouldStop) {
       await progressHelper?.stop(false);
-      const message =
+      let message =
         getDefaultString(displayMessages.errorMessageKey) +
         " " +
         displayMessages.showDetailMessage();
 
       // show failure summary in display message
-      const displayMessage =
+      let displayMessage =
         util.format(
           localize("teamstoolkit.localDebug.failedCheckers"),
           failures.map((f) => f.failureMsg ?? f.checker).join(", ")
@@ -750,6 +753,17 @@ async function handleCheckResults(
         localize(displayMessages.errorDisplayMessageKey) +
         " " +
         displayMessages.showDetailDisplayMessage();
+
+      // Recommend to open test tool if M365 account check failed
+      if (failures.find((f) => f.checker === Checker.M365Account)) {
+        if (
+          globalVariables.workspaceUri?.fsPath &&
+          isTestToolEnabledProject(globalVariables.workspaceUri.fsPath)
+        ) {
+          message += ` ${openTestToolMessage()}`;
+          displayMessage += ` ${openTestToolDisplayMessage()}`;
+        }
+      }
 
       const errorOptions: UserErrorOptions = {
         source: ExtensionSource,

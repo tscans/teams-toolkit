@@ -5,6 +5,8 @@ import * as util from "util";
 import { Hub, TaskLabel } from "@microsoft/teamsfx-core";
 import { ExtensionErrors } from "../error";
 import { getDefaultString, localize } from "../utils/localizeUtils";
+import { isTestToolEnabledProject } from "@microsoft/teamsfx-core";
+import * as globalVariables from "../globalVariables";
 
 export const issueChooseLink = "https://github.com/OfficeDev/TeamsFx/issues/new/choose";
 export const issueLink = "https://github.com/OfficeDev/TeamsFx/issues/new?";
@@ -90,6 +92,15 @@ function stepPrefix(stepNumber: number) {
   return stepNumber > 1 ? `(Total: ${stepNumber} Steps)` : `(Total: ${stepNumber} Step)`;
 }
 
+export const openTestToolMessage = () =>
+  util.format(localize("teamstoolkit.localDebug.useTestTool"), "'Debug in Test Tool'");
+
+export const openTestToolDisplayMessage = () =>
+  util.format(
+    localize("teamstoolkit.localDebug.useTestTool"),
+    "[Debug in Test Tool](command:workbench.action.debug.selectandstart)"
+  );
+
 export const prerequisiteCheckForGetStartedDisplayMessages: DisplayMessages = {
   taskName: "Get Started Prerequisites Check",
   title: "Get Started Prerequisites Check",
@@ -171,6 +182,8 @@ export const baseTunnelDisplayMessages = Object.freeze({
   startTerminalMessage: "Starting local tunnel service", // begin pattern of problem matcher
   successTerminalMessage: "Local tunnel service is started successfully.", // end pattern of problem matcher
   errorTerminalMessage: "Failed to start local tunnel service.", // end pattern of problem matcher
+  showTestToolTipMessage: () => openTestToolMessage("devtunnel"),
+  showTestToolTipDisplayMessage: () => openTestToolDisplayMessage("devtunnel"),
 });
 
 export type TunnelDisplayMessages = typeof baseTunnelDisplayMessages;

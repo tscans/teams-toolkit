@@ -74,6 +74,11 @@ export class PrerequisiteTaskTerminal extends BaseTaskTerminal {
     });
   }
 
+  protected recommendTestTool(): boolean {
+    // Only M365 checker needs to recommend test tool.
+    return false;
+  }
+
   private async _do(telemetryProperties: {
     [key: string]: string;
   }): Promise<Result<Void, FxError>> {
