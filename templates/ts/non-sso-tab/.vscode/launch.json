@@ -173,7 +173,7 @@
             ],
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
-                "group": "group 1: Teams",
+                "group": "teamsfx-1-teams-local",
                 "order": 1
             },
             "stopAll": true
@@ -186,7 +186,7 @@
             ],
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
-                "group": "group 1: Teams",
+                "group": "teamsfx-1-teams-local",
                 "order": 2
             },
             "stopAll": true
@@ -199,7 +199,7 @@
             ],
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
-                "group": "group 2: Outlook",
+                "group": "teamsfx-2-outlook-local",
                 "order": 1
             },
             "stopAll": true
@@ -212,7 +212,7 @@
             ],
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
-                "group": "group 2: Outlook",
+                "group": "teamsfx-2-outlook-local",
                 "order": 2
             },
             "stopAll": true
@@ -225,7 +225,7 @@
             ],
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
-                "group": "group 3: the Microsoft 365 app",
+                "group": "teamsfx-3-m365-app-local",
                 "order": 1
             },
             "stopAll": true
@@ -238,7 +238,7 @@
             ],
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
-                "group": "group 3: the Microsoft 365 app",
+                "group": "teamsfx-3-m365-app-local",
                 "order": 2
             },
             "stopAll": true

@@ -7,7 +7,7 @@
           "request": "launch",
           "url": "https://teams.microsoft.com/l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
           "presentation": {
-              "group": "group 1: Teams",
+              "group": "teamsfx-1-teams-remote",
               "order": 3
           },
           "internalConsoleOptions": "neverOpen"
@@ -18,7 +18,7 @@
           "request": "launch",
           "url": "https://teams.microsoft.com/l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
           "presentation": {
-              "group": "group 1: Teams",
+              "group": "teamsfx-1-teams-remote",
               "order": 3
           },
           "internalConsoleOptions": "neverOpen"
@@ -29,7 +29,7 @@
           "request": "launch",
           "url": "https://outlook.office.com/host/${{M365_APP_ID}}?${account-hint}",
           "presentation": {
-              "group": "group 2: Outlook",
+              "group": "teamsfx-2-outlook-remote",
               "order": 3
           },
           "internalConsoleOptions": "neverOpen"
@@ -40,7 +40,7 @@
           "request": "launch",
           "url": "https://outlook.office.com/host/${{M365_APP_ID}}?${account-hint}",
           "presentation": {
-              "group": "group 2: Outlook",
+              "group": "teamsfx-2-outlook-remote",
               "order": 3
           },
           "internalConsoleOptions": "neverOpen"
@@ -51,7 +51,7 @@
           "request": "launch",
           "url": "https://www.office.com/m365apps/${{M365_APP_ID}}?auth=2&${account-hint}",
           "presentation": {
-              "group": "group 3: the Microsoft 365 app",
+              "group": "teamsfx-3-m365-app-remote",
               "order": 3
           },
           "internalConsoleOptions": "neverOpen"
@@ -62,7 +62,7 @@
           "request": "launch",
           "url": "https://www.office.com/m365apps/${{M365_APP_ID}}?auth=2&${account-hint}",
           "presentation": {
-              "group": "group 3: the Microsoft 365 app",
+              "group": "teamsfx-3-m365-app-remote",
               "order": 3
           },
           "internalConsoleOptions": "neverOpen"
@@ -142,7 +142,7 @@
           ],
           "preLaunchTask": "Start Teams App Locally",
           "presentation": {
-              "group": "group 1: Teams",
+              "group": "teamsfx-1-teams-local",
               "order": 1
           },
           "stopAll": true
@@ -154,7 +154,7 @@
           ],
           "preLaunchTask": "Start Teams App Locally",
           "presentation": {
-              "group": "group 1: Teams",
+              "group": "teamsfx-1-teams-local",
               "order": 2
           },
           "stopAll": true
@@ -166,7 +166,7 @@
           ],
           "preLaunchTask": "Start Teams App Locally",
           "presentation": {
-              "group": "group 2: Outlook",
+              "group": "teamsfx-2-outlook-local",
               "order": 1
           },
           "stopAll": true
@@ -178,7 +178,7 @@
           ],
           "preLaunchTask": "Start Teams App Locally",
           "presentation": {
-              "group": "group 2: Outlook",
+              "group": "teamsfx-2-outlook-local",
               "order": 2
           },
           "stopAll": true
@@ -190,7 +190,7 @@
           ],
           "preLaunchTask": "Start Teams App Locally",
           "presentation": {
-              "group": "group 3: the Microsoft 365 app",
+              "group": "teamsfx-3-m365-app-local",
               "order": 1
           },
           "stopAll": true
@@ -202,7 +202,7 @@
           ],
           "preLaunchTask": "Start Teams App Locally",
           "presentation": {
-              "group": "group 3: the Microsoft 365 app",
+              "group": "teamsfx-3-m365-app-local",
               "order": 2
           },
           "stopAll": true
