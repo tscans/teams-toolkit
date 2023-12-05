@@ -7,7 +7,7 @@
             "request": "launch",
             "url": "https://teams.microsoft.com/l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
             "presentation": {
-                "group": "3-remote",
+                "group": "teamsfx-3-remote",
                 "order": 1
             },
             "internalConsoleOptions": "neverOpen"
@@ -18,7 +18,7 @@
             "request": "launch",
             "url": "https://teams.microsoft.com/l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
             "presentation": {
-                "group": "3-remote",
+                "group": "teamsfx-3-remote",
                 "order": 2
             },
             "internalConsoleOptions": "neverOpen"
@@ -74,10 +74,10 @@
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
 {{#enableTestToolByDefault}}
-                "group": "2-local",
+                "group": "teamsfx-2-local",
 {{/enableTestToolByDefault}}
 {{^enableTestToolByDefault}}
-                "group": "1-local",
+                "group": "teamsfx-1-local",
 {{/enableTestToolByDefault}}
                 "order": 1
             },
@@ -92,10 +92,10 @@
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
 {{#enableTestToolByDefault}}
-                "group": "2-local",
+                "group": "teamsfx-2-local",
 {{/enableTestToolByDefault}}
 {{^enableTestToolByDefault}}
-                "group": "1-local",
+                "group": "teamsfx-1-local",
 {{/enableTestToolByDefault}}
                 "order": 2
             },
@@ -109,10 +109,10 @@
             "preLaunchTask": "Start Teams App (Test Tool)",
             "presentation": {
 {{#enableTestToolByDefault}}
-                "group": "1-local",
+                "group": "teamsfx-1-local",
 {{/enableTestToolByDefault}}
 {{^enableTestToolByDefault}}
-                "group": "2-local",
+                "group": "teamsfx-2-local",
 {{/enableTestToolByDefault}}
                 "order": 1
             },

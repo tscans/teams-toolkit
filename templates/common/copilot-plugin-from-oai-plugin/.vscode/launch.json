@@ -7,7 +7,7 @@
             "request": "launch",
             "url": "https://teams.microsoft.com?${account-hint}",
             "presentation": {
-                "group": "remote",
+                "group": "teamsfx-remote",
                 "order": 1
             },
             "internalConsoleOptions": "neverOpen"
@@ -18,7 +18,7 @@
             "request": "launch",
             "url": "https://teams.microsoft.com?${account-hint}",
             "presentation": {
-                "group": "remote",
+                "group": "teamsfx-remote",
                 "order": 2
             },
             "internalConsoleOptions": "neverOpen"
