@@ -443,14 +443,14 @@ async function ensureCopilotAccess(
         scopes: [copilotCheckServiceScope],
         showDialog: false,
       });
-      let hasCopilotAccess: boolean | undefined = undefined;
+      let hasCopilotAccess: "true" | "false" | "stale" | undefined = undefined;
       if (copilotTokenRes.isOk()) {
         hasCopilotAccess = await getCopilotStatus(copilotTokenRes.value);
       }
 
-      // true, false or undefined for error
-      ctx.properties[TelemetryProperty.DebugHasCopilotAccess] = String(!!hasCopilotAccess);
-      if (hasCopilotAccess === false) {
+      // true, false, stale or undefined for error
+      ctx.properties[TelemetryProperty.DebugHasCopilotAccess] = hasCopilotAccess ?? "undefined";
+      if (hasCopilotAccess === "false") {
         // copilot disabled
         return err(
           new UserError(
@@ -460,6 +460,8 @@ async function ensureCopilotAccess(
             localize("teamstoolkit.accountTree.copilotWarningTooltip")
           )
         );
+      } else if (hasCopilotAccess === "stale") {
+        // TODO: stale warning
       }
 
       return ok(undefined);

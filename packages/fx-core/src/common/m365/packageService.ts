@@ -338,7 +338,9 @@ export class PackageService {
   }
 
   @hooks([ErrorContextMW({ source: M365ErrorSource, component: M365ErrorComponent })])
-  public async getActiveExperiences(token: string): Promise<string[] | undefined> {
+  public async getActiveExperiences(
+    token: string
+  ): Promise<{ values: string[] | undefined; stale: boolean }> {
     try {
       const serviceUrl = await this.getTitleServiceUrl(token);
       this.logger?.debug(`Get active experiences from service URL ${serviceUrl} ...`);
@@ -351,8 +353,12 @@ export class PackageService {
       });
       const status = response.status;
       const activeExperiences = response.data?.activeExperiences as string[];
+      const nextInterval = (response.data?.nextInterval as number) ?? -1;
       this.logger?.debug(`(${status}) Active experiences: ${JSON.stringify(activeExperiences)}`);
-      return activeExperiences;
+      return {
+        values: activeExperiences,
+        stale: nextInterval > 0 && nextInterval < 30,
+      };
     } catch (error: any) {
       this.logger?.error("Fail to get active experiences.");
       if (error.response) {
@@ -366,11 +372,21 @@ export class PackageService {
     }
   }
 
-  public async getCopilotStatus(token: string): Promise<boolean | undefined> {
+  public async getCopilotStatus(token: string): Promise<"true" | "false" | "stale" | undefined> {
     try {
       const activeExperiences = await this.getActiveExperiences(token);
-      const copilotAllowed =
-        activeExperiences == undefined ? undefined : activeExperiences.includes("CopilotTeams");
+      const values = activeExperiences.values;
+      const stale = activeExperiences.stale;
+      let copilotAllowed: "true" | "false" | "stale" | undefined;
+      if (values === undefined) {
+        copilotAllowed = undefined;
+      } else if (values.includes("CopilotTeams")) {
+        copilotAllowed = "true";
+      } else if (stale) {
+        copilotAllowed = "stale";
+      } else {
+        copilotAllowed = "false";
+      }
       sendTelemetryEvent(Component.core, TelemetryEvent.CheckCopilot, {
         [TelemetryProperty.IsCopilotAllowed]: copilotAllowed?.toString() ?? "undefined",
       });

@@ -833,7 +833,7 @@ describe("Package Service", () => {
 
     let packageService = new PackageService("https://test-endpoint");
     let actualError: Error | undefined;
-    let result: string[] | undefined;
+    let result;
     try {
       result = await packageService.getActiveExperiences("test-token");
     } catch (error: any) {
@@ -841,7 +841,7 @@ describe("Package Service", () => {
     }
 
     chai.assert.isUndefined(actualError);
-    chai.assert.deepEqual(result, ["foo", "bar"]);
+    chai.assert.deepEqual(result, { values: ["foo", "bar"], stale: false });
 
     packageService = new PackageService("https://test-endpoint", logger);
     actualError = undefined;
@@ -852,7 +852,7 @@ describe("Package Service", () => {
     }
 
     chai.assert.isUndefined(actualError);
-    chai.assert.deepEqual(result, ["foo", "bar"]);
+    chai.assert.deepEqual(result, { values: ["foo", "bar"], stale: false });
   });
 
   it("getActiveExperiences throws expected error", async () => {
@@ -924,7 +924,7 @@ describe("Package Service", () => {
 
     const packageService = new PackageService("https://test-endpoint");
     let actualError: Error | undefined;
-    let result: boolean | undefined;
+    let result;
     try {
       result = await packageService.getCopilotStatus("test-token");
     } catch (error: any) {
@@ -932,7 +932,7 @@ describe("Package Service", () => {
     }
 
     chai.assert.isUndefined(actualError);
-    chai.assert.isFalse(result);
+    chai.assert.equal(result, "false");
   });
 
   it("getCopilotStatus bad response", async () => {
@@ -947,7 +947,7 @@ describe("Package Service", () => {
 
     const packageService = new PackageService("https://test-endpoint");
     let actualError: Error | undefined;
-    let result: boolean | undefined;
+    let result;
     try {
       result = await packageService.getCopilotStatus("test-token");
     } catch (error: any) {
@@ -968,7 +968,7 @@ describe("Package Service", () => {
 
     let packageService = new PackageService("https://test-endpoint");
     let actualError: Error | undefined;
-    let result: boolean | undefined;
+    let result;
     try {
       result = await packageService.getCopilotStatus("test-token");
     } catch (error: any) {
@@ -1002,7 +1002,7 @@ describe("Package Service", () => {
       throw error;
     };
     let actualError: Error | undefined;
-    let result: boolean | undefined;
+    let result;
     try {
       result = await packageService.getCopilotStatus("test-token");
     } catch (error: any) {

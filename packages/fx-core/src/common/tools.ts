@@ -229,7 +229,7 @@ export function getAllowedAppMaps(): Record<string, string> {
   };
 }
 
-export function getCopilotStatus(token: string): Promise<boolean | undefined> {
+export function getCopilotStatus(token: string): Promise<"true" | "false" | "stale" | undefined> {
   return PackageService.GetSharedInstance().getCopilotStatus(token);
 }
 

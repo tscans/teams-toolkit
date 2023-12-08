@@ -30,7 +30,7 @@ describe("sideloadingNode", () => {
     sandbox
       .stub(M365TokenInstance, "getAccessToken")
       .returns(Promise.resolve(new Ok("test-token")));
-    sandbox.stub(tools, "getCopilotStatus").returns(Promise.resolve(false));
+    sandbox.stub(tools, "getCopilotStatus").returns(Promise.resolve("false"));
     sandbox.stub(handlers, "checkCopilotCallback");
     const copilotNode = new CopilotNode(eventEmitter, "token");
     const treeItem = await copilotNode.getTreeItem();
@@ -42,7 +42,7 @@ describe("sideloadingNode", () => {
     sandbox
       .stub(M365TokenInstance, "getAccessToken")
       .returns(Promise.resolve(new Ok("test-token")));
-    sandbox.stub(tools, "getCopilotStatus").returns(Promise.resolve(true));
+    sandbox.stub(tools, "getCopilotStatus").returns(Promise.resolve("true"));
     const copilotNode = new CopilotNode(eventEmitter, "token");
     const treeItem = await copilotNode.getTreeItem();
 

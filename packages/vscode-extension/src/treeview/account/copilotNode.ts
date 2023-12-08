@@ -28,7 +28,7 @@ export class CopilotNode extends DynamicNode {
     this.contextValue = ContextValues.Normal;
   }
 
-  private async checkCopilot(): Promise<boolean | undefined> {
+  private async checkCopilot(): Promise<"true" | "false" | "stale" | undefined> {
     try {
       const m365TokenStatus = await M365TokenInstance.getAccessToken({
         scopes: [copilotCheckServiceScope],
@@ -52,10 +52,10 @@ export class CopilotNode extends DynamicNode {
   }
 
   public override async getTreeItem(): Promise<vscode.TreeItem> {
-    let isCopilotAllowed: boolean | undefined;
+    let isCopilotAllowed: "true" | "false" | "stale" | undefined;
     if (this.token != "") {
       isCopilotAllowed = await this.checkCopilot();
-      if (isCopilotAllowed === false) {
+      if (isCopilotAllowed === "false") {
         // Don't popup the warning since it's noisy
         // await checkCopilotCallback();
       }
@@ -66,13 +66,16 @@ export class CopilotNode extends DynamicNode {
       this.tooltip = localize("teamstoolkit.accountTree.copilotStatusUnknownTooltip");
       this.contextValue = ContextValues.Normal;
       this.command = undefined;
-    } else if (isCopilotAllowed) {
+    } else if (isCopilotAllowed === "true") {
       this.label = localize("teamstoolkit.accountTree.copilotPass");
       this.iconPath = passIcon;
       this.tooltip = localize("teamstoolkit.accountTree.copilotPassTooltip");
       this.contextValue = ContextValues.Normal;
       this.command = undefined;
+    } else if (isCopilotAllowed === "stale") {
+      // TODO: stale warning
     } else {
+      // false warning
       this.label = localize("teamstoolkit.accountTree.copilotWarning");
       this.iconPath = warningIcon;
       this.tooltip = localize("teamstoolkit.accountTree.copilotWarningTooltip");
