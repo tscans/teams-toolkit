@@ -12,12 +12,13 @@
   <ItemGroup>
     <None Remove="build/**/*" />
     <Content Remove="build/**/*" />
+    <None Include="env/**/*" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Bot.Builder" Version="4.21.1" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.21.1" />
-    <PackageReference Include="Microsoft.Teams.AI" Version="1.0.0-preview-3" />
+    <PackageReference Include="Microsoft.Teams.AI" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
