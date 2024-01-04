@@ -244,13 +244,13 @@ jobs:
         with:
           ref: ${{ needs.setup.outputs.branch }}
 
-      - name: Enable Corepack
-        run: corepack enable
-
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Setup yarn
+        run: npm install -g yarn
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@v3
