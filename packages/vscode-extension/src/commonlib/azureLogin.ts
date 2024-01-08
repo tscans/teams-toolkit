@@ -435,6 +435,15 @@ export class AzureAccountManager extends login implements AzureAccountProvider {
         }
       }
     });
+    // solve no subscription issue
+    azureAccount.onSessionsChanged(async () => {
+      const temp: AzureAccount =
+        vscode.extensions.getExtension<AzureAccount>("ms-vscode.azure-account")!.exports;
+      if (temp.sessions.length > 0 && temp.subscriptions.length === 0) {
+        await this.updateLoginStatus();
+        await this.notifyStatus();
+      }
+    });
   }
 
   public async clearSub() {
