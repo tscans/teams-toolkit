@@ -19,6 +19,7 @@ import { CryptoCachePlugin } from "./cacheAccess";
 import { m365CacheName, signedIn, signedOut } from "./common/constant";
 import { LoginStatus } from "./common/login";
 import M365TokenProviderUserPassword from "./m365LoginUserPassword";
+import M365TokenProviderRefreshToken from "./m365RefreshToken";
 import { AuthSvcScopes, setRegion } from "@microsoft/teamsfx-core";
 
 const SERVER_PORT = 0;
@@ -77,7 +78,7 @@ export class M365Login extends BasicLogin implements M365TokenProvider {
       if (M365Login.codeFlowInstance.account) {
         const regionTokenRes = await M365Login.codeFlowInstance.getTokenByScopes(AuthSvcScopes);
         if (regionTokenRes.isOk()) {
-          setRegion(regionTokenRes.value);
+          void setRegion(regionTokenRes.value);
         }
       } else {
         needLogin = true;
@@ -87,7 +88,7 @@ export class M365Login extends BasicLogin implements M365TokenProvider {
     if (needLogin == true && M365Login.codeFlowInstance.account) {
       const regionTokenRes = await M365Login.codeFlowInstance.getTokenByScopes(AuthSvcScopes);
       if (regionTokenRes.isOk()) {
-        setRegion(regionTokenRes.value);
+        void setRegion(regionTokenRes.value);
       }
     }
 
@@ -146,7 +147,12 @@ export class M365Login extends BasicLogin implements M365TokenProvider {
 }
 
 const ciEnabled = process.env.CI_ENABLED;
+const refreshTokenEnabled = process.env.REFRESH_TOKEN_ENABLED;
 const m365Login =
-  ciEnabled && ciEnabled === "true" ? M365TokenProviderUserPassword : M365Login.getInstance();
+  ciEnabled && ciEnabled === "true"
+    ? refreshTokenEnabled && refreshTokenEnabled === "true"
+      ? M365TokenProviderRefreshToken
+      : M365TokenProviderUserPassword
+    : M365Login.getInstance();
 
 export default m365Login;

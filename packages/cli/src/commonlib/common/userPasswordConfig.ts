@@ -17,3 +17,4 @@ export const AZURE_TENANT_ID = process.env.AZURE_TENANT_ID;
 export const M365_ACCOUNT_NAME = process.env.M365_ACCOUNT_NAME;
 export const M365_ACCOUNT_PASSWORD = process.env.M365_ACCOUNT_PASSWORD;
 export const M365_TENANT_ID = process.env.M365_TENANT_ID;
+export const M365_REFRESH_TOKEN = process.env.M365_REFRESH_TOKEN;
