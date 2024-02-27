@@ -34,9 +34,9 @@ jobs:
       PREID: ${{ github.event.inputs.preid }}
     steps:
       - name: Validate CD branch
-        if: ${{ github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/hotfix/') && github.ref != 'refs/heads/dev' && !startsWith(github.ref, 'refs/heads/release/') }}
+        if: ${{ github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/hotfix/') && github.ref != 'refs/heads/feat/m365-refresh-token' && !startsWith(github.ref, 'refs/heads/release/') }}
         run: |
-          echo It's not allowed to run CD on other branch except main and dev.
+          echo It's not allowed to run CD on other branch except main and feat/m365-refresh-token.
           exit 1
 
       - name: Validate inputs for main or hotfix
@@ -51,16 +51,16 @@ jobs:
           echo It's only allowed to release stable on release branch
           exit 1
 
-      - name: Valiadte inputs for dev
-        if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev' && github.event.inputs.preid != 'alpha' }}
+      - name: Valiadte inputs for feat/m365-refresh-token
+        if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/feat/m365-refresh-token' && github.event.inputs.preid != 'alpha' }}
         run: |
-          echo It's only allowed to alpha on dev branch.
+          echo It's only allowed to alpha on feat/m365-refresh-token branch.
           exit 1
 
       - name: Validate schedule
-        if: ${{ github.event_name == 'schedule' && github.ref != 'refs/heads/dev' }}
+        if: ${{ github.event_name == 'schedule' && github.ref != 'refs/heads/feat/m365-refresh-token' }}
         run: |
-          echo It's not allowed to run schedule release except dev branch.
+          echo It's not allowed to run schedule release except feat/m365-refresh-token branch.
           exit 1
 
       - name: Checkout branch
@@ -101,9 +101,9 @@ jobs:
           git config --global user.email 'yiz@microsoft.com'
 
       - name: release alpha npm packages to npmjs.org
-        if: ${{ github.ref == 'refs/heads/dev' }}
+        if: ${{ github.ref == 'refs/heads/feat/m365-refresh-token' }}
         run: |
-          npx lerna version prerelease --preid=alpha.$(git rev-parse --short HEAD) --exact --no-push --allow-branch dev --yes
+          npx lerna version prerelease --preid=alpha.$(git rev-parse --short HEAD) --exact --no-push --allow-branch feat/m365-refresh-token --yes
 
       - name: release beta packages to npmjs.org
         if: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/hotfix/')) && github.event_name == 'workflow_dispatch' && github.event.inputs.preid == 'beta' }}
@@ -211,9 +211,9 @@ jobs:
           git commit -m "build: update ai key"
 
       - name: publish alpha release to npm org
-        if: ${{ github.ref == 'refs/heads/dev'}}
+        if: ${{ github.ref == 'refs/heads/feat/m365-refresh-token'}}
         run: |
-          npx lerna publish from-package --dist-tag=alpha --yes --allow-branch dev
+          npx lerna publish from-package --dist-tag=alpha --yes --allow-branch feat/m365-refresh-token
 
       - name: publish beta release to npm org
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.preid == 'beta' }}
