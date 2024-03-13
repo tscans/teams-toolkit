@@ -10,10 +10,12 @@ import fs from "fs-extra";
 import path from "path";
 import {
   APIInfo,
+  AuthInfo,
   ErrorType,
   GenerateResult,
   ListAPIResult,
   ParseOptions,
+  ProjectType,
   ValidateResult,
   ValidationStatus,
   WarningType,
@@ -45,7 +47,8 @@ export class SpecParser {
     allowAPIKeyAuth: false,
     allowMultipleParameters: false,
     allowOauth2: false,
-    isCopilot: false,
+    allowMethods: ["get", "post"],
+    projectType: ProjectType.SME,
   };
 
   /**
@@ -90,16 +93,7 @@ export class SpecParser {
         };
       }
 
-      return Utils.validateSpec(
-        this.spec!,
-        this.parser,
-        !!this.isSwaggerFile,
-        this.options.allowMissingId,
-        this.options.allowAPIKeyAuth,
-        this.options.allowMultipleParameters,
-        this.options.allowOauth2,
-        this.options.isCopilot
-      );
+      return Utils.validateSpec(this.spec!, this.parser, !!this.isSwaggerFile, this.options);
     } catch (err) {
       throw new SpecParserError((err as Error).toString(), ErrorType.ValidateFailed);
     }
@@ -193,11 +187,7 @@ export class SpecParser {
         filter,
         this.unResolveSpec!,
         this.spec!,
-        this.options.allowMissingId,
-        this.options.allowAPIKeyAuth,
-        this.options.allowMultipleParameters,
-        this.options.allowOauth2,
-        this.options.isCopilot
+        this.options
       );
 
       if (signal?.aborted) {
@@ -254,7 +244,8 @@ export class SpecParser {
         manifestPath,
         outputSpecPath,
         pluginFilePath,
-        newSpec
+        newSpec,
+        this.options
       );
 
       await fs.outputJSON(manifestPath, updatedManifest, { spaces: 2 });
@@ -275,15 +266,13 @@ export class SpecParser {
    * @param filter An array of strings that represent the filters to apply when generating the artifacts. If filter is empty, it would process nothing.
    * @param outputSpecPath File path of the new OpenAPI specification file to generate. If not specified or empty, no spec file will be generated.
    * @param adaptiveCardFolder Folder path where the Adaptive Card files will be generated. If not specified or empty, Adaptive Card files will not be generated.
-   * @param isMe Boolean that indicates whether the project is an Messaging Extension. For Messaging Extension, composeExtensions will be added in Teams app manifest.
    */
   async generate(
     manifestPath: string,
     filter: string[],
     outputSpecPath: string,
-    adaptiveCardFolder: string,
-    signal?: AbortSignal,
-    isMe?: boolean
+    adaptiveCardFolder?: string,
+    signal?: AbortSignal
   ): Promise<GenerateResult> {
     const result: GenerateResult = {
       allSuccess: true,
@@ -294,8 +283,8 @@ export class SpecParser {
       const newUnResolvedSpec = newSpecs[0];
       const newSpec = newSpecs[1];
 
-      const AuthSet: Set<OpenAPIV3.SecuritySchemeObject> = new Set();
-      let hasMultipleAPIKeyAuth = false;
+      const authSet: Set<AuthInfo> = new Set();
+      let hasMultipleAuth = false;
 
       for (const url in newSpec.paths) {
         for (const method in newSpec.paths[url]) {
@@ -304,19 +293,19 @@ export class SpecParser {
           const authArray = Utils.getAuthArray(operation.security, newSpec);
 
           if (authArray && authArray.length > 0) {
-            AuthSet.add(authArray[0][0].authSchema);
-            if (AuthSet.size > 1) {
-              hasMultipleAPIKeyAuth = true;
+            authSet.add(authArray[0][0]);
+            if (authSet.size > 1) {
+              hasMultipleAuth = true;
               break;
             }
           }
         }
       }
 
-      if (hasMultipleAPIKeyAuth) {
+      if (hasMultipleAuth && this.options.projectType !== ProjectType.TeamsAi) {
         throw new SpecParserError(
-          ConstantString.MultipleAPIKeyNotSupported,
-          ErrorType.MultipleAPIKeyNotSupported
+          ConstantString.MultipleAuthNotSupported,
+          ErrorType.MultipleAuthNotSupported
         );
       }
 
@@ -328,12 +317,11 @@ export class SpecParser {
       }
       await fs.outputFile(outputSpecPath, resultStr);
 
-      if (isMe === undefined || isMe === true) {
-        // Only generate adaptive card for Messaging Extension
+      if (adaptiveCardFolder) {
         for (const url in newSpec.paths) {
           for (const method in newSpec.paths[url]) {
-            // paths object may contain description/summary, so we need to check if it is a operation object
-            if (method === ConstantString.PostMethod || method === ConstantString.GetMethod) {
+            // paths object may contain description/summary which is not a http method, so we need to check if it is a operation object
+            if (this.options.allowMethods.includes(method)) {
               const operation = (newSpec.paths[url] as any)[method] as OpenAPIV3.OperationObject;
               try {
                 const [card, jsonPath] = AdaptiveCardGenerator.generateAdaptiveCard(operation);
@@ -362,15 +350,14 @@ export class SpecParser {
         throw new SpecParserError(ConstantString.CancelledMessage, ErrorType.Cancelled);
       }
 
-      const auth = Array.from(AuthSet)[0];
+      const authInfo = Array.from(authSet)[0];
       const [updatedManifest, warnings] = await ManifestUpdater.updateManifest(
         manifestPath,
         outputSpecPath,
-        adaptiveCardFolder,
         newSpec,
-        this.options.allowMultipleParameters,
-        auth,
-        isMe
+        this.options,
+        adaptiveCardFolder,
+        authInfo
       );
 
       await fs.outputJSON(manifestPath, updatedManifest, { spaces: 2 });
@@ -407,14 +394,7 @@ export class SpecParser {
     if (this.apiMap !== undefined) {
       return this.apiMap;
     }
-    const result = Utils.listSupportedAPIs(
-      spec,
-      this.options.allowMissingId,
-      this.options.allowAPIKeyAuth,
-      this.options.allowMultipleParameters,
-      this.options.allowOauth2,
-      this.options.isCopilot
-    );
+    const result = Utils.listSupportedAPIs(spec, this.options);
     this.apiMap = result;
     return result;
   }
