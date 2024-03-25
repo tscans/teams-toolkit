@@ -36,6 +36,7 @@ import { ChatTelemetryData } from "./telemetry";
 import { localize } from "../utils/localizeUtils";
 import { Correlator } from "@microsoft/teamsfx-core";
 import { ExtTelemetry } from "../telemetry/extTelemetry";
+import testCommandHandler from "./commands/test/testCommandHandler";
 
 export function chatRequestHandler(
   request: ChatRequest,
@@ -49,6 +50,8 @@ export function chatRequestHandler(
     return createCommandHandler(request, context, response, token);
   } else if (request.command == TeamsChatCommand.NextStep) {
     return nextStepCommandHandler(request, context, response, token);
+  } else if (request.command == TeamsChatCommand.Test) {
+    return testCommandHandler(request, context, response, token);
   } else {
     return defaultHandler(request, context, response, token);
   }

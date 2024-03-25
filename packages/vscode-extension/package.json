@@ -1358,6 +1358,10 @@
           {
             "name": "nextstep",
             "description": "%teamstoolkit.chatParticipants.nextStep.description%"
+          },
+          {
+            "name": "test",
+            "description": "only for test purpoose"
           }
         ]
       }
@@ -1372,7 +1376,7 @@
     "compile": "tsc -p ./ && npm run copy-files && npm run copy-md-files && npm run copy-static-assets",
     "build": "rimraf out && webpack --mode development --config ./webpack.config.js && npm run compile",
     "build-failpoint": "rimraf out && npx ttsc -p ./",
-    "watch": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./webpack.config.js",
+    "watch": "webpack --watch --devtool nosources-source-map --stats verbose --config ./webpack.config.js",
     "package": "rimraf out && webpack --mode production --config ./webpack.config.js",
     "test-compile": "tsc -p ./",
     "test-watch": "tsc -watch -p ./",
