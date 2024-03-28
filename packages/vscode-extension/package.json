@@ -1492,6 +1492,7 @@
     "@microsoft/tiktokenizer": "^1.0.4",
     "@microsoft/vscode-ui": "workspace:*",
     "@npmcli/package-json": "^1.0.1",
+    "@types/xlsx": "^0.0.36",
     "@vscode/extension-telemetry": "^0.6.2",
     "@vscode/webview-ui-toolkit": "^1.2.2",
     "async-mutex": "^0.3.1",
@@ -1511,7 +1512,8 @@
     "react-syntax-highlighter": "^15.5.0",
     "tmp": "^0.2.1",
     "validator": "^13.7.0",
-    "vscode-tas-client": "^0.1.75"
+    "vscode-tas-client": "^0.1.75",
+    "xlsx": "^0.18.5"
   },
   "extensionDependencies": [
     "github.copilot-chat",
