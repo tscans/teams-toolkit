@@ -103,6 +103,12 @@ export const rootCommand: CLICommand = {
       description: commands.root.options.telemetry,
       default: true,
     },
+    {
+      type: "boolean",
+      name: "previewTemplate",
+      description: commands.root.options.previewTemplate,
+      default: false,
+    },
   ],
   telemetry: {
     event: TelemetryEvent.RootCommand,

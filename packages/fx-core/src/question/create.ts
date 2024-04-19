@@ -31,6 +31,7 @@ import {
   isOfficeJSONAddinEnabled,
   isTdpTemplateCliTestEnabled,
   isChatParticipantEnabled,
+  isPreviewTemplatesEnabled,
 } from "../common/featureFlags";
 import { getLocalizedString } from "../common/localizeUtils";
 import { sampleProvider } from "../common/samples";
@@ -207,6 +208,7 @@ export function projectTypeQuestion(): SingleSelectQuestion {
     ProjectTypeOptions.officeAddin(Platform.CLI),
     ProjectTypeOptions.outlookAddin(Platform.CLI),
   ];
+
   return {
     name: QuestionNames.ProjectType,
     title: getLocalizedString("core.createProjectQuestion.title"),
@@ -214,6 +216,9 @@ export function projectTypeQuestion(): SingleSelectQuestion {
     staticOptions: staticOptions,
     dynamicOptions: (inputs: Inputs) => {
       const staticOptions: OptionItem[] = [];
+      const tt = isPreviewTemplatesEnabled();
+      const context = createContextV3();
+      context.logProvider?.info("question ff" + tt.toString());
 
       if (isApiCopilotPluginEnabled()) {
         staticOptions.push(ProjectTypeOptions.copilotPlugin(inputs.platform));

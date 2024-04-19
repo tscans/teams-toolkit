@@ -91,6 +91,10 @@ export function isCopilotAuthEnabled(): boolean {
   return isFeatureFlagEnabled(FeatureFlagName.CopilotAuth, false);
 }
 
+export function isPreviewTemplatesEnabled(): boolean {
+  return featureFlagManager.getBooleanValue(FeatureFlags.PreviewTemplate);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Notes for Office Addin Feature flags:
 // Case 1: TEAMSFX_OFFICE_ADDIN = false, TEAMSFX_OFFICE_XML_ADDIN = false
@@ -183,6 +187,10 @@ export class FeatureFlags {
   static readonly NewProjectType = { name: FeatureFlagName.NewProjectType, defaultValue: "true" };
   static readonly ChatParticipant = {
     name: FeatureFlagName.ChatParticipant,
+    defaultValue: "false",
+  };
+  static readonly PreviewTemplate = {
+    name: FeatureFlagName.PreviewTemplates,
     defaultValue: "false",
   };
 }

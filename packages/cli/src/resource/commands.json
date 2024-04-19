@@ -7,7 +7,8 @@
       "interactive": "Run the command in interactive mode.",
       "debug": "Print debug information.",
       "verbose": "Print diagnostic information.",
-      "telemetry": "Whether to enable telemetry."
+      "telemetry": "Whether to enable telemetry.",
+      "previewTemplate": "Scaffold using preview templates"
     }
   },
   "help": {

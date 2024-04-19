@@ -18,6 +18,7 @@ import {
 } from "@microsoft/teamsfx-api";
 import {
   Correlator,
+  FeatureFlags,
   IncompatibleProjectError,
   VersionState,
   assembleError,
@@ -517,6 +518,10 @@ class CLIEngine {
 
     UI.interactive = context.globalOptionValues.interactive as boolean;
 
+    if (context.globalOptionValues.previewTemplate) {
+      process.env[FeatureFlags.PreviewTemplate.name] = "true";
+    }
+
     // set global option telemetry property
     context.telemetryProperties[TelemetryProperty.CommandDebug] =
       context.globalOptionValues.debug + "";
@@ -530,6 +535,7 @@ class CLIEngine {
       context.globalOptionValues.version + "";
     context.telemetryProperties[TelemetryProperty.CorrelationId] =
       context.optionValues.correlationId;
+    // TODO: add preview
 
     return ok(undefined);
   }

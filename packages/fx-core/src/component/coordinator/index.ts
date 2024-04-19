@@ -23,7 +23,7 @@ import { EOL } from "os";
 import * as path from "path";
 import * as uuid from "uuid";
 import * as xml2js from "xml2js";
-import { isNewGeneratorEnabled } from "../../common/featureFlags";
+import { isNewGeneratorEnabled, isPreviewTemplatesEnabled } from "../../common/featureFlags";
 import { getLocalizedString } from "../../common/localizeUtils";
 import { TelemetryEvent, TelemetryProperty } from "../../common/telemetry";
 import { getResourceGroupInPortal } from "../../common/tools";
@@ -110,6 +110,8 @@ class Coordinator {
     const scratch = inputs[QuestionNames.Scratch] as string;
     let projectPath = "";
     let warnings = undefined;
+    const tt = isPreviewTemplatesEnabled();
+    context.logProvider?.info(tt.toString());
     if (scratch === ScratchOptions.no().id) {
       // create from sample
       const sampleId = inputs[QuestionNames.Samples] as string;
