@@ -50,12 +50,18 @@ import {
 } from "./error";
 import { Constants, ManifestTemplate } from "./utils/constants";
 import { ProgressHelper } from "./utils/progress-helper";
-import { SPFxVersionOptionIds } from "../../../question/create";
+import {
+  CapabilityOptions,
+  ProgrammingLanguage,
+  SPFxVersionOptionIds,
+} from "../../../question/create";
 import { TelemetryEvents, TelemetryProperty } from "./utils/telemetryEvents";
 import { Utils } from "./utils/utils";
 import semver from "semver";
 import { jsonUtils } from "../../../common/jsonUtils";
 import { telemetryHelper } from "./utils/telemetry-helper";
+import { DefaultTemplateGenerator } from "../templates/templateGenerator";
+import { TemplateInfo } from "../templates/templateInfo";
 
 export class SPFxGenerator {
   @hooks([
@@ -413,19 +419,6 @@ export class SPFxGenerator {
       await progressHandler?.end(false);
       return err(ScaffoldError(error as Error));
     }
-  }
-
-  public static async getSolutionName(spfxFolder: string): Promise<string | undefined> {
-    const yoInfoPath = path.join(spfxFolder, Constants.YO_RC_FILE);
-    if (await fs.pathExists(yoInfoPath)) {
-      const yoInfo = await fs.readJson(yoInfoPath);
-      if (yoInfo["@microsoft/generator-sharepoint"]) {
-        return yoInfo["@microsoft/generator-sharepoint"][Constants.YO_RC_SOLUTION_NAME];
-      }
-    } else {
-      throw new FileNotFoundError(Constants.PLUGIN_NAME, yoInfoPath, Constants.IMPORT_HELP_LINK);
-    }
-    return undefined;
   }
 
   private static async getSolutionVersion(yoInfoPath: string): Promise<string> {
@@ -889,5 +882,34 @@ export class SPFxGenerator {
     }
 
     return Constants.DEFAULT_NODE_VERSION;
+  }
+}
+
+export class SPFxGeneratorNew extends DefaultTemplateGenerator {
+  componentName = Constants.PLUGIN_DEV_NAME;
+
+  public activate(context: Context, inputs: Inputs): boolean {
+    return inputs[QuestionNames.Capabilities] === CapabilityOptions.SPFxTab().id;
+  }
+
+  public async getTemplateInfos(
+    context: Context,
+    inputs: Inputs,
+    actionContext?: ActionContext
+  ): Promise<Result<TemplateInfo[], FxError>> {
+    const spfxSolution = inputs[QuestionNames.SPFxSolution];
+    if (spfxSolution === "new") {
+      await SPFxGenerator.doYeomanScaffold(context, inputs, inputs.projectPath!);
+    }
+
+    return Promise.resolve(
+      ok([
+        {
+          templateName: Constants.TEMPLATE_NAME,
+          language: ProgrammingLanguage.TS,
+          replaceMap: context.templateVariables as { [key: string]: string },
+        },
+      ])
+    );
   }
 }

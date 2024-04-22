@@ -9,6 +9,8 @@ import axios, { AxiosInstance } from "axios";
 import { cpUtils, DebugLogger } from "../../../../common/deps-checker/util/cpUtils";
 import * as os from "os";
 import { Constants } from "./constants";
+import { FileNotFoundError } from "../../../../error/common";
+import path from "path";
 
 export class Utils {
   static async configure(configurePath: string, map: Map<string, string>): Promise<void> {
@@ -228,6 +230,19 @@ export class Utils {
     }
 
     return appName;
+  }
+
+  static async getSpfxSolutionName(spfxFolder: string): Promise<string | undefined> {
+    const yoInfoPath = path.join(spfxFolder, Constants.YO_RC_FILE);
+    if (await fs.pathExists(yoInfoPath)) {
+      const yoInfo = await fs.readJson(yoInfoPath);
+      if (yoInfo["@microsoft/generator-sharepoint"]) {
+        return yoInfo["@microsoft/generator-sharepoint"][Constants.YO_RC_SOLUTION_NAME];
+      }
+    } else {
+      throw new FileNotFoundError(Constants.PLUGIN_NAME, yoInfoPath, Constants.IMPORT_HELP_LINK);
+    }
+    return undefined;
   }
 }
 

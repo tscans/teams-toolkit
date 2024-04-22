@@ -51,7 +51,6 @@ import {
   getOfficeAddinTemplateConfig,
 } from "../component/generator/officeXMLAddin/projectConfig";
 import { DevEnvironmentSetupError } from "../component/generator/spfx/error";
-import { SPFxGenerator } from "../component/generator/spfx/spfxGenerator";
 import { Constants } from "../component/generator/spfx/utils/constants";
 import { Utils } from "../component/generator/spfx/utils/utils";
 import { createContextV3 } from "../component/utils";
@@ -1593,7 +1592,7 @@ export function appNameQuestion(): TextInputQuestion {
       if (inputs.teamsAppFromTdp?.appName) {
         defaultName = convertToAlphanumericOnly(inputs.teamsAppFromTdp?.appName);
       } else if (inputs[QuestionNames.SPFxSolution] == "import") {
-        defaultName = await SPFxGenerator.getSolutionName(inputs[QuestionNames.SPFxFolder]);
+        defaultName = await Utils.getSpfxSolutionName(inputs[QuestionNames.SPFxFolder]);
       } else if (inputs.openAIPluginManifest) {
         defaultName = inputs.openAIPluginManifest.name_for_human;
       }
