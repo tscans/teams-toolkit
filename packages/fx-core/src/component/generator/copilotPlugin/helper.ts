@@ -84,7 +84,7 @@ export const copilotPluginParserOptions: ParseOptions = {
   allowAPIKeyAuth: false,
   allowBearerTokenAuth: false,
   allowMultipleParameters: true,
-  allowOauth2: false,
+  allowOauth2: isCopilotAuthEnabled(),
   projectType: ProjectType.Copilot,
   allowMissingId: true,
   allowSwagger: true,
@@ -200,7 +200,6 @@ export async function listOperations(
         : {
             allowBearerTokenAuth: true, // Currently, API key auth support is actually bearer token auth
             allowMultipleParameters: true,
-            allowOauth2: isCopilotAuthEnabled(),
           }
     );
     const validationRes = await specParser.validate();

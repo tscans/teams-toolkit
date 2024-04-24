@@ -113,20 +113,14 @@ export class CopilotPluginGenerator {
     actionContext?: ActionContext
   ): Promise<Result<CopilotPluginGeneratorResult, FxError>> {
     const apiOperations = inputs[QuestionNames.ApiOperation] as string[];
-    const authApis = (inputs.supportedApisFromApiSpec as ApiOperation[])
-      .filter((api) => !!api.data.authName && apiOperations.includes(api.id))
-      .map((api) => api.data);
-    const isApiKey = authApis.find((api) => !api.authType || api.authType === "apiKey");
+    const authApi = (inputs.supportedApisFromApiSpec as ApiOperation[]).find(
+      (api) => !!api.data.authName && apiOperations.includes(api.id)
+    );
 
-    // TODO: Will merge these two templates into one in the future
-    const templateName =
-      authApis.length > 0 && isApiKey ? fromApiSpecWithApiKeyTemplateName : fromApiSpecTemplateName;
+    const templateName = authApi ? fromApiSpecWithApiKeyTemplateName : fromApiSpecTemplateName;
     const componentName = fromApiSpecComponentName;
 
-    merge(actionContext?.telemetryProps, {
-      [telemetryProperties.templateName]: templateName,
-      [telemetryProperties.authType]: authApis.length > 0 ? authApis[0].authType : undefined,
-    });
+    merge(actionContext?.telemetryProps, { [telemetryProperties.templateName]: templateName });
 
     return await this.generate(
       context,
@@ -135,7 +129,7 @@ export class CopilotPluginGenerator {
       templateName,
       componentName,
       false,
-      authApis ? authApis[0] : undefined
+      authApi?.data
     );
   }
 
@@ -324,7 +318,6 @@ export class CopilotPluginGenerator {
               allowBearerTokenAuth: true, // Currently, API key auth support is actually bearer token auth
               allowMultipleParameters: true,
               projectType: type,
-              allowOauth2: isCopilotAuthEnabled(),
             }
       );
       const validationRes = await specParser.validate();

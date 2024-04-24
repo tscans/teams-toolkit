@@ -800,17 +800,17 @@ describe("copilotPluginGenerator", function () {
     sandbox.stub(manifestUtils, "_readAppManifest").resolves(ok(teamsManifest));
     sandbox.stub(CopilotPluginHelper, "isYamlSpecFile").resolves(false);
     const generateBasedOnSpec = sandbox
-      .stub(SpecParser.prototype, "generate")
+      .stub(SpecParser.prototype, "generateForCopilot")
       .resolves({ allSuccess: true, warnings: [] });
     const downloadTemplate = sandbox.stub(Generator, "generateTemplate").resolves(ok(undefined));
 
-    const result = await CopilotPluginGenerator.generateMeFromApiSpec(
+    const result = await CopilotPluginGenerator.generatePluginFromApiSpec(
       context,
       inputs,
       "projectPath"
     );
     assert.isTrue(result.isOk());
-    assert.equal(downloadTemplate.args[0][2], "copilot-plugin-existing-api");
+    assert.equal(downloadTemplate.args[0][2], "api-plugin-existing-api");
     assert.isTrue(downloadTemplate.calledOnce);
     assert.isTrue(generateBasedOnSpec.calledOnce);
   });
