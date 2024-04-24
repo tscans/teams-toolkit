@@ -159,7 +159,10 @@ export class CopilotPluginGenerator {
         : apiPluginFromApiSpecTemplateName;
     const componentName = fromApiSpecComponentName;
 
-    merge(actionContext?.telemetryProps, { [telemetryProperties.templateName]: templateName });
+    merge(actionContext?.telemetryProps, {
+      [telemetryProperties.templateName]: templateName,
+      [telemetryProperties.authType]: authApi?.data.authType ?? undefined,
+    });
 
     return await this.generate(
       context,
