@@ -124,35 +124,60 @@ export function isCopilotAuthEnabled(): boolean {
 export interface FeatureFlag {
   name: string;
   defaultValue: string;
-  description?: string;
+  title?: () => string;
+  description?: () => string;
 }
 
 export class FeatureFlags {
-  static readonly CLIDotNet = { name: FeatureFlagName.CLIDotNet, defaultValue: "false" };
-  static readonly CopilotPlugin = { name: FeatureFlagName.CopilotPlugin, defaultValue: "false" };
-  static readonly ApiCopilotPlugin = {
+  static readonly CLIDotNet: FeatureFlag = {
+    name: FeatureFlagName.CLIDotNet,
+    defaultValue: "false",
+  };
+  static readonly CopilotPlugin: FeatureFlag = {
+    name: FeatureFlagName.CopilotPlugin,
+    defaultValue: "false",
+  };
+  static readonly ApiCopilotPlugin: FeatureFlag = {
     name: FeatureFlagName.ApiCopilotPlugin,
     defaultValue: "false",
   };
-  static readonly TestTool = { name: FeatureFlagName.TestTool, defaultValue: "true" };
-  static readonly METestTool = { name: FeatureFlagName.METestTool, defaultValue: "true" };
-  static readonly NewGenerator = { name: FeatureFlagName.NewGenerator, defaultValue: "false" };
-  static readonly OfficeAddin = { name: FeatureFlagName.OfficeAddin, defaultValue: "false" };
-  static readonly TdpTemplateCliTest = {
+  static readonly TestTool: FeatureFlag = { name: FeatureFlagName.TestTool, defaultValue: "true" };
+  static readonly METestTool: FeatureFlag = {
+    name: FeatureFlagName.METestTool,
+    defaultValue: "true",
+  };
+  static readonly NewGenerator: FeatureFlag = {
+    name: FeatureFlagName.NewGenerator,
+    defaultValue: "false",
+  };
+  static readonly OfficeAddin: FeatureFlag = {
+    name: FeatureFlagName.OfficeAddin,
+    defaultValue: "false",
+  };
+  static readonly TdpTemplateCliTest: FeatureFlag = {
     name: FeatureFlagName.TdpTemplateCliTest,
     defaultValue: "false",
   };
-  static readonly AsyncAppValidation = {
+  static readonly AsyncAppValidation: FeatureFlag = {
     name: FeatureFlagName.AsyncAppValidation,
     defaultValue: "false",
   };
-  static readonly NewProjectType = { name: FeatureFlagName.NewProjectType, defaultValue: "true" };
-  static readonly ChatParticipant = {
+  static readonly NewProjectType: FeatureFlag = {
+    name: FeatureFlagName.NewProjectType,
+    defaultValue: "true",
+  };
+  static readonly ChatParticipant: FeatureFlag = {
     name: FeatureFlagName.ChatParticipant,
     defaultValue: "false",
   };
-  static readonly CopilotAuth = { name: FeatureFlagName.CopilotAuth, defaultValue: "false" };
-  static readonly CustomizeGpt = { name: FeatureFlagName.CustomizeGpt, defaultValue: "false" };
+  static readonly CopilotAuth: FeatureFlag = {
+    name: FeatureFlagName.CopilotAuth,
+    defaultValue: "false",
+  };
+  static readonly CustomizeGpt: FeatureFlag = {
+    name: FeatureFlagName.CustomizeGpt,
+    defaultValue: "false",
+  };
 }
 
 export class FeatureFlagManager {
