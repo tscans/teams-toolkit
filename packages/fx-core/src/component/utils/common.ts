@@ -128,7 +128,8 @@ export async function wrapSummary(
 // Expand environment variables in content. The format of referencing environment variable is: ${{ENV_NAME}}
 export function expandEnvironmentVariable(
   content: string,
-  envs?: { [key in string]: string }
+  envs?: { [key in string]: string },
+  keepValueInOneLine?: boolean
 ): string {
   const placeholders = content.match(placeholderRegex);
   if (placeholders) {
@@ -141,7 +142,10 @@ export function expandEnvironmentVariable(
         }
       } else {
         if (envValue) {
-          content = content.replace(placeholder, envValue);
+          content = content.replace(
+            placeholder,
+            keepValueInOneLine ? envValue.replace(/\n/g, "\\\\n") : envValue
+          );
         }
       }
     }

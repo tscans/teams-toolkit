@@ -218,10 +218,8 @@ export class PackageService {
       const serviceUrl = await this.getTitleServiceUrl(token);
       this.logger?.verbose(`Getting LaunchInfo with ManifestId ${manifestId} ...`);
       const launchInfo = await this.axiosInstance.post(
-        "/catalog/v1/users/titles/launchInfo",
+        "/catalog/v1/users/acquisitions/get",
         {
-          Id: manifestId,
-          IdType: "ManifestId",
           Filter: {
             SupportedElementTypes: [
               // "Extensions", // Extensions require ClientDetails to be determined later

@@ -294,6 +294,7 @@ class EnvUtil {
 export const envUtil = new EnvUtil();
 
 const NEW_LINE_SPLITTER = /\r?\n/;
+const NEWLINE = "\n";
 type DotenvParsedLine =
   | string
   | { key: string; value: string; comment?: string; quote?: '"' | "'" };
@@ -307,7 +308,8 @@ class DotenvUtil {
     const lines: DotenvParsedLine[] = [];
     const obj: DotenvOutput = {};
     const stringLines = src.toString().replace(/\r\n?/gm, "\n").split(NEW_LINE_SPLITTER);
-    for (const line of stringLines) {
+    for (let idx = 0; idx < stringLines.length; idx++) {
+      let line = stringLines[idx];
       const match =
         /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/gm.exec(
           line
@@ -318,29 +320,51 @@ class DotenvUtil {
         const key = match[1];
         //value
         let value = match[2] || "";
-        //comment
-        const valueIndex = match[0].indexOf(value);
-        if (valueIndex >= 0) {
-          const remaining = match[0].substring(valueIndex + value.length).trim();
-          if (remaining.startsWith("#")) {
-            inlineComment = remaining;
-          }
-        }
-        //trim
-        value = value.trim();
-        //quote
+
+        let end = value.length - 1;
         const firstChar = value[0];
-        value = value.replace(/^(['"`])([\s\S]*)\1$/gm, "$2");
-        //de-escape
-        if (firstChar === '"') {
-          value = value.replace(/\\n/g, "\n");
-          value = value.replace(/\\r/g, "\r");
+        const isMultilineDoubleQuoted = firstChar === '"' && value[end] !== '"';
+        const isMultilineSingleQuoted = firstChar === "'" && value[end] !== "'";
+
+        if (isMultilineDoubleQuoted || isMultilineSingleQuoted) {
+          const quoteChar = isMultilineDoubleQuoted ? '"' : "'";
+          value = value.substring(1);
+          while (idx++ < stringLines.length - 1) {
+            line = stringLines[idx];
+            end = line.length - 1;
+            if (line[end] === quoteChar) {
+              value += NEWLINE + line.substring(0, end);
+              break;
+            }
+            value += NEWLINE + line;
+          }
+          // if single or double quoted, remove quotes
+        } else {
+          //comment
+          const valueIndex = match[0].indexOf(value);
+          if (valueIndex >= 0) {
+            const remaining = match[0].substring(valueIndex + value.length).trim();
+            if (remaining.startsWith("#")) {
+              inlineComment = remaining;
+            }
+          }
+          //trim
+          value = value.trim();
+          // //quote
+          // const firstChar = value[0];
+          value = value.replace(/^(['"`])([\s\S]*)\1$/gm, "$2");
+          //de-escape
+          if (firstChar === '"') {
+            value = value.replace(/\\n/g, "\n");
+            value = value.replace(/\\r/g, "\r");
+          }
         }
         //output
         obj[key] = value;
         const parsedLine: DotenvParsedLine = { key: key, value: value };
         if (inlineComment) parsedLine.comment = inlineComment;
         if (firstChar === '"' || firstChar === "'") parsedLine.quote = firstChar;
+
         lines.push(parsedLine);
       } else {
         lines.push(line);

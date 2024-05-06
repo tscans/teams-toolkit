@@ -315,7 +315,7 @@ export class CreateAppPackageDriver implements StepDriver {
     ctx.addTelemetryProperties({
       [telemetryKey]: vars.join(";"),
     });
-    const result = expandEnvironmentVariable(content);
+    const result = expandEnvironmentVariable(content, undefined, true);
     const notExpandedVars = getEnvironmentVariables(result);
     if (notExpandedVars.length > 0) {
       return err(
