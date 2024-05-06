@@ -5,7 +5,7 @@
             "name": "Launch Remote in Teams (Edge)",
             "type": "msedge",
             "request": "launch",
-            "url": "https://teams.microsoft.com/l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}#l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true",
             "presentation": {
                 "group": "group 1: Teams",
                 "order": 3
@@ -16,7 +16,7 @@
             "name": "Launch Remote in Teams (Chrome)",
             "type": "chrome",
             "request": "launch",
-            "url": "https://teams.microsoft.com/l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}#l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true",
             "presentation": {
                 "group": "group 1: Teams",
                 "order": 3
@@ -27,7 +27,7 @@
             "name": "Launch App (Edge)",
             "type": "msedge",
             "request": "launch",
-            "url": "https://teams.microsoft.com/l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}#l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true",
             "presentation": {
                 "group": "all",
                 "hidden": true
@@ -38,7 +38,7 @@
             "name": "Launch App (Chrome)",
             "type": "chrome",
             "request": "launch",
-            "url": "https://teams.microsoft.com/l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}#l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true",
             "presentation": {
                 "group": "all",
                 "hidden": true

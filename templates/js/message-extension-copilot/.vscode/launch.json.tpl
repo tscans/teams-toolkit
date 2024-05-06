@@ -5,7 +5,7 @@
             "name": "Launch Remote in Teams (Edge)",
             "type": "msedge",
             "request": "launch",
-            "url": "https://teams.microsoft.com/l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}#l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true",
             "presentation": {
                 "group": "group 1: Teams",
                 "order": 3
@@ -16,7 +16,7 @@
             "name": "Launch Remote in Teams (Chrome)",
             "type": "chrome",
             "request": "launch",
-            "url": "https://teams.microsoft.com/l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}#l/app/${{TEAMS_APP_ID}}?installAppPackage=true&webjoin=true",
             "presentation": {
                 "group": "group 1: Teams",
                 "order": 3
@@ -49,7 +49,7 @@
             "name": "Launch Remote in Copilot (Edge)",
             "type": "msedge",
             "request": "launch",
-            "url": "https://teams.microsoft.com?${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}",
             "presentation": {
                 "group": "group 2: Copilot",
                 "order": 3
@@ -60,7 +60,7 @@
             "name": "Launch Remote in Copilot (Chrome)",
             "type": "chrome",
             "request": "launch",
-            "url": "https://teams.microsoft.com?${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}",
             "presentation": {
                 "group": "group 2: Copilot",
                 "order": 3
@@ -71,7 +71,7 @@
             "name": "Launch App in Teams (Edge)",
             "type": "msedge",
             "request": "launch",
-            "url": "https://teams.microsoft.com/l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}#l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true",
             "cascadeTerminateToConfigurations": [
                 "Attach to Local Service"
             ],
@@ -85,7 +85,7 @@
             "name": "Launch App in Teams (Chrome)",
             "type": "chrome",
             "request": "launch",
-            "url": "https://teams.microsoft.com/l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}#l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true",
             "cascadeTerminateToConfigurations": [
                 "Attach to Local Service"
             ],
@@ -127,7 +127,7 @@
             "name": "Launch App in Copilot (Edge)",
             "type": "msedge",
             "request": "launch",
-            "url": "https://teams.microsoft.com?${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}",
             "cascadeTerminateToConfigurations": [
                 "Attach to Local Service"
             ],
@@ -141,7 +141,7 @@
             "name": "Launch App in Copilot (Chrome)",
             "type": "chrome",
             "request": "launch",
-            "url": "https://teams.microsoft.com?${account-hint}",
+            "url": "https://teams.microsoft.com/?clientexperience=t2&${account-hint}",
             "cascadeTerminateToConfigurations": [
                 "Attach to Local Service"
             ],
