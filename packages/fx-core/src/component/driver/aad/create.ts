@@ -167,12 +167,12 @@ export class CreateAadAppDriver implements StepDriver {
         };
       }
 
-      if (axios.isAxiosError(error)) {
-        const message = JSON.stringify(error.response!.data);
+      if (axios.isAxiosError(error) && error.response) {
+        const message = JSON.stringify(error.response.data);
         context.logProvider?.error(
           getLocalizedString(logMessageKeys.failExecuteDriver, actionName, message)
         );
-        if (error.response!.status >= 400 && error.response!.status < 500) {
+        if (error.response.status >= 400 && error.response.status < 500) {
           return {
             result: err(new HttpClientError(error, actionName, message, helpLink)),
             summaries: summaries,

@@ -206,6 +206,25 @@ describe("botAadAppCreate", async () => {
     });
   });
 
+  it("should throw unhandled error when axios error contains no response", async () => {
+    sinon.stub(AadAppClient.prototype, "createAadApp").rejects({
+      isAxiosError: true,
+    });
+
+    const args: any = {
+      name: expectedDisplayName,
+    };
+
+    await expect(
+      createBotAadAppDriver.handler(args, mockedDriverContext, outputEnvVarNames)
+    ).to.be.rejected.then((error) => {
+      expect(error instanceof UnhandledError).to.be.true;
+      expect(error.message).equals(
+        'An unexpected error has occurred while performing the aadAppCreate task. {"isAxiosError":true}'
+      );
+    });
+  });
+
   it("should throw error when GraphClient throws errors", async () => {
     sinon.stub(AadAppClient.prototype, "createAadApp").throwsException();
     const args: any = {

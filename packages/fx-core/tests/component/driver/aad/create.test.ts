@@ -19,6 +19,7 @@ import {
   HttpClientError,
   HttpServerError,
   InvalidActionInputError,
+  UnhandledError,
 } from "../../../../src/error/common";
 import { UserError } from "@microsoft/teamsfx-api";
 import { OutputEnvironmentVariableUndefinedError } from "../../../../src/component/driver/error/outputEnvironmentVariableUndefinedError";
@@ -435,6 +436,26 @@ describe("aadAppCreate", async () => {
       .and.has.property("message")
       .and.equals(
         'A http server error happened while performing the aadApp/create task. Please try again later. The error response is: {"error":{"code":"InternalServerError","message":"Internal server error"}}'
+      );
+  });
+
+  it("should throw unhandled error when axios error contains no response", async () => {
+    sinon.stub(AadAppClient.prototype, "createAadApp").rejects({
+      isAxiosError: true,
+    });
+
+    const args: any = {
+      name: "test",
+      generateClientSecret: false,
+    };
+
+    const result = await createAadAppDriver.execute(args, mockedDriverContext, outputEnvVarNames);
+    expect(result.result.isErr()).to.be.true;
+    expect(result.result._unsafeUnwrapErr())
+      .is.instanceOf(UnhandledError)
+      .and.property("message")
+      .equals(
+        'An unexpected error has occurred while performing the aadAppCreate task. {"isAxiosError":true}'
       );
   });
 

@@ -142,12 +142,12 @@ export class CreateBotAadAppDriver implements StepDriver {
         throw error;
       }
 
-      if (axios.isAxiosError(error)) {
+      if (axios.isAxiosError(error) && error.response) {
         const message = JSON.stringify(error.response?.data);
         context.logProvider?.error(
           getLocalizedString(logMessageKeys.failExecuteDriver, actionName, message)
         );
-        if (error.response!.status >= 400 && error.response!.status < 500) {
+        if (error.response.status >= 400 && error.response.status < 500) {
           throw new HttpClientError(error, actionName, message, helpLink);
         } else {
           throw new HttpServerError(error, actionName, message);
