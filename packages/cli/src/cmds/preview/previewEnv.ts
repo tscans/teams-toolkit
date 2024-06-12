@@ -36,6 +36,7 @@ import { openHubWebClientNew } from "./launch";
 import { localTelemetryReporter } from "./localTelemetryReporter";
 import { ServiceLogWriter } from "./serviceLogWriter";
 import { Task } from "./task";
+import { login } from "../../commonlib/common/login";
 enum Progress {
   M365Account = "Microsoft 365 Account",
 }
@@ -70,6 +71,7 @@ export default class PreviewEnv {
     const execPath: string = args["exec-path"] as string;
     const browser = args.browser as constants.Browser;
     const browserArguments = (args["browser-arg"] as string[]) ?? [];
+    const desktop = args["desktop"] as boolean;
 
     cliTelemetry.withRootFolder(workspaceFolder);
     this.telemetryProperties[TelemetryProperty.PreviewType] =
@@ -92,7 +94,8 @@ export default class PreviewEnv {
           m365Host,
           browser,
           browserArguments,
-          execPath
+          execPath,
+          desktop
         ),
       (result: Result<null, FxError>, ctx: TelemetryContext) => {
         // whether on success or failure, send this.telemetryProperties and this.telemetryMeasurements
@@ -114,7 +117,8 @@ export default class PreviewEnv {
     hub: HubTypes,
     browser: constants.Browser,
     browserArguments: string[],
-    execPath: string
+    execPath: string,
+    desktop: boolean
   ): Promise<Result<null, FxError>> {
     // 1. load envs
     const envRes = await envUtil.readEnv(workspaceFolder, env, false, false);
@@ -180,10 +184,20 @@ export default class PreviewEnv {
         }
       }
 
-      // 6. open hub web client
-      const launchRes = await this.launchBrowser(env, hub, urlRes.value, browser, browserArguments);
-      if (launchRes.isErr()) {
-        throw launchRes.error;
+      // 6. open hub web client or Teams desktop client
+      if (desktop && hub == HubTypes.teams) {
+        
+      } else {
+        const launchRes = await this.launchBrowser(
+          env,
+          hub,
+          urlRes.value,
+          browser,
+          browserArguments
+        );
+        if (launchRes.isErr()) {
+          throw launchRes.error;
+        }
       }
       if (runCommand !== undefined && env === environmentNameManager.getLocalEnvName()) {
         cliLogger.necessaryLog(LogLevel.Warning, constants.waitCtrlPlusC);
@@ -381,6 +395,26 @@ export default class PreviewEnv {
     if (hub !== HubTypes.teams) {
       cliLogger.necessaryLog(LogLevel.Warning, constants.m365TenantHintMessage);
     }
+
+    return ok(null);
+  }
+
+  protected async launchDesktopClient(env: string, url: string): Promise<Result<null, FxError>> {
+    const loginStatusRes = await M365TokenInstance.getStatus({ scopes: AppStudioScopes });
+    let username = "";
+    if (
+      loginStatusRes.isOk() &&
+      loginStatusRes?.value?.accountInfo &&
+      loginStatusRes?.value?.accountInfo["unique_name"]
+    ) {
+      username = " (" + (loginStatusRes?.value?.accountInfo["unique_name"] as string) + ")";
+    }
+    await openHubWebClientNew(url, username, this.telemetryProperties);
+
+    cliLogger.necessaryLog(
+      LogLevel.Warning,
+      util.format(constants.manifestChangesHintMessage, `--env ${env}`)
+    );
 
     return ok(null);
   }
