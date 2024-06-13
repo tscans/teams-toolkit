@@ -21,17 +21,17 @@ import {
   DepsCheckerError,
   DepsManager,
   DepsType,
+  ErrorCategory,
   LocalEnvManager,
+  MosServiceScope,
   NodeNotFoundError,
   NodeNotLtsError,
+  PackageService,
   Prerequisite,
   TelemetryContext,
   V3NodeNotSupportedError,
   assembleError,
-  MosServiceScope,
-  getSideloadingStatus,
-  ErrorCategory,
-  PackageService,
+  teamsDevPortalClient,
 } from "@microsoft/teamsfx-core";
 import * as os from "os";
 import * as util from "util";
@@ -41,10 +41,10 @@ import { signedOut } from "../commonlib/common/constant";
 import VsCodeLogInstance from "../commonlib/log";
 import M365TokenInstance from "../commonlib/m365Login";
 import { ExtensionErrors, ExtensionSource } from "../error";
-import { VS_CODE_UI } from "../qm/vsc_ui";
 import { tools, workspaceUri } from "../globalVariables";
 import { checkCopilotCallback, openAccountHelpHandler } from "../handlers";
 import { ProgressHandler } from "../progressHandler";
+import { VS_CODE_UI } from "../qm/vsc_ui";
 import { ExtTelemetry } from "../telemetry/extTelemetry";
 import { TelemetryEvent, TelemetryProperty } from "../telemetry/extTelemetryEvents";
 import { getDefaultString, localize } from "../utils/localizeUtils";
@@ -52,8 +52,8 @@ import * as commonUtils from "./commonUtils";
 import { Step } from "./commonUtils";
 import {
   DisplayMessages,
-  prerequisiteCheckForGetStartedDisplayMessages,
   RecommendedOperations,
+  prerequisiteCheckForGetStartedDisplayMessages,
   v3PrerequisiteCheckTaskDisplayMessages,
 } from "./constants";
 import { doctorConstant } from "./depsChecker/doctorConstant";
@@ -489,7 +489,9 @@ async function ensureSideloding(
   const sideloadingResult = await localTelemetryReporter.runWithTelemetry(
     TelemetryEvent.DebugPrereqsCheckM365Sideloading,
     async (ctx: TelemetryContext) => {
-      const isSideloadingEnabled = await getSideloadingStatus(m365Result.value.token);
+      const isSideloadingEnabled = await teamsDevPortalClient.getSideloadingStatus(
+        m365Result.value.token
+      );
       // true, false or undefined for error
       ctx.properties[TelemetryProperty.DebugIsSideloadingAllowed] = String(!!isSideloadingEnabled);
       if (isSideloadingEnabled === false) {

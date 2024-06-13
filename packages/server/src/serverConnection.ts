@@ -31,7 +31,6 @@ import {
   TestToolInstallOptions,
   assembleError,
   environmentNameManager,
-  getSideloadingStatus,
   listDevTunnels,
   teamsDevPortalClient,
 } from "@microsoft/teamsfx-core";
@@ -330,7 +329,7 @@ export default class ServerConnection implements IServerConnection {
     },
     token: CancellationToken
   ): Promise<Result<string, FxError>> {
-    const res = await getSideloadingStatus(accountToken.token);
+    const res = await teamsDevPortalClient.getSideloadingStatus(accountToken.token);
     return ok(String(res));
   }
 

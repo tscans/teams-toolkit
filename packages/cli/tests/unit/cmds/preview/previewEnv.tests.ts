@@ -2,9 +2,16 @@
 // Licensed under the MIT license.
 
 import { err, FxError, IProgressHandler, ok, Result } from "@microsoft/teamsfx-api";
-import { envUtil, FxCore, HubTypes, VersionCheckRes, VersionState } from "@microsoft/teamsfx-core";
+import {
+  envUtil,
+  FxCore,
+  HubTypes,
+  teamsDevPortalClient,
+  VersionCheckRes,
+  VersionState,
+} from "@microsoft/teamsfx-core";
+import * as settingHelper from "@microsoft/teamsfx-core/build/common/projectSettingsHelper";
 import * as packageJson from "@microsoft/teamsfx-core/build/component/local/packageJsonHelper";
-import * as tools from "@microsoft/teamsfx-core/build/common/tools";
 import fs from "fs-extra";
 import { RestoreFn } from "mocked-env";
 import * as path from "path";
@@ -20,9 +27,7 @@ import cliLogger from "../../../../src/commonlib/log";
 import M365TokenInstance from "../../../../src/commonlib/m365Login";
 import cliTelemetry from "../../../../src/telemetry/cliTelemetry";
 import CLIUIInstance from "../../../../src/userInteraction";
-import * as Utils from "../../../../src/utils";
 import { expect } from "../../utils";
-import * as settingHelper from "@microsoft/teamsfx-core/build/common/projectSettingsHelper";
 
 describe("Preview --env", () => {
   const sandbox = sinon.createSandbox();
@@ -328,7 +333,7 @@ describe("PreviewEnv Steps", () => {
         })
       )
     );
-    sandbox.stub(tools, "getSideloadingStatus").resolves(true);
+    sandbox.stub(teamsDevPortalClient, "getSideloadingStatus").resolves(true);
 
     const previewEnv = new PreviewEnvTest();
     const accountRes = await previewEnv.checkM365Account(undefined);
@@ -359,7 +364,7 @@ describe("PreviewEnv Steps", () => {
       })
     );
     sandbox.stub(M365TokenInstance, "getAccessToken").resolves(ok(token));
-    sandbox.stub(tools, "getSideloadingStatus").resolves(true);
+    sandbox.stub(teamsDevPortalClient, "getSideloadingStatus").resolves(true);
 
     const previewEnv = new PreviewEnvTest();
     const accountRes = await previewEnv.checkM365Account(undefined);
@@ -385,7 +390,7 @@ describe("PreviewEnv Steps", () => {
         })
       )
     );
-    sandbox.stub(tools, "getSideloadingStatus").resolves(false);
+    sandbox.stub(teamsDevPortalClient, "getSideloadingStatus").resolves(false);
 
     const previewEnv = new PreviewEnvTest();
     const accountRes = await previewEnv.checkM365Account(undefined);

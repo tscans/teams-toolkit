@@ -10,9 +10,10 @@ import "mocha";
 import mockFs from "mock-fs";
 import * as path from "path";
 import Sinon, * as sinon from "sinon";
+import { teamsDevPortalClient } from "../../src/client/teamsDevPortalClient";
 import { getProjectMetadata } from "../../src/common/projectSettingsHelper";
 import * as telemetry from "../../src/common/telemetry";
-import { getSPFxToken, getSideloadingStatus, listDevTunnels } from "../../src/common/tools";
+import { getSPFxToken, listDevTunnels } from "../../src/common/tools";
 import { PackageService } from "../../src/component/m365/packageService";
 import { isVideoFilterProject } from "../../src/core/middleware/videoFilterAppBlocker";
 import { isUserCancelError } from "../../src/error/common";
@@ -60,7 +61,7 @@ describe("tools", () => {
         } as AxiosResponse;
       };
 
-      const result = await getSideloadingStatus("fake-token");
+      const result = await teamsDevPortalClient.getSideloadingStatus("fake-token");
 
       chai.assert.isDefined(result);
       chai.assert.isTrue(result);
@@ -80,7 +81,7 @@ describe("tools", () => {
         } as AxiosResponse;
       };
 
-      const result = await getSideloadingStatus("fake-token");
+      const result = await teamsDevPortalClient.getSideloadingStatus("fake-token");
 
       chai.assert.isDefined(result);
       chai.assert.isFalse(result);
@@ -100,7 +101,7 @@ describe("tools", () => {
         } as AxiosResponse;
       };
 
-      const result = await getSideloadingStatus("fake-token");
+      const result = await teamsDevPortalClient.getSideloadingStatus("fake-token");
 
       chai.assert.isUndefined(result);
       chai.assert.equal(events, 0);
@@ -113,7 +114,7 @@ describe("tools", () => {
       };
       const clock = sinon.useFakeTimers();
 
-      const resultPromise = getSideloadingStatus("fake-token");
+      const resultPromise = teamsDevPortalClient.getSideloadingStatus("fake-token");
       await clock.tickAsync(100000);
       const result = await resultPromise;
       clock.restore();

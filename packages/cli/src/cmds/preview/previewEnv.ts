@@ -7,14 +7,14 @@ import { Colors, err, FxError, LogLevel, ok, Result } from "@microsoft/teamsfx-a
 import {
   AppStudioScopes,
   assembleError,
-  QuestionNames,
   environmentNameManager,
   envUtil,
   FxCore,
-  getSideloadingStatus,
   HubTypes,
   isValidProjectV3,
   loadTeamsFxDevScript,
+  QuestionNames,
+  teamsDevPortalClient,
   TelemetryContext,
 } from "@microsoft/teamsfx-core";
 import fs from "fs-extra";
@@ -228,7 +228,7 @@ export default class PreviewEnv {
         result = false;
         summaryMsg = constants.doctorResult.NotSignIn;
       } else {
-        const isSideloadingEnabled = await getSideloadingStatus(token);
+        const isSideloadingEnabled = await teamsDevPortalClient.getSideloadingStatus(token);
         if (isSideloadingEnabled === false) {
           // sideloading disabled
           result = false;

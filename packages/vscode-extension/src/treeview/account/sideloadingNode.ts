@@ -3,7 +3,7 @@
 
 import * as vscode from "vscode";
 
-import { getSideloadingStatus } from "@microsoft/teamsfx-core";
+import { teamsDevPortalClient } from "@microsoft/teamsfx-core";
 
 import { checkSideloadingCallback } from "../../handlers";
 import { TelemetryTriggerFrom } from "../../telemetry/extTelemetryEvents";
@@ -32,7 +32,7 @@ export class SideloadingNode extends DynamicNode {
   public override async getTreeItem(): Promise<vscode.TreeItem> {
     let isSideloadingAllowed: boolean | undefined;
     if (this.token != "") {
-      isSideloadingAllowed = await getSideloadingStatus(this.token);
+      isSideloadingAllowed = await teamsDevPortalClient.getSideloadingStatus(this.token);
       if (isSideloadingAllowed === false) {
         await checkSideloadingCallback();
       }

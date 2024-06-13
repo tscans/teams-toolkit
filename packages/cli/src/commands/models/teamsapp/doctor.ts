@@ -10,7 +10,7 @@ import {
   FuncToolChecker,
   LocalCertificateManager,
   assembleError,
-  getSideloadingStatus,
+  teamsDevPortalClient,
 } from "@microsoft/teamsfx-core";
 import * as util from "util";
 import { getFxCore } from "../../../activate";
@@ -123,7 +123,7 @@ export class DoctorChecker {
         result = false;
         summaryMsg = WarningText + strings.command.doctor.account.NotSignIn;
       } else {
-        const isSideloadingEnabled = await getSideloadingStatus(token);
+        const isSideloadingEnabled = await teamsDevPortalClient.getSideloadingStatus(token);
         if (isSideloadingEnabled === false) {
           // sideloading disabled
           result = false;

@@ -7,12 +7,7 @@ import {
 } from "@microsoft/dev-tunnels-management";
 import { FxError, M365TokenProvider, Result, SystemError, err, ok } from "@microsoft/teamsfx-api";
 import axios from "axios";
-import { teamsDevPortalClient } from "../client/teamsDevPortalClient";
 import { GraphReadUserScopes, SPFxScopes } from "./constants";
-
-export async function getSideloadingStatus(token: string): Promise<boolean | undefined> {
-  return teamsDevPortalClient.getSideloadingStatus(token);
-}
 
 export async function getSPFxTenant(graphToken: string): Promise<string> {
   const GRAPH_TENANT_ENDPT = "https://graph.microsoft.com/v1.0/sites/root?$select=webUrl";

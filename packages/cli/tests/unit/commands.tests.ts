@@ -9,11 +9,11 @@ import {
   LtsNodeChecker,
   PackageService,
   PermissionsResult,
-  QuestionNames,
   UserCancelError,
   envUtil,
+  teamsDevPortalClient,
 } from "@microsoft/teamsfx-core";
-import * as tools from "@microsoft/teamsfx-core/build/common/tools";
+import * as settingHelper from "@microsoft/teamsfx-core/build/common/projectSettingsHelper";
 import { assert } from "chai";
 import "mocha";
 import mockedEnv, { RestoreFn } from "mocked-env";
@@ -49,22 +49,21 @@ import {
   upgradeCommand,
   validateCommand,
 } from "../../src/commands/models";
+import { addPluginCommand } from "../../src/commands/models/addPlugin";
+import { entraAppUpdateCommand } from "../../src/commands/models/entraAppUpdate";
+import { envResetCommand } from "../../src/commands/models/envReset";
 import { DoctorChecker, teamsappDoctorCommand } from "../../src/commands/models/teamsapp/doctor";
 import { teamsappPackageCommand } from "../../src/commands/models/teamsapp/package";
 import { teamsappPublishCommand } from "../../src/commands/models/teamsapp/publish";
 import { teamsappUpdateCommand } from "../../src/commands/models/teamsapp/update";
 import { teamsappValidateCommand } from "../../src/commands/models/teamsapp/validate";
 import AzureTokenProvider from "../../src/commonlib/azureLogin";
+import AzureTokenCIProvider from "../../src/commonlib/azureLoginCI";
 import { signedIn, signedOut } from "../../src/commonlib/common/constant";
 import { logger } from "../../src/commonlib/logger";
 import M365TokenProvider from "../../src/commonlib/m365Login";
 import { MissingRequiredOptionError } from "../../src/error";
 import * as utils from "../../src/utils";
-import * as settingHelper from "@microsoft/teamsfx-core/build/common/projectSettingsHelper";
-import { entraAppUpdateCommand } from "../../src/commands/models/entraAppUpdate";
-import AzureTokenCIProvider from "../../src/commonlib/azureLoginCI";
-import { envResetCommand } from "../../src/commands/models/envReset";
-import { addPluginCommand } from "../../src/commands/models/addPlugin";
 
 describe("CLI commands", () => {
   const sandbox = sinon.createSandbox();
@@ -1291,7 +1290,7 @@ describe("CLI read-only commands", () => {
             })
           )
         );
-        sandbox.stub(tools, "getSideloadingStatus").resolves(true);
+        sandbox.stub(teamsDevPortalClient, "getSideloadingStatus").resolves(true);
         const checker = new DoctorChecker();
         const accountRes = await checker.checkM365Account();
         assert.isTrue(accountRes.isOk());
@@ -1300,7 +1299,7 @@ describe("CLI read-only commands", () => {
       });
       it("checkM365Account - error", async () => {
         sandbox.stub(M365TokenProvider, "getStatus").resolves(err(new UserCancelError()));
-        sandbox.stub(tools, "getSideloadingStatus").resolves(true);
+        sandbox.stub(teamsDevPortalClient, "getSideloadingStatus").resolves(true);
         const checker = new DoctorChecker();
         const accountRes = await checker.checkM365Account();
         assert.isTrue(accountRes.isOk());
@@ -1309,7 +1308,7 @@ describe("CLI read-only commands", () => {
       });
       it("checkM365Account - error2", async () => {
         sandbox.stub(M365TokenProvider, "getStatus").rejects(new Error("test"));
-        sandbox.stub(tools, "getSideloadingStatus").resolves(true);
+        sandbox.stub(teamsDevPortalClient, "getSideloadingStatus").resolves(true);
         const checker = new DoctorChecker();
         const accountRes = await checker.checkM365Account();
         assert.isTrue(accountRes.isErr());
@@ -1335,7 +1334,7 @@ describe("CLI read-only commands", () => {
           })
         );
         sandbox.stub(M365TokenProvider, "getAccessToken").resolves(ok(token));
-        sandbox.stub(tools, "getSideloadingStatus").resolves(true);
+        sandbox.stub(teamsDevPortalClient, "getSideloadingStatus").resolves(true);
         const checker = new DoctorChecker();
         const accountRes = await checker.checkM365Account();
         assert.isTrue(accountRes.isOk());
@@ -1359,7 +1358,7 @@ describe("CLI read-only commands", () => {
             })
           )
         );
-        sandbox.stub(tools, "getSideloadingStatus").resolves(false);
+        sandbox.stub(teamsDevPortalClient, "getSideloadingStatus").resolves(false);
         const checker = new DoctorChecker();
         const accountRes = await checker.checkM365Account();
         assert.isTrue(accountRes.isOk());
