@@ -27,6 +27,7 @@ import {
 } from "../telemetry/extTelemetryEvents";
 import createCommandHandler from "./commands/create/createCommandHandler";
 import nextStepCommandHandler from "./commands/nextstep/nextstepCommandHandler";
+import fixCommandHandler from "./commands/fix/fixCommandHandler";
 import { TeamsChatCommand, chatParticipantId } from "./consts";
 import followupProvider from "./followupProvider";
 import { defaultSystemPrompt } from "./prompts";
@@ -47,6 +48,8 @@ export function chatRequestHandler(
     return createCommandHandler(request, context, response, token);
   } else if (request.command == TeamsChatCommand.NextStep) {
     return nextStepCommandHandler(request, context, response, token);
+  } else if (request.command == TeamsChatCommand.Fix) {
+    return fixCommandHandler(request, context, response, token);
   } else {
     return defaultHandler(request, context, response, token);
   }

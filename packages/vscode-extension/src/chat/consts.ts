@@ -11,6 +11,7 @@ export const CHAT_OPENURL_COMMAND_ID = "fx-extension.chat.openUrlCommand";
 export const enum TeamsChatCommand {
   Create = "create",
   NextStep = "nextstep",
+  Fix = "fix",
 }
 
 export const DefaultNextStep: ChatFollowup = {

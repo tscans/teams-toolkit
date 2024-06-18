@@ -13,7 +13,8 @@
       "resolveSourceMapLocations": [],
       "env": {
         "NODE_ENV": "development",
-        "TEAMSFX_SAMPLE_CONFIG_BRANCH": "dev"
+        "TEAMSFX_SAMPLE_CONFIG_BRANCH": "dev",
+        "TEAMSFX_CHAT_PARTICIPANT": "true"
       },
       "preLaunchTask": "npm: build"
     },
