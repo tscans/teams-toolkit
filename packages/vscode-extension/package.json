@@ -1576,6 +1576,10 @@
           {
             "name": "nextstep",
             "description": "%teamstoolkit.chatParticipants.nextStep.description%"
+          },
+          {
+            "name": "fix",
+            "description": "%teamstoolkit.chatParticipants.fix.description%"
           }
         ]
       },
