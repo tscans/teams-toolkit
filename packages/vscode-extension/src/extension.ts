@@ -82,6 +82,9 @@ import * as copilotChatHandlers from "./handlers/copilotChatHandlers";
 import { debugInTestToolHandler } from "./handlers/debugInTestTool";
 import { downloadSampleApp } from "./handlers/downloadSample";
 import {
+  addWebpartHandler,
+  copilotPluginAddAPIHandler,
+  createNewEnvironmentHandler,
   createNewProjectHandler,
   deployHandler,
   provisionHandler,
@@ -537,12 +540,7 @@ function registerTreeViewCommandsInDevelopment(context: vscode.ExtensionContext)
     handlers.installAdaptiveCardExt
   );
 
-  registerInCommandController(
-    context,
-    "fx-extension.addWebpart",
-    handlers.addWebpart,
-    "addWebpart"
-  );
+  registerInCommandController(context, "fx-extension.addWebpart", addWebpartHandler, "addWebpart");
 }
 
 function registerTreeViewCommandsInLifecycle(context: vscode.ExtensionContext) {
@@ -582,7 +580,7 @@ function registerTeamsFxCommands(context: vscode.ExtensionContext) {
   const createNewEnvironment = vscode.commands.registerCommand(
     // TODO: fix trigger from
     "fx-extension.addEnvironment",
-    (...args) => Correlator.run(handlers.createNewEnvironment, args)
+    (...args) => Correlator.run(createNewEnvironmentHandler, args)
   );
   context.subscriptions.push(createNewEnvironment);
 
@@ -652,7 +650,7 @@ function registerMenuCommands(context: vscode.ExtensionContext) {
   const createNewEnvironmentWithIcon = vscode.commands.registerCommand(
     "fx-extension.addEnvironmentWithIcon",
     (...args) =>
-      Correlator.run(handlers.createNewEnvironment, [TelemetryTriggerFrom.ViewTitleNavigation])
+      Correlator.run(createNewEnvironmentHandler, [TelemetryTriggerFrom.ViewTitleNavigation])
   );
   context.subscriptions.push(createNewEnvironmentWithIcon);
 
@@ -773,7 +771,7 @@ function registerMenuCommands(context: vscode.ExtensionContext) {
   const addAPICmd = vscode.commands.registerCommand(
     "fx-extension.copilotPluginAddAPI",
     async (...args) => {
-      await Correlator.run(handlers.copilotPluginAddAPIHandler, args);
+      await Correlator.run(copilotPluginAddAPIHandler, args);
     }
   );
   context.subscriptions.push(addAPICmd);

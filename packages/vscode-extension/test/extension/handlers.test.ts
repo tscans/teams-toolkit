@@ -93,36 +93,6 @@ describe("handlers", () => {
       sandbox.restore();
     });
 
-    it("API ME: copilotPluginAddAPIHandler()", async () => {
-      sandbox.stub(globalVariables, "core").value(new MockCore());
-      const addAPIHanlder = sandbox.spy(globalVariables.core, "copilotPluginAddAPI");
-      const args = [
-        {
-          fsPath: "manifest.json",
-        },
-      ];
-
-      await handlers.copilotPluginAddAPIHandler(args);
-
-      sinon.assert.calledOnce(addAPIHanlder);
-    });
-
-    it("API Plugin: copilotPluginAddAPIHandler()", async () => {
-      sandbox.stub(globalVariables, "core").value(new MockCore());
-      const addAPIHanlder = sandbox.spy(globalVariables.core, "copilotPluginAddAPI");
-      const args = [
-        {
-          fsPath: "openapi.yaml",
-          isFromApiPlugin: true,
-          manifestPath: "manifest.json",
-        },
-      ];
-
-      await handlers.copilotPluginAddAPIHandler(args);
-
-      sinon.assert.calledOnce(addAPIHanlder);
-    });
-
     it("treeViewPreviewHandler() - previewWithManifest error", async () => {
       sandbox.stub(localizeUtils, "localize").returns("");
       sandbox.stub(ExtTelemetry, "sendTelemetryEvent");

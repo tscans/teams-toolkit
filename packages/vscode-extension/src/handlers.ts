@@ -9,17 +9,14 @@
 "use strict";
 
 import {
-  AppPackageFolderName,
   BuildFolderName,
   Func,
   FxError,
-  OptionItem,
   Result,
   SelectFileConfig,
   SelectFolderConfig,
   SingleSelectConfig,
   Stage,
-  StaticOptions,
   SubscriptionInfo,
   SystemError,
   UserError,
@@ -63,8 +60,7 @@ import { openHubWebClient } from "./debug/launch";
 import { selectAndDebug } from "./debug/runIconHandler";
 import { showError, wrapError } from "./error/common";
 import { ExtensionErrors, ExtensionSource } from "./error/error";
-import { TreatmentVariableValue } from "./exp/treatmentVariables";
-import { core, isSPFxProject, isTeamsFxProject, tools, workspaceUri } from "./globalVariables";
+import { core, isTeamsFxProject, tools, workspaceUri } from "./globalVariables";
 import { createNewProjectHandler } from "./handlers/lifecycleHandlers";
 import { processResult, runCommand } from "./handlers/sharedOpts";
 import { TeamsAppMigrationHandler } from "./migration/migrationHandler";
@@ -185,12 +181,6 @@ export function openFolderHandler(...args: unknown[]): Promise<Result<unknown, F
     openFolderInExplorer(uri.fsPath);
   }
   return Promise.resolve(ok(null));
-}
-
-export async function addWebpart(...args: unknown[]) {
-  ExtTelemetry.sendTelemetryEvent(TelemetryEvent.AddWebpartStart, getTriggerFromProperty(args));
-
-  return await runCommand(Stage.addWebpart);
 }
 
 export async function validateAzureDependenciesHandler(): Promise<string | undefined> {
@@ -362,18 +352,6 @@ export async function openExternalHandler(args?: any[]) {
     const url = (args[0] as { url: string }).url;
     return vscode.env.openExternal(vscode.Uri.parse(url));
   }
-}
-
-export async function createNewEnvironment(args?: any[]): Promise<Result<undefined, FxError>> {
-  ExtTelemetry.sendTelemetryEvent(
-    TelemetryEvent.CreateNewEnvironmentStart,
-    getTriggerFromProperty(args)
-  );
-  const result = await runCommand(Stage.createEnv);
-  if (!result.isErr()) {
-    await envTreeProviderInstance.reloadEnvironments();
-  }
-  return result;
 }
 
 export async function refreshEnvironment(args?: any[]): Promise<Result<Void, FxError>> {
@@ -730,25 +708,6 @@ export async function openConfigStateFile(args: any[]): Promise<any> {
   ExtTelemetry.sendTelemetryEvent(telemetryName, {
     [TelemetryProperty.Success]: TelemetrySuccess.Yes,
   });
-}
-
-export async function copilotPluginAddAPIHandler(args: any[]) {
-  // Telemetries are handled in runCommand()
-  const inputs = getSystemInputs();
-  if (args && args.length > 0) {
-    const filePath = args[0].fsPath as string;
-    const isFromApiPlugin: boolean = args[0].isFromApiPlugin ?? false;
-    if (!isFromApiPlugin) {
-      // Codelens for API ME. Trigger from manifest.json
-      inputs[QuestionNames.ManifestPath] = filePath;
-    } else {
-      inputs[QuestionNames.Capabilities] = CapabilityOptions.copilotPluginApiSpec().id;
-      inputs[QuestionNames.DestinationApiSpecFilePath] = filePath;
-      inputs[QuestionNames.ManifestPath] = args[0].manifestPath;
-    }
-  }
-  const result = await runCommand(Stage.copilotPluginAddAPI, inputs);
-  return result;
 }
 
 export function editAadManifestTemplate(args: any[]) {

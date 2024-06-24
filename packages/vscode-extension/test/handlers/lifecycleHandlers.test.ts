@@ -4,7 +4,9 @@ import * as projectSettingsHelper from "@microsoft/teamsfx-core/build/common/pro
 import { assert } from "chai";
 import * as sinon from "sinon";
 import * as copilotHandler from "../../src/handlers/copilotChatHandlers";
+import * as globalVariables from "../../src/globalVariables";
 import {
+  copilotPluginAddAPIHandler,
   createNewProjectHandler,
   deployHandler,
   provisionHandler,
@@ -17,6 +19,7 @@ import { TelemetryEvent } from "../../src/telemetry/extTelemetryEvents";
 import envTreeProviderInstance from "../../src/treeview/environmentTreeViewProvider";
 import * as telemetryUtils from "../../src/utils/telemetryUtils";
 import * as workspaceUtils from "../../src/utils/workspaceUtils";
+import { MockCore } from "../mocks/mockCore";
 
 describe("Lifecycle handlers", () => {
   const sandbox = sinon.createSandbox();
@@ -29,6 +32,7 @@ describe("Lifecycle handlers", () => {
   afterEach(() => {
     sandbox.restore();
   });
+
   describe("provision handlers", () => {
     it("error", async () => {
       sandbox.stub(shared, "runCommand").resolves(err(new UserCancelError()));
@@ -118,6 +122,7 @@ describe("Lifecycle handlers", () => {
       assert.isTrue(openFolder.calledOnce);
     });
   });
+
   describe("provisionHandler", function () {
     it("happy", async () => {
       sandbox.stub(shared, "runCommand").resolves(ok(undefined));
@@ -126,6 +131,7 @@ describe("Lifecycle handlers", () => {
       assert.isTrue(res.isOk());
     });
   });
+
   describe("deployHandler", function () {
     it("happy", async () => {
       sandbox.stub(shared, "runCommand").resolves(ok(undefined));
@@ -133,11 +139,48 @@ describe("Lifecycle handlers", () => {
       assert.isTrue(res.isOk());
     });
   });
+
   describe("publishHandler", function () {
     it("happy()", async () => {
       sandbox.stub(shared, "runCommand").resolves(ok(undefined));
       const res = await publishHandler();
       assert.isTrue(res.isOk());
+    });
+  });
+
+  describe("copilotPluginAddAPIHandler", function () {
+    const sandbox = sinon.createSandbox();
+
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    it("API ME: copilotPluginAddAPIHandler()", async () => {
+      sandbox.stub(globalVariables, "core").value(new MockCore());
+      const addAPIHanlder = sandbox.spy(globalVariables.core, "copilotPluginAddAPI");
+      const args = [
+        {
+          fsPath: "manifest.json",
+        },
+      ];
+
+      await copilotPluginAddAPIHandler(args);
+      sinon.assert.calledOnce(addAPIHanlder);
+    });
+
+    it("API Plugin: copilotPluginAddAPIHandler()", async () => {
+      sandbox.stub(globalVariables, "core").value(new MockCore());
+      const addAPIHanlder = sandbox.spy(globalVariables.core, "copilotPluginAddAPI");
+      const args = [
+        {
+          fsPath: "openapi.yaml",
+          isFromApiPlugin: true,
+          manifestPath: "manifest.json",
+        },
+      ];
+
+      await copilotPluginAddAPIHandler(args);
+      sinon.assert.calledOnce(addAPIHanlder);
     });
   });
 });

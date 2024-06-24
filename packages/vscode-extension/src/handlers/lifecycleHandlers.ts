@@ -1,7 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 import { CreateProjectResult, err, FxError, Inputs, Result, Stage } from "@microsoft/teamsfx-api";
-import { isUserCancelError, isValidOfficeAddInProject } from "@microsoft/teamsfx-core";
+import {
+  CapabilityOptions,
+  isUserCancelError,
+  isValidOfficeAddInProject,
+  QuestionNames,
+} from "@microsoft/teamsfx-core";
 import { Uri } from "vscode";
 import { ExtTelemetry } from "../telemetry/extTelemetry";
 import { TelemetryEvent, TelemetryTriggerFrom } from "../telemetry/extTelemetryEvents";
@@ -69,4 +74,42 @@ export async function deployHandler(...args: unknown[]): Promise<Result<null, Fx
 export async function publishHandler(...args: unknown[]): Promise<Result<null, FxError>> {
   ExtTelemetry.sendTelemetryEvent(TelemetryEvent.PublishStart, getTriggerFromProperty(args));
   return await runCommand(Stage.publish);
+}
+
+export async function addWebpartHandler(...args: unknown[]) {
+  ExtTelemetry.sendTelemetryEvent(TelemetryEvent.AddWebpartStart, getTriggerFromProperty(args));
+  return await runCommand(Stage.addWebpart);
+}
+
+export async function createNewEnvironmentHandler(
+  args?: any[]
+): Promise<Result<undefined, FxError>> {
+  ExtTelemetry.sendTelemetryEvent(
+    TelemetryEvent.CreateNewEnvironmentStart,
+    getTriggerFromProperty(args)
+  );
+  const result = await runCommand(Stage.createEnv);
+  if (!result.isErr()) {
+    await envTreeProviderInstance.reloadEnvironments();
+  }
+  return result;
+}
+
+export async function copilotPluginAddAPIHandler(args: any[]) {
+  // Telemetries are handled in runCommand()
+  const inputs = getSystemInputs();
+  if (args && args.length > 0) {
+    const filePath = args[0].fsPath as string;
+    const isFromApiPlugin: boolean = args[0].isFromApiPlugin ?? false;
+    if (!isFromApiPlugin) {
+      // Codelens for API ME. Trigger from manifest.json
+      inputs[QuestionNames.ManifestPath] = filePath;
+    } else {
+      inputs[QuestionNames.Capabilities] = CapabilityOptions.copilotPluginApiSpec().id;
+      inputs[QuestionNames.DestinationApiSpecFilePath] = filePath;
+      inputs[QuestionNames.ManifestPath] = args[0].manifestPath;
+    }
+  }
+  const result = await runCommand(Stage.copilotPluginAddAPI, inputs);
+  return result;
 }
