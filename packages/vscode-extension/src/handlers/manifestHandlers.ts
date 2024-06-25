@@ -219,50 +219,49 @@ export async function zipAndValidateAppPackage(
     },
   ];
 
-  diagnosticCollection.set(document.uri, [
-    {
-      code: "",
-      message: "cannot assign twice to immutable variable `x`",
-      range: new Range(new Position(3, 4), new Position(3, 10)),
-      severity: DiagnosticSeverity.Error,
-      source: "",
-      relatedInformation: [
-        new DiagnosticRelatedInformation(
-          new Location(document.uri, new Range(new Position(1, 8), new Position(1, 9))),
-          "first assignment to `x`"
-        ),
-      ],
-    },
-  ]);
+  // diagnosticCollection.set(document.uri, [
+  //   {
+  //     code: "",
+  //     message: "cannot assign twice to immutable variable `x`",
+  //     range: new Range(new Position(3, 4), new Position(3, 10)),
+  //     severity: DiagnosticSeverity.Error,
+  //     source: "",
+  //     relatedInformation: [
+  //       new DiagnosticRelatedInformation(
+  //         new Location(document.uri, new Range(new Position(1, 8), new Position(1, 9))),
+  //         "first assignment to `x`"
+  //       ),
+  //     ],
+  //   },
+  // ]);
 
-  // let diagnosticCollection: DiagnosticCollection;
   // diagnosticCollection.clear();
-  // const diagnosticMap: Map<string, Diagnostic[]> = new Map();
-  // errors.forEach((error) => {
-  //   const canonicalFile = Uri.parse(filePath).toString();
-  //   const regex = new RegExp(error.validationCategory);
+  const diagnosticMap: Map<string, Diagnostic[]> = new Map();
+  errors.forEach((error) => {
+    const canonicalFile = Uri.parse(filePath).toString();
+    const regex = new RegExp(error.validationCategory);
 
-  //   const text = document.getText();
-  //   let matches;
-  //   let range;
-  //   if ( (matches = regex.exec(text)) !== null) {
-  //     const match = matches[0];
-  //     const line = document.lineAt(document.positionAt(matches.index).line);
-  //     const indexOf = line.text.indexOf(match);
-  //     const position = new Position(line.lineNumber, indexOf);
-  //     range = new Range(position, new Position(line.lineNumber, indexOf + match.length));
+    const text = document.getText();
+    let matches;
+    let range;
+    if ((matches = regex.exec(text)) !== null) {
+      const match = matches[0];
+      const line = document.lineAt(document.positionAt(matches.index).line);
+      const indexOf = line.text.indexOf(match);
+      const position = new Position(line.lineNumber, indexOf);
+      range = new Range(position, new Position(line.lineNumber, indexOf + match.length));
 
-  //     let diagnostics = diagnosticMap.get(canonicalFile);
-  //     if (!diagnostics) {
-  //       diagnostics = [];
-  //     }
-  //     diagnostics.push(new Diagnostic(range, error.content, DiagnosticSeverity.Error));
-  //     diagnosticMap.set(canonicalFile, diagnostics);
-  // }
-  // });
-  // diagnosticMap.forEach((diags, file) => {
-  //   diagnosticCollection.set(Uri.parse(file), diags);
-  // });
+      let diagnostics = diagnosticMap.get(canonicalFile);
+      if (!diagnostics) {
+        diagnostics = [];
+      }
+      diagnostics.push(new Diagnostic(range, error.content, DiagnosticSeverity.Error));
+      diagnosticMap.set(canonicalFile, diagnostics);
+    }
+  });
+  diagnosticMap.forEach((diags, file) => {
+    diagnosticCollection.set(document.uri, diags);
+  });
 
   //   {
   //     "id": "958d86ff-864b-474d-bea4-d8068b8c8cad",
