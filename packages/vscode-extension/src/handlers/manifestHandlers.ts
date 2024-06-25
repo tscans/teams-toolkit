@@ -6,6 +6,7 @@ import {
   err,
   FxError,
   ok,
+  Platform,
   Result,
   SelectFileConfig,
   SingleSelectConfig,
@@ -13,7 +14,19 @@ import {
 } from "@microsoft/teamsfx-api";
 import * as fs from "fs-extra";
 import * as path from "path";
-import { window, workspace } from "vscode";
+import {
+  window,
+  workspace,
+  Diagnostic,
+  DiagnosticSeverity,
+  TextDocument,
+  Position,
+  DiagnosticCollection,
+  Range,
+  Uri,
+  DiagnosticRelatedInformation,
+  Location,
+} from "vscode";
 import { core, workspaceUri } from "../globalVariables";
 import { VS_CODE_UI } from "../qm/vsc_ui";
 import { ExtTelemetry } from "../telemetry/extTelemetry";
@@ -22,6 +35,8 @@ import { localize } from "../utils/localizeUtils";
 import { getSystemInputs } from "../utils/systemEnvUtils";
 import { getTriggerFromProperty } from "../utils/telemetryUtils";
 import { runCommand } from "./sharedOpts";
+import { QuestionNames } from "@microsoft/teamsfx-core";
+import { sleep } from "@microsoft/vscode-ui";
 
 export async function validateManifestHandler(args?: any[]): Promise<Result<null, FxError>> {
   ExtTelemetry.sendTelemetryEvent(
@@ -170,4 +185,105 @@ export async function updatePreviewManifest(args: any[]): Promise<any> {
     });
   }
   return result;
+}
+
+export async function zipAndValidateAppPackage(
+  diagnosticCollection: DiagnosticCollection,
+  args: any[]
+): Promise<any> {
+  await sleep(1000);
+  const document = args[0] as TextDocument;
+  const filePath = document.uri.fsPath;
+  const workspacePath = workspaceUri?.fsPath;
+  const zipDefaultFolder: string | undefined = path.join(
+    workspacePath!,
+    BuildFolderName,
+    AppPackageFolderName
+  );
+  // const zipAppPackageRes = await runCommand(Stage.createAppPackage, {
+  //   [QuestionNames.TeamsAppManifestFilePath]: filePath,
+  //   platform: Platform.VSCode,
+  //   projectPath: workspacePath
+  // });
+
+  const errors = [
+    {
+      id: "958d86ff-864b-474d-bea4-d8068b8c8cad",
+      title: "ShortNameContainsPreprodWording",
+      content: "Short name doesn't contain beta environment keywords",
+      helpUrl:
+        "https://docs.microsoft.com/en-us/microsoftteams/platform/resources/schema/manifest-schema#name",
+      filePath: "manifest.json",
+      shortCodeNumber: 4000,
+      validationCategory: "Name",
+    },
+  ];
+
+  diagnosticCollection.set(document.uri, [
+    {
+      code: "",
+      message: "cannot assign twice to immutable variable `x`",
+      range: new Range(new Position(3, 4), new Position(3, 10)),
+      severity: DiagnosticSeverity.Error,
+      source: "",
+      relatedInformation: [
+        new DiagnosticRelatedInformation(
+          new Location(document.uri, new Range(new Position(1, 8), new Position(1, 9))),
+          "first assignment to `x`"
+        ),
+      ],
+    },
+  ]);
+
+  // let diagnosticCollection: DiagnosticCollection;
+  // diagnosticCollection.clear();
+  // const diagnosticMap: Map<string, Diagnostic[]> = new Map();
+  // errors.forEach((error) => {
+  //   const canonicalFile = Uri.parse(filePath).toString();
+  //   const regex = new RegExp(error.validationCategory);
+
+  //   const text = document.getText();
+  //   let matches;
+  //   let range;
+  //   if ( (matches = regex.exec(text)) !== null) {
+  //     const match = matches[0];
+  //     const line = document.lineAt(document.positionAt(matches.index).line);
+  //     const indexOf = line.text.indexOf(match);
+  //     const position = new Position(line.lineNumber, indexOf);
+  //     range = new Range(position, new Position(line.lineNumber, indexOf + match.length));
+
+  //     let diagnostics = diagnosticMap.get(canonicalFile);
+  //     if (!diagnostics) {
+  //       diagnostics = [];
+  //     }
+  //     diagnostics.push(new Diagnostic(range, error.content, DiagnosticSeverity.Error));
+  //     diagnosticMap.set(canonicalFile, diagnostics);
+  // }
+  // });
+  // diagnosticMap.forEach((diags, file) => {
+  //   diagnosticCollection.set(Uri.parse(file), diags);
+  // });
+
+  //   {
+  //     "id": "958d86ff-864b-474d-bea4-d8068b8c8cad",
+  //     "title": "ShortNameContainsPreprodWording",
+  //     "content": "Short name doesn't contain beta environment keywords",
+  //     "helpUrl": "https://docs.microsoft.com/en-us/microsoftteams/platform/resources/schema/manifest-schema#name",
+  //     "filePath": "manifest.json",
+  //     "shortCodeNumber": 4000,
+  //     "validationCategory": "Name"
+  // },
+
+  // {
+  //   "id": "fe260769-7844-4a6e-a639-58ff3960216f",
+  //   "title": "permissionss",
+  //   "content": "Property \"permissionss\" has not been defined and the schema does not allow additional properties.",
+  //   "filePath": "manifest.json",
+  //   "line": 34,
+  //   "column": 19
+  // }
+
+  // if(zipAppPackageRes.isErr()){
+  //   vsc
+  // }
 }

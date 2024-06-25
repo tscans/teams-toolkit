@@ -141,6 +141,7 @@ import {
   publishInDeveloperPortalHandler,
   updatePreviewManifest,
   validateManifestHandler,
+  zipAndValidateAppPackage,
 } from "./handlers/manifestHandlers";
 import { openTutorialHandler, selectTutorialsHandler } from "./handlers/tutorialHandlers";
 
@@ -218,6 +219,16 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   void VsCodeLogInstance.info("Teams Toolkit extension is now active!");
+
+  const diagnosticCollection = vscode.languages.createDiagnosticCollection("test");
+
+  context.subscriptions.push(diagnosticCollection);
+
+  vscode.workspace.onDidSaveTextDocument(async (event) => {
+    if (event.fileName.includes("manifest.json")) {
+      await zipAndValidateAppPackage(diagnosticCollection, [event]);
+    }
+  });
 
   // Don't wait this async method to let it run in background.
   void runBackgroundAsyncTasks(context, isTeamsFxProject);
