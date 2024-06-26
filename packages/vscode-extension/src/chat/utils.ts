@@ -1,7 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { CancellationToken, ChatResponseStream, LanguageModelChatMessage, lm } from "vscode";
+import {
+  CancellationToken,
+  ChatResponseMarkdownPart,
+  ChatResponseStream,
+  ChatResponseTurn,
+  LanguageModelChatMessage,
+  lm,
+} from "vscode";
 
 import { sampleProvider } from "@microsoft/teamsfx-core";
 import { BaseTokensPerCompletion, BaseTokensPerMessage, BaseTokensPerName } from "./consts";
@@ -77,4 +84,54 @@ export function countMessagesTokens(messages: LanguageModelChatMessage[]): numbe
   }
   numTokens += BaseTokensPerCompletion;
   return numTokens;
+}
+
+export function ChatResponseToString(response: ChatResponseTurn): string {
+  let result = "";
+  for (const fragment of response.response) {
+    if (fragment instanceof ChatResponseMarkdownPart) {
+      result += fragment.value.value;
+    }
+  }
+
+  return result;
+}
+
+export async function myAzureOpenaiRequest(
+  messages: { role: string; content: { type: string; text: string }[] }[],
+  response: ChatResponseStream,
+  token: CancellationToken
+) {
+  const headers = {
+    "Content-Type": "application/json",
+    "api-key": process.env.OPENAI_API_KEY || "",
+  };
+  const payload = {
+    messages: messages,
+    temperature: 0.5,
+    top_p: 0.95,
+    max_tokens: 4096,
+    stream: true,
+  };
+
+  const GPT4O_ENDPOINT =
+    "https://teams-agent-ai-wu3.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview";
+  const stream = await fetch(GPT4O_ENDPOINT, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  });
+
+  if (stream.body != null) {
+    const reader = stream.body.getReader();
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+        break;
+      }
+      const json = JSON.parse(new TextDecoder().decode(value));
+      const text = json.data.choices[0].delta.content;
+      response.markdown(text);
+    }
+  }
 }
