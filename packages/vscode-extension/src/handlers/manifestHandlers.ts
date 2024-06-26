@@ -189,9 +189,14 @@ export async function updatePreviewManifest(args: any[]): Promise<any> {
 
 export async function zipAndValidateAppPackage(
   diagnosticCollection: DiagnosticCollection,
-  args: any[]
+  args?: any[]
 ): Promise<any> {
   await sleep(1000);
+  if (!args) {
+    console.log(diagnosticCollection);
+    return;
+  }
+  diagnosticCollection.clear();
   const document = args[0] as TextDocument;
   const filePath = document.uri.fsPath;
   const workspacePath = workspaceUri?.fsPath;
@@ -200,6 +205,7 @@ export async function zipAndValidateAppPackage(
     BuildFolderName,
     AppPackageFolderName
   );
+  console.log("run");
   // const zipAppPackageRes = await runCommand(Stage.createAppPackage, {
   //   [QuestionNames.TeamsAppManifestFilePath]: filePath,
   //   platform: Platform.VSCode,
@@ -255,7 +261,7 @@ export async function zipAndValidateAppPackage(
       if (!diagnostics) {
         diagnostics = [];
       }
-      diagnostics.push(new Diagnostic(range, error.content, DiagnosticSeverity.Error));
+      diagnostics.push(new Diagnostic(range, error.content, DiagnosticSeverity.Warning));
       diagnosticMap.set(canonicalFile, diagnostics);
     }
   });
@@ -280,6 +286,34 @@ export async function zipAndValidateAppPackage(
   //   "filePath": "manifest.json",
   //   "line": 34,
   //   "column": 19
+  // }
+
+  //   {
+  //     "id": "fe260769-7844-4a6e-a639-58ff3960216f",
+  //     "title": "root",
+  //     "content": "Required properties are missing from object: [\"version\"].",
+  //     "filePath": "manifest.json",
+  //     "line": 1,
+  //     "column": 1
+  // }
+
+  //   {
+  //     "id": "e23ff251-cb5a-49d2-8567-c85fd7422808",
+  //     "title": "ApiBasedComposeExtensionManifestCommandIdsNotIncludedInOperationIdsOnApiSpecficationFile",
+  //     "content": "Command Ids on manifest are not included in Operation Ids on API specification file.",
+  //     "helpUrl": "https://docs.microsoft.com/en-us/microsoftteams/platform/resources/schema/manifest-schema#composeextensionscommands",
+  //     "filePath": "manifest.json",
+  //     "shortCodeNumber": 12009,
+  //     "validationCategory": "ComposeExtensions"
+  // },
+  // {
+  //     "id": "a91bae70-33d9-4c56-b1b2-61b12b3768ce",
+  //     "title": "ParameterOnManifestNotDefinedOnApiSpecFile",
+  //     "content": "Api based compose extension have parameters title,description,assignedTo on manifest not defined on api specification file.",
+  //     "helpUrl": "https://docs.microsoft.com/en-us/microsoftteams/platform/resources/schema/manifest-schema#composeextensionscommands",
+  //     "filePath": "manifest.json",
+  //     "shortCodeNumber": 12033,
+  //     "validationCategory": "ComposeExtensions"
   // }
 
   // if(zipAppPackageRes.isErr()){

@@ -145,6 +145,29 @@ import {
 } from "./handlers/manifestHandlers";
 import { openTutorialHandler, selectTutorialsHandler } from "./handlers/tutorialHandlers";
 
+async function setAbortableTimeout(ms: number, signal: any) {
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      // Resolve the promise after 5 seconds
+      resolve("Completed after 5 seconds");
+      console.log("after 5 seconds!");
+    }, ms);
+
+    // Listen for the abort event
+    signal.addEventListener("abort", () => {
+      // Clear the timeout and reject the promise if aborted
+      clearTimeout(timeoutId);
+      console.log("clearred timeout");
+      resolve("resolved after clear");
+    });
+  });
+}
+
+// export async function sleep(timeout: NodeJS.Timeout) {
+//   await new Promise((resolve) => timeout);
+//   //await new Promise((resolve) => setTimeout(resolve, ms));
+// }
+
 export async function activate(context: vscode.ExtensionContext) {
   process.env[FeatureFlags.ChatParticipant] = (
     IsChatParticipantEnabled &&
@@ -224,11 +247,38 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(diagnosticCollection);
 
+  let controller: undefined | AbortController;
+
+  const abortEventListener = () => {
+    // Abort API from here
+    console.log("aborteddd!");
+  };
+
+  //signal.removeEventListener("abort", abortEventListener)
+
   vscode.workspace.onDidSaveTextDocument(async (event) => {
     if (event.fileName.includes("manifest.json")) {
+      if (controller) {
+        controller.abort();
+      }
+      console.log("controller" + (!controller ? "undefined" : "hasvalue"));
+      controller = new AbortController();
+      controller.signal.addEventListener("abort", abortEventListener);
+      await setAbortableTimeout(5000, controller.signal);
       await zipAndValidateAppPackage(diagnosticCollection, [event]);
     }
   });
+
+  // vscode.workspace.onDidChangeTextDocument(async (event) => {
+  //   if (event.document.fileName.includes("manifest.json")) {
+  //     await zipAndValidateAppPackage(diagnosticCollection, [event.document]);
+  //   }
+  // });
+
+  // // // Tutorials
+  // registerInCommandController(context, "fx-extension.selectTutorials", () => {
+  //   return zipAndValidateAppPackage(diagnosticCollection);
+  // });
 
   // Don't wait this async method to let it run in background.
   void runBackgroundAsyncTasks(context, isTeamsFxProject);
@@ -369,8 +419,8 @@ function registerActivateCommands(context: vscode.ExtensionContext) {
     handlers.openBuildIntelligentAppsWalkthroughHandler
   );
 
-  // Tutorials
-  registerInCommandController(context, "fx-extension.selectTutorials", selectTutorialsHandler);
+  // // Tutorials
+  // registerInCommandController(context, "fx-extension.selectTutorials", selectTutorialsHandler);
 
   // Sign in to M365
   registerInCommandController(context, CommandKeys.SigninM365, handlers.signinM365Callback);
