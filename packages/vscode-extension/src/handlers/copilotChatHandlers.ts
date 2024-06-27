@@ -26,12 +26,15 @@ function githubCopilotInstalled(): boolean {
   return !!extension;
 }
 
-async function openGithubCopilotChat(query: string): Promise<Result<null, FxError>> {
+async function openGithubCopilotChat(
+  query: string,
+  isPartialQuery: boolean
+): Promise<Result<null, FxError>> {
   const eventName = "openCopilotChat";
   try {
     const options = {
       query,
-      isPartialQuery: true,
+      isPartialQuery: isPartialQuery,
     };
     await vscode.commands.executeCommand("workbench.panel.chat.view.copilot.focus");
     await vscode.commands.executeCommand("workbench.action.chat.open", options);
@@ -125,7 +128,7 @@ export async function invokeTeamsAgent(args?: any[]): Promise<Result<null, FxErr
 
   const isExtensionInstalled = githubCopilotInstalled();
   if (isExtensionInstalled) {
-    res = await openGithubCopilotChat(query);
+    res = await openGithubCopilotChat(query, true);
   } else {
     VsCodeLogInstance.info(
       util.format(
@@ -155,7 +158,7 @@ export async function invokeTeamsAgent(args?: any[]): Promise<Result<null, FxErr
 
       if (verifyExtensionInstalled) {
         await sleep(2000); // wait for extension activation
-        res = await openGithubCopilotChat(query);
+        res = await openGithubCopilotChat(query, true);
       } else {
         const error = new SystemError(
           eventName,
@@ -195,7 +198,7 @@ export async function invokeTeamsParticipantFix(args?: any[]): Promise<Result<nu
 
   const isExtensionInstalled = githubCopilotInstalled();
   if (isExtensionInstalled) {
-    res = await openGithubCopilotChat(query);
+    res = await openGithubCopilotChat(query, false);
   } else {
     VsCodeLogInstance.info(
       util.format(
@@ -225,7 +228,7 @@ export async function invokeTeamsParticipantFix(args?: any[]): Promise<Result<nu
 
       if (verifyExtensionInstalled) {
         await sleep(2000); // wait for extension activation
-        res = await openGithubCopilotChat(query);
+        res = await openGithubCopilotChat(query, false);
       } else {
         const error = new SystemError(
           eventName,
