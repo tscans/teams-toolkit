@@ -103,6 +103,7 @@ export enum ProgrammingLanguage {
   TS = "typescript",
   CSharp = "csharp",
   PY = "python",
+  Common = "common",
   None = "none",
 }
 
@@ -221,17 +222,6 @@ export class ProjectTypeOptions {
     };
   }
 
-  static officeXMLAddin(platform?: Platform): OptionItem {
-    return {
-      id: "office-xml-addin-type",
-      label: `${platform === Platform.VSCode ? "$(teamsfx-m365) " : ""}${getLocalizedString(
-        "core.createProjectQuestion.officeXMLAddin.mainEntry.title"
-      )}`,
-      detail: getLocalizedString("core.createProjectQuestion.officeXMLAddin.mainEntry.detail"),
-      groupName: ProjectTypeOptions.getCreateGroupName(),
-    };
-  }
-
   static officeAddin(platform?: Platform): OptionItem {
     return {
       id: "office-addin-type",
@@ -246,7 +236,6 @@ export class ProjectTypeOptions {
   static officeAddinAllIds(platform?: Platform): string[] {
     return [
       ProjectTypeOptions.officeAddin(platform).id,
-      ProjectTypeOptions.officeXMLAddin(platform).id,
       ProjectTypeOptions.outlookAddin(platform).id,
     ];
   }
@@ -573,9 +562,6 @@ export class CapabilityOptions {
     const items: OptionItem[] = [];
     const isOutlookAddin = projectType === ProjectTypeOptions.outlookAddin().id;
     const isOfficeAddin = projectType === ProjectTypeOptions.officeAddin().id;
-    const isOfficeXMLAddinForOutlook =
-      projectType === ProjectTypeOptions.officeXMLAddin().id &&
-      host === OfficeAddinHostOptions.outlook().id;
 
     const pushToItems = (option: any) => {
       const capabilityValue = OfficeAddinProjectConfig.json[option];
@@ -586,11 +572,11 @@ export class CapabilityOptions {
       });
     };
 
-    if (isOutlookAddin || isOfficeAddin || isOfficeXMLAddinForOutlook) {
+    if (isOutlookAddin || isOfficeAddin) {
       pushToItems("json-taskpane");
-      if (isOutlookAddin || isOfficeXMLAddinForOutlook) {
+      if (isOutlookAddin) {
         items.push(CapabilityOptions.outlookAddinImport());
-      } else if (isOfficeAddin) {
+      } else {
         items.push(CapabilityOptions.officeContentAddin());
         items.push(CapabilityOptions.officeAddinImport());
       }
@@ -821,53 +807,6 @@ export class CapabilityOptions {
       detail: getLocalizedString(
         "core.createProjectQuestion.capability.declarativeCopilotWithPlugin.detail"
       ),
-    };
-  }
-}
-
-export class OfficeAddinHostOptions {
-  static all(platform?: Platform): OptionItem[] {
-    return [
-      OfficeAddinHostOptions.outlook(platform),
-      OfficeAddinHostOptions.word(),
-      OfficeAddinHostOptions.excel(),
-      OfficeAddinHostOptions.powerpoint(),
-    ];
-  }
-  static outlook(platform?: Platform): OptionItem {
-    return {
-      id: "outlook",
-      label: `${platform === Platform.VSCode ? "$(mail) " : ""}${getLocalizedString(
-        "core.createProjectQuestion.projectType.outlookAddin.label"
-      )}`,
-      detail: getLocalizedString("core.createProjectQuestion.projectType.outlookAddin.detail"),
-      data: "Outlook",
-    };
-  }
-  static word(): OptionItem {
-    return {
-      id: "word",
-      label: getLocalizedString("core.createProjectQuestion.officeXMLAddin.word.title"),
-      detail: getLocalizedString("core.createProjectQuestion.officeXMLAddin.word.detail"),
-      data: "Word",
-    };
-  }
-
-  static excel(): OptionItem {
-    return {
-      id: "excel",
-      label: getLocalizedString("core.createProjectQuestion.officeXMLAddin.excel.title"),
-      detail: getLocalizedString("core.createProjectQuestion.officeXMLAddin.excel.detail"),
-      data: "Excel",
-    };
-  }
-
-  static powerpoint(): OptionItem {
-    return {
-      id: "powerpoint",
-      label: getLocalizedString("core.createProjectQuestion.officeXMLAddin.powerpoint.title"),
-      detail: getLocalizedString("core.createProjectQuestion.officeXMLAddin.powerpoint.detail"),
-      data: "PowerPoint",
     };
   }
 }
