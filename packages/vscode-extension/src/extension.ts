@@ -367,6 +367,12 @@ function registerActivateCommands(context: vscode.ExtensionContext) {
     Correlator.run(copilotChatHandlers.invokeTeamsAgent, args)
   );
   context.subscriptions.push(invokeTeamsAgent);
+
+  const invokeTeamsParticipantFix = vscode.commands.registerCommand(
+    "fx-extension.invokeChatFix",
+    (...args) => Correlator.run(copilotChatHandlers.invokeTeamsParticipantFix, args)
+  );
+  context.subscriptions.push(invokeTeamsParticipantFix);
 }
 
 /**

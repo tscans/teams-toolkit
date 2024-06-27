@@ -949,6 +949,12 @@
         "title": "%teamstoolkit.commandsTreeViewProvider.getCopilotHelpTitle%",
         "category": "Teams",
         "enablement": "fx-extension.isChatParticipantEnabled"
+      },
+      {
+        "command": "fx-extension.invokeChatFix",
+        "title": "%teamstoolkit.commandsTreeViewProvider.invokeChatFix%",
+        "category": "Teams",
+        "enablement": "fx-extension.isChatParticipantEnabled"
       }
     ],
     "taskDefinitions": [

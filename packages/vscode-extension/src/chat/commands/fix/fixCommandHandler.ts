@@ -24,6 +24,9 @@ import {
 } from "../../utils";
 import { RephraseQueryPrompt } from "./prompts";
 import { sleep } from "@microsoft/vscode-ui";
+import * as fs from "fs-extra";
+import VsCodeLogInstance from "../../../commonlib/log";
+import { log } from "console";
 
 export default async function fixCommandHandler(
   request: ChatRequest,
@@ -43,6 +46,8 @@ export default async function fixCommandHandler(
 
     // 2. Get Output panel log
     response.progress("Retrieving output panel log...");
+    const outputLog = await getOutputLog();
+    console.log(outputLog);
 
     // 3. rephrase query with chat history
     response.progress("Rephrasing query...");
@@ -116,4 +121,17 @@ export default async function fixCommandHandler(
       requestId: chatTelemetryData.requestId,
     },
   };
+}
+
+export async function getOutputLog(): Promise<string> {
+  const logFilePath = VsCodeLogInstance.getLogFilePath();
+  if (!fs.existsSync(logFilePath)) {
+    return "";
+  }
+
+  const logContent = await fs.readFile(logFilePath);
+  // return only the last 1000 lines
+  const lines = logContent.toString().split("\n");
+  const lastLines = lines.slice(Math.max(lines.length - 1000, 0)).join("\n");
+  return lastLines;
 }

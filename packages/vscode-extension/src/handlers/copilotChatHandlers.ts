@@ -184,3 +184,73 @@ export async function invokeTeamsAgent(args?: any[]): Promise<Result<null, FxErr
   }
   return res;
 }
+
+export async function invokeTeamsParticipantFix(args?: any[]): Promise<Result<null, FxError>> {
+  const eventName = TelemetryEvent.InvokeTeamsAgent;
+  const triggerFromProperty = getTriggerFromProperty(args);
+  ExtTelemetry.sendTelemetryEvent(eventName, triggerFromProperty);
+
+  const query = "@teams /fix ";
+  let res;
+
+  const isExtensionInstalled = githubCopilotInstalled();
+  if (isExtensionInstalled) {
+    res = await openGithubCopilotChat(query);
+  } else {
+    VsCodeLogInstance.info(
+      util.format(
+        localize("teamstoolkit.handlers.installExtension.output"),
+        "Github Copilot Chat",
+        InstallCopilotChatLink
+      )
+    );
+    showOutputChannelHandler();
+
+    const maxRetry = 5;
+    const installRes = await installGithubCopilotChatExtension(
+      triggerFromProperty[TelemetryProperty.TriggerFrom]
+    );
+    if (installRes.isOk()) {
+      let checkCount = 0;
+      let verifyExtensionInstalled = false;
+      while (checkCount < maxRetry) {
+        verifyExtensionInstalled = githubCopilotInstalled();
+        if (!verifyExtensionInstalled) {
+          await sleep(3000);
+          checkCount++;
+        } else {
+          break;
+        }
+      }
+
+      if (verifyExtensionInstalled) {
+        await sleep(2000); // wait for extension activation
+        res = await openGithubCopilotChat(query);
+      } else {
+        const error = new SystemError(
+          eventName,
+          "CannotVerifyGithubCopilotChat",
+          util.format(
+            localize("teamstoolkit.handlers.verifyCopilotExtensionError", InstallCopilotChatLink)
+          ),
+          util.format(
+            localize("teamstoolkit.handlers.verifyCopilotExtensionError", InstallCopilotChatLink)
+          )
+        );
+        VsCodeLogInstance.error(error.message);
+        res = err(error);
+      }
+    } else {
+      res = installRes;
+    }
+  }
+  if (res.isErr()) {
+    ExtTelemetry.sendTelemetryErrorEvent(eventName, res.error, triggerFromProperty);
+  } else {
+    ExtTelemetry.sendTelemetryEvent(eventName, {
+      [TelemetryProperty.Success]: TelemetrySuccess.Yes,
+      ...triggerFromProperty,
+    });
+  }
+  return res;
+}

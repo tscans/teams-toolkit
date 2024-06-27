@@ -15,9 +15,14 @@ import { ExtTelemetry } from "../telemetry/extTelemetry";
 import { anonymizeFilePaths } from "../utils/fileSystemUtils";
 import { localize } from "../utils/localizeUtils";
 import { isTestToolEnabledProject } from "../utils/projectChecker";
-import { TelemetryEvent, TelemetryProperty } from "../telemetry/extTelemetryEvents";
+import {
+  TelemetryEvent,
+  TelemetryProperty,
+  TelemetryTriggerFrom,
+} from "../telemetry/extTelemetryEvents";
 import VsCodeLogInstance from "../commonlib/log";
 import { ExtensionSource, ExtensionErrors } from "./error";
+import { title } from "process";
 
 export async function showError(e: UserError | SystemError) {
   let notificationMessage = e.displayMessage ?? e.message;
@@ -37,6 +42,19 @@ export async function showError(e: UserError | SystemError) {
     e.message += ` ${recommendTestToolMessage}`;
     notificationMessage += ` ${recommendTestToolDisplayMessage}`;
   }
+
+  const chatTroubleShoot = {
+    title: localize("teamstoolkit.handlers.chatTroubleshoot"),
+    run: async (): Promise<void> => {
+      // ExtTelemetry.sendTelemetryEvent(TelemetryEvent.ChatTroubleshoot);
+      await commands.executeCommand(
+        "fx-extension.invokeChatFix",
+        TelemetryTriggerFrom.Notification,
+        e
+      );
+    },
+  };
+
   if (isUserCancelError(e)) {
     return;
   } else if ("helpLink" in e && e.helpLink && typeof e.helpLink != "undefined") {
@@ -55,7 +73,9 @@ export async function showError(e: UserError | SystemError) {
     VsCodeLogInstance.error(`code:${errorCode}, message: ${e.message}\n Help link: ${e.helpLink}`);
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     VsCodeLogInstance.debug(`Call stack: ${e.stack || e.innerError?.stack || ""}`);
-    const buttons = recommendTestTool ? [runTestTool, help] : [help];
+    const buttons = recommendTestTool
+      ? [runTestTool, help, chatTroubleShoot]
+      : [help, chatTroubleShoot];
     const button = await window.showErrorMessage(
       `[${errorCode}]: ${notificationMessage}`,
       ...buttons
@@ -90,8 +110,8 @@ export async function showError(e: UserError | SystemError) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     VsCodeLogInstance.debug(`Call stack: ${e.stack || e.innerError?.stack || ""}`);
     const buttons = recommendTestTool
-      ? [runTestTool, issue, similarIssues]
-      : [issue, similarIssues];
+      ? [runTestTool, issue, similarIssues, chatTroubleShoot]
+      : [issue, similarIssues, chatTroubleShoot];
     const button = await window.showErrorMessage(
       `[${errorCode}]: ${notificationMessage}`,
       ...buttons
@@ -101,7 +121,7 @@ export async function showError(e: UserError | SystemError) {
     if (!(e instanceof ConcurrentError)) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       VsCodeLogInstance.debug(`Call stack: ${e.stack || e.innerError?.stack || ""}`);
-      const buttons = recommendTestTool ? [runTestTool] : [];
+      const buttons = recommendTestTool ? [runTestTool, chatTroubleShoot] : [chatTroubleShoot];
       const button = await window.showErrorMessage(
         `[${errorCode}]: ${notificationMessage}`,
         ...buttons
