@@ -44,6 +44,7 @@ import {
   apiSpecLocationQuestion,
 } from "./create";
 import { UninstallInputs } from "./inputs";
+import { get } from "lodash";
 
 export function listCollaboratorQuestionNode(): IQTreeNode {
   const selectTeamsAppNode = selectTeamsAppManifestQuestionNode();
@@ -892,7 +893,7 @@ export function uninstallQuestionNode(): IQTreeNode {
             data: {
               type: "text",
               name: "manifest-id",
-              title: "Manifest ID",
+              title: getLocalizedString("core.uninstallQuestion.manifestId"),
             },
             condition: (input: UninstallInputs) => {
               return input[QuestionNames.UninstallMode] == "uninstall-mode-manifest-id";
@@ -902,7 +903,7 @@ export function uninstallQuestionNode(): IQTreeNode {
             data: {
               type: "text",
               name: "env",
-              title: "Env",
+              title: getLocalizedString("core.uninstallQuestion.env"),
             },
             condition: (input: UninstallInputs) => {
               return input[QuestionNames.UninstallMode] === "uninstall-mode-env";
@@ -929,7 +930,7 @@ export function uninstallQuestionNode(): IQTreeNode {
             data: {
               type: "text",
               name: "title-id",
-              title: "Title ID",
+              title: getLocalizedString("core.uninstallQuestion.titleId"),
             },
             condition: (input: UninstallInputs) => {
               return input[QuestionNames.UninstallMode] === "uninstall-mode-title-id";
@@ -944,21 +945,20 @@ export function uninstallQuestionNode(): IQTreeNode {
 function uninstallModeQuestion(): SingleSelectQuestion {
   return {
     name: QuestionNames.UninstallMode,
-    // todo: change to localized string
-    title: "Choose uninstall mode",
+    title: getLocalizedString("core.uninstallQuestion.chooseMode"),
     type: "singleSelect",
     staticOptions: [
       {
         id: "uninstall-mode-manifest-id",
-        label: "By manifest id",
+        label: getLocalizedString("core.uninstallQuestion.manifestIdMode"),
       },
       {
         id: "uninstall-mode-env",
-        label: "By env",
+        label: getLocalizedString("core.uninstallQuestion.envMode"),
       },
       {
         id: "uninstall-mode-title-id",
-        label: "By title id",
+        label: getLocalizedString("core.uninstallQuestion.titleIdMode"),
       },
     ],
     default: "uninstall-env",
@@ -968,21 +968,20 @@ function uninstallModeQuestion(): SingleSelectQuestion {
 function uninstallOptionQuestion(): MultiSelectQuestion {
   return {
     name: QuestionNames.UninstallOption,
-    // todo: change to localized string
-    title: "Choose resources to uninstall",
+    title: getLocalizedString("core.uninstallQuestion.chooseOption"),
     type: "multiSelect",
     staticOptions: [
       {
         id: QuestionNames.UninstallOptionM365,
-        label: "M365 app",
+        label: getLocalizedString("core.uninstallQuestion.m365Option"),
       },
       {
         id: QuestionNames.UninstallOptionTDP,
-        label: "App registration",
+        label: getLocalizedString("core.uninstallQuestion.tdpOption"),
       },
       {
         id: QuestionNames.UninstallOptionBot,
-        label: "Bot framework registration",
+        label: getLocalizedString("core.uninstallQuestion.botOption"),
       },
     ],
   };
@@ -991,8 +990,7 @@ function uninstallProjectPathQuestion(): FolderQuestion {
   return {
     type: "folder",
     name: QuestionNames.ProjectPath,
-    // todo: use localized string
-    title: "Project path",
+    title: getLocalizedString("core.uninstallQuestion.projectPath"),
     cliDescription: "Project Path for uninstall",
     placeholder: "./",
     default: "./",
