@@ -263,12 +263,14 @@ export async function zipAndValidateAppPackage(args?: any[]): Promise<any> {
       //const message = `[✏️Edit env file](${commandUri.toString()})`;
       const diag = new Diagnostic(
         range,
-        "**test** error \ntest more info",
+        "Short name doesn't contain beta environment keywords",
         DiagnosticSeverity.Warning
       );
       diag.code = {
         value: "NameField",
-        target: Uri.parse("https://www.bing.com"),
+        target: Uri.parse(
+          "https://docs.microsoft.com/en-us/microsoftteams/platform/resources/schema/manifest-schema#name"
+        ),
       };
       diag.source = "TTK";
 
