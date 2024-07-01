@@ -5,7 +5,10 @@
  * @author Ivan Chen <v-ivanchen@microsoft.com>
  */
 
-import { openPage, cleanInstalledApp } from "../../utils/playwrightOperation";
+import {
+  openPage,
+  cleanInstalledChannelApp,
+} from "../../utils/playwrightOperation";
 import { Timeout } from "../../utils/constants";
 import { Env } from "../../utils/env";
 import { it } from "../../utils/it";
@@ -42,10 +45,10 @@ describe("Local Debug Tests", function () {
     try {
       const page = await openPage(
         localDebugTestContext.context!,
-        Env.username,
+        "test17@xxbdw.onmicrosoft.com",
         Env.password
       );
-      await cleanInstalledApp(page, { deleteAppNum: 20 });
+      await cleanInstalledChannelApp(page, { deleteAppNum: 20 });
     } catch (error) {
       successFlag = false;
       errorMessage = "[Error]: " + error;
