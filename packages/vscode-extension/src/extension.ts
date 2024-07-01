@@ -64,6 +64,8 @@ import * as exp from "./exp";
 import { TreatmentVariableValue, TreatmentVariables } from "./exp/treatmentVariables";
 import { FeatureFlags } from "./featureFlags";
 import {
+  diagnosticCollection,
+  initializeDiagostics,
   initializeGlobalVariables,
   isExistingUser,
   isOfficeAddInProject,
@@ -144,6 +146,7 @@ import {
   zipAndValidateAppPackage,
 } from "./handlers/manifestHandlers";
 import { openTutorialHandler, selectTutorialsHandler } from "./handlers/tutorialHandlers";
+import { CodeActionProvider } from "./codeActionProvider";
 
 async function setAbortableTimeout(ms: number, signal: any) {
   return new Promise((resolve, reject) => {
@@ -158,7 +161,7 @@ async function setAbortableTimeout(ms: number, signal: any) {
       // Clear the timeout and reject the promise if aborted
       clearTimeout(timeoutId);
       console.log("clearred timeout");
-      resolve("resolved after clear");
+      reject("resolved after clear");
     });
   });
 }
@@ -169,11 +172,7 @@ async function setAbortableTimeout(ms: number, signal: any) {
 // }
 
 export async function activate(context: vscode.ExtensionContext) {
-  process.env[FeatureFlags.ChatParticipant] = (
-    IsChatParticipantEnabled &&
-    semver.gte(vscode.version, "1.90.0-insider") &&
-    vscode.version.includes("insider")
-  ).toString();
+  process.env[FeatureFlags.ChatParticipant] = true.toString();
 
   configMgr.registerConfigChangeCallback();
 
@@ -240,10 +239,9 @@ export async function activate(context: vscode.ExtensionContext) {
     "fx-extension.isManifestOnlyOfficeAddIn",
     isOfficeManifestOnlyProject
   );
+  initializeDiagostics();
 
   void VsCodeLogInstance.info("Teams Toolkit extension is now active!");
-
-  const diagnosticCollection = vscode.languages.createDiagnosticCollection("test");
 
   context.subscriptions.push(diagnosticCollection);
 
@@ -264,10 +262,25 @@ export async function activate(context: vscode.ExtensionContext) {
       console.log("controller" + (!controller ? "undefined" : "hasvalue"));
       controller = new AbortController();
       controller.signal.addEventListener("abort", abortEventListener);
-      await setAbortableTimeout(5000, controller.signal);
-      await zipAndValidateAppPackage(diagnosticCollection, [event]);
+      try {
+        await setAbortableTimeout(5000, controller.signal);
+        if (!controller.signal.aborted) {
+          await zipAndValidateAppPackage([event]);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   });
+
+  const MANIFEST_DOC_SELECTOR: vscode.DocumentSelector = {
+    language: "json",
+    pattern: "**/appPackage/manifest.json",
+  };
+
+  context.subscriptions.push(
+    vscode.languages.registerCodeActionsProvider(MANIFEST_DOC_SELECTOR, new CodeActionProvider())
+  );
 
   // vscode.workspace.onDidChangeTextDocument(async (event) => {
   //   if (event.document.fileName.includes("manifest.json")) {

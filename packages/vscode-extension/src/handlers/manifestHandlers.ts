@@ -26,8 +26,9 @@ import {
   Uri,
   DiagnosticRelatedInformation,
   Location,
+  DiagnosticTag,
 } from "vscode";
-import { core, workspaceUri } from "../globalVariables";
+import { core, diagnosticCollection, workspaceUri } from "../globalVariables";
 import { VS_CODE_UI } from "../qm/vsc_ui";
 import { ExtTelemetry } from "../telemetry/extTelemetry";
 import { TelemetryEvent } from "../telemetry/extTelemetryEvents";
@@ -187,10 +188,7 @@ export async function updatePreviewManifest(args: any[]): Promise<any> {
   return result;
 }
 
-export async function zipAndValidateAppPackage(
-  diagnosticCollection: DiagnosticCollection,
-  args?: any[]
-): Promise<any> {
+export async function zipAndValidateAppPackage(args?: any[]): Promise<any> {
   await sleep(1000);
   if (!args) {
     console.log(diagnosticCollection);
@@ -261,7 +259,20 @@ export async function zipAndValidateAppPackage(
       if (!diagnostics) {
         diagnostics = [];
       }
-      diagnostics.push(new Diagnostic(range, error.content, DiagnosticSeverity.Warning));
+
+      //const message = `[✏️Edit env file](${commandUri.toString()})`;
+      const diag = new Diagnostic(
+        range,
+        "**test** error \ntest more info",
+        DiagnosticSeverity.Warning
+      );
+      diag.code = {
+        value: "NameField",
+        target: Uri.parse("https://www.bing.com"),
+      };
+      diag.source = "TTK";
+
+      diagnostics.push(diag);
       diagnosticMap.set(canonicalFile, diagnostics);
     }
   });
