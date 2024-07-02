@@ -77,10 +77,6 @@ describe("Create Copilot plugin", () => {
       const result = await createResourceGroup(resourceGroupName, "westus");
       chai.assert.isTrue(result);
 
-      await setProvisionParameterValueV3(projectPath, envName, {
-        key: "webAppSKU",
-        value: "B1",
-      });
       await CliHelper.provisionProject(projectPath, "", envName as "dev", {
         ...env,
         AZURE_RESOURCE_GROUP_NAME: resourceGroupName,
