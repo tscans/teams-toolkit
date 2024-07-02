@@ -8,6 +8,7 @@
 import { describe } from "mocha";
 import { expect } from "chai";
 import * as path from "path";
+import * as chai from "chai";
 
 import { it } from "@microsoft/extra-shot-mocha";
 import * as fs from "fs-extra";
