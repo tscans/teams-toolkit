@@ -72,13 +72,8 @@ describe("Create Copilot plugin", () => {
         const filePath = path.join(testFolder, appName, file);
         expect(fs.existsSync(filePath), `${filePath} must exist.`).to.eq(true);
       }
-    }
-  );
 
-  it(
-    `Provision Resource`,
-    { testPlanCaseId: 0, author: "yiminjin@microsoft.com" },
-    async () => {
+      console.log(`start provision`);
       const result = await createResourceGroup(resourceGroupName, "westus");
       chai.assert.isTrue(result);
 
