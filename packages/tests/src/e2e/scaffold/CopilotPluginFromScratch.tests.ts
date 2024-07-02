@@ -13,18 +13,26 @@ import { it } from "@microsoft/extra-shot-mocha";
 import * as fs from "fs-extra";
 import { CliHelper } from "../../commonlib/cliHelper";
 import { Capability } from "../../utils/constants";
+import { environmentNameManager } from "@microsoft/teamsfx-core/build/core/environmentName";
 import {
   cleanUpLocalProject,
+  createResourceGroup,
   getTestFolder,
   getUniqueAppName,
   readContextMultiEnvV3,
+  setProvisionParameterValueV3,
+  getSubscriptionId,
 } from "../commonUtils";
 import { deleteTeamsApp } from "../debug/utility";
 
 describe("Create Copilot plugin", () => {
   const testFolder = getTestFolder();
   const appName = getUniqueAppName();
+  const resourceGroupName = `${appName}-rg`;
+  const envName = environmentNameManager.getDefaultEnvName();
   const projectPath = path.resolve(testFolder, appName);
+  const env = Object.assign({}, process.env);
+  const subscription = getSubscriptionId();
 
   afterEach(async function () {
     // clean up
@@ -63,6 +71,24 @@ describe("Create Copilot plugin", () => {
         const filePath = path.join(testFolder, appName, file);
         expect(fs.existsSync(filePath), `${filePath} must exist.`).to.eq(true);
       }
+    }
+  );
+
+  it(
+    `Provision Resource`,
+    { testPlanCaseId: 0, author: "yiminjin@microsoft.com" },
+    async () => {
+      const result = await createResourceGroup(resourceGroupName, "westus");
+      chai.assert.isTrue(result);
+
+      await setProvisionParameterValueV3(projectPath, envName, {
+        key: "webAppSKU",
+        value: "B1",
+      });
+      await CliHelper.provisionProject(projectPath, "", envName as "dev", {
+        ...env,
+        AZURE_RESOURCE_GROUP_NAME: resourceGroupName,
+      });
     }
   );
 });
