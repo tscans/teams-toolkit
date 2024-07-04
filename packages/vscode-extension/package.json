@@ -1583,16 +1583,16 @@
   },
   "scripts": {
     "lint:staged": "lint-staged",
+    "build": "npm run check-types && npm run vite && node esbuild.js",
+    "check-types": "tsc --noEmit",
+    "vite": "vite build --config vite.config.ts",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.mjs --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "vscode:prepublish": "rimraf out && npm run package",
-    "compile": "tsc -p ./",
-    "build": "rimraf out && webpack --mode development --config ./webpack.config.js && npm run compile",
-    "watch": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./webpack.config.js",
-    "package": "rimraf out && webpack --mode production --config ./webpack.config.js",
-    "test-compile": "tsc -p ./",
-    "test-watch": "tsc -watch -p ./",
+    "package": "npm run check-types && node esbuild.mjs --production",
     "pretest": "npm run lint && npm run check-format && npm run test-compile",
     "test:unit": "rimraf out && rimraf coverage && npm run compile && nyc mocha --config .mocharc.json \"test/**/*.test.ts\"",
-    "test:integration": "echo 'to be implementd'",
     "test:e2e": "echo 'to be implementd'",
     "check-format": "prettier --list-different --config .prettierrc.js --ignore-path .prettierignore \"src/**/*.ts\" \"test/**/*.ts\" \"*.{js,json}\"",
     "format": "prettier --write --config .prettierrc.js --ignore-path .prettierignore \"src/**/*.ts\" \"test/**/*.ts\" \"*.{js,json}\"",
@@ -1603,8 +1603,7 @@
     "updateFont": "node ./scripts/updateFont.js",
     "previewFont": "start ./media/font/teamstoolkit.html",
     "version": "bash ../../.github/scripts/vsc-version.sh",
-    "pack-local": "pnpm dlx vsce package --no-dependencies",
-    "vite": "vite build --config vite.config.ts"
+    "pack-local": "pnpm dlx vsce package --no-dependencies"
   },
   "devDependencies": {
     "@azure/arm-subscriptions": "^5.0.0",

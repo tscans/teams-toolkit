@@ -1,7 +1,7 @@
 import { FxError, Result, ok } from "@microsoft/teamsfx-api";
 import * as globalState from "@microsoft/teamsfx-core/build/common/globalState";
 import * as chai from "chai";
-import * as mockfs from "mock-fs";
+import mockfs from "mock-fs";
 import * as sinon from "sinon";
 import * as vscode from "vscode";
 import { OfficeDevTerminal, TriggerCmdType } from "../../src/debug/taskTerminal/officeDevTerminal";
