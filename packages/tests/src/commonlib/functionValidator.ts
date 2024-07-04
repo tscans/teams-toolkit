@@ -110,6 +110,9 @@ export class FunctionValidator {
       token as string
     );
     chai.assert.exists(webappSettingsResponse);
+    console.log(
+      "webappSettingsResponse: " + JSON.stringify(webappSettingsResponse)
+    );
     const endpoint =
       (this.ctx[EnvConstants.FUNCTION_ENDPOINT] as string) ??
       (this.ctx[EnvConstants.FUNCTION_ENDPOINT_2] as string);
