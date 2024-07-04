@@ -1,4 +1,5 @@
 import * as esbuild from "esbuild";
+import copyStaticFiles from "esbuild-copy-static-files";
 import path from "node:path";
 
 
@@ -19,6 +20,46 @@ async function main() {
     external: ['vscode'],
     // logLevel: 'silent',
     plugins: [
+      copyStaticFiles({
+        src: "../fx-core/resource/",
+        dest: path.join(outputDirectory, "resource"),
+      }),
+      copyStaticFiles({
+        src: "../fx-core/templates/",
+        dest: path.join(outputDirectory, "templates"),
+      }),
+      copyStaticFiles({
+        src: "./src/commonlib/codeFlowResult/index.html",
+        dest: path.join(outputDirectory, "src", "codeFlowResult", "index.html"),
+      }),
+      copyStaticFiles({
+        src: "./src/chat/cl100k_base.tiktoken",
+        dest: path.join(outputDirectory, "src", "chat", "cl100k_base.tiktoken"),
+      }),
+      copyStaticFiles({
+        src: "./CHANGELOG.md",
+        dest: path.join(outputDirectory, "resource", "CHANGELOG.md"),
+      }),
+      copyStaticFiles({
+        src: "./PRERELEASE.md",
+        dest: path.join(outputDirectory, "resource", "PRERELEASE.md"),
+      }),
+      copyStaticFiles({
+        src: "./node_modules/@vscode/codicons/dist/codicon.css",
+        dest: path.join(outputDirectory, "resource", "codicon.css"),
+      }),
+      copyStaticFiles({
+        src: "./node_modules/@vscode/codicons/dist/codicon.ttf",
+        dest: path.join(outputDirectory, "resource", "codicon.ttf"),
+      }),
+      copyStaticFiles({
+        src: "./node_modules/dompurify/dist/purify.min.js",
+        dest: path.join(outputDirectory, "resource", "purify.min.js"),
+      }),
+      copyStaticFiles({
+        src: "./node_modules/mermaid/dist/mermaid.min.js",
+        dest: path.join(outputDirectory, "resource", "mermaid.min.js"),
+      }),
       /* add to the end of plugins array */
       esbuildProblemMatcherPlugin
     ]
