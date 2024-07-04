@@ -39,7 +39,7 @@ async function main() {
     platform: 'node',
     external: ['vscode'],
     mainFields: ["module", "main"], // https://github.com/microsoft/node-jsonc-parser/issues/57
-    // logLevel: 'silent',
+    logLevel: production? 'silent': 'info',
     plugins: [
       toolkitResolvePlugin,
       copyStaticFiles({

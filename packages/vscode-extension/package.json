@@ -1591,7 +1591,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "watch:vite": "vite build --config vite.config.ts --watch",
     "vscode:prepublish": "rimraf out && npm run package",
-    "package": "npm run check-types && node esbuild.mjs --production",
+    "package": "npm run check-types && npm run vite && node esbuild.mjs --production",
     "pretest": "npm run lint && npm run check-format && npm run test-compile",
     "test:unit": "rimraf out && rimraf coverage && npm run compile && nyc mocha --config .mocharc.json \"test/**/*.test.ts\"",
     "test:e2e": "echo 'to be implementd'",
