@@ -14,16 +14,13 @@ import { it } from "@microsoft/extra-shot-mocha";
 import * as fs from "fs-extra";
 import { CliHelper } from "../../commonlib/cliHelper";
 import { Capability } from "../../utils/constants";
-import { environmentNameManager } from "@microsoft/teamsfx-core/build/core/environmentName";
 import {
   cleanUpLocalProject,
   createResourceGroup,
   getTestFolder,
   getUniqueAppName,
   readContextMultiEnvV3,
-  setProvisionParameterValueV3,
-  getSubscriptionId,
-  execAsyncWithRetry,
+  execAsync,
 } from "../commonUtils";
 import { deleteTeamsApp } from "../debug/utility";
 
@@ -31,10 +28,7 @@ describe("Create Copilot plugin", () => {
   const testFolder = getTestFolder();
   const appName = getUniqueAppName();
   const resourceGroupName = `${appName}-rg`;
-  const envName = environmentNameManager.getDefaultEnvName();
   const projectPath = path.resolve(testFolder, appName);
-  const env = Object.assign({}, process.env);
-  const subscription = getSubscriptionId();
 
   afterEach(async function () {
     // clean up
@@ -83,28 +77,27 @@ describe("Create Copilot plugin", () => {
         ...env,
         AZURE_RESOURCE_GROUP_NAME: resourceGroupName,
       };
-      const res = await execAsyncWithRetry(
-        `teamsapp provision --env dev --interactive false --verbose ${option}`,
-        {
-          cwd: projectPath,
-          env: processEnv,
-          timeout: 0,
-        }
-      );
-
-      if (res.stderr) {
+      try {
+        await execAsync(
+          `teamsapp provision --env dev --interactive false --verbose ${option}`,
+          {
+            cwd: projectPath,
+            env: processEnv,
+            timeout: 0,
+          }
+        );
+      } catch (e) {
         if (
-          res.stderr.includes("Request failed with status code 400") &&
-          res.stderr.includes("No elements found in the manifest")
+          e.message.includes("Request failed with status code 400") &&
+          e.message.includes("No elements found in the manifest")
         ) {
-          console.warn(`Skipped error: ${res.stderr}`);
+          console.warn(`Skipped error: ${e.message}`);
+          console.log(`[Successfully] provision ${projectPath}`);
         } else {
           console.error(
-            `[Failed] provision ${projectPath}. Error message: ${res.stderr}`
+            `[Failed] provision ${projectPath}. Error message: ${e.message}`
           );
         }
-      } else {
-        console.log(`[Successfully] provision ${projectPath}`);
       }
     }
   );
