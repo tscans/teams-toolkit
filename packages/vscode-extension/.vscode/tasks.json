@@ -5,7 +5,7 @@
   "tasks": [
     {
       "label": "watch",
-      "dependsOn": ["npm: watch:tsc", "npm: watch:esbuild"],
+      "dependsOn": ["npm: watch:tsc", "npm: watch:esbuild", "npm: watch:vite"],
       "presentation": {
         "reveal": "never"
       },
@@ -33,6 +33,18 @@
       "problemMatcher": "$tsc-watch",
       "isBackground": true,
       "label": "npm: watch:tsc",
+      "presentation": {
+        "group": "watch",
+        "reveal": "never"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "watch:vite",
+      "group": "build",
+      "problemMatcher": "$rollup-ts-watch",
+      "isBackground": true,
+      "label": "npm: watch:vite",
       "presentation": {
         "group": "watch",
         "reveal": "never"

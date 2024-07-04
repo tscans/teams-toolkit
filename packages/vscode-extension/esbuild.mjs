@@ -82,14 +82,6 @@ async function main() {
         src: "./node_modules/mermaid/dist/mermaid.min.js",
         dest: path.join(outputDirectory, "resource", "mermaid.min.js"),
       }),
-      copyStaticFiles({
-        src: "./vite-out/src/",
-        dest: path.join(outputDirectory, "src"),
-      }),
-      copyStaticFiles({
-        src: "./vite-out/assets/client.css",
-        dest: path.join(outputDirectory, "resource", "client.css"),
-      }),
       /* add to the end of plugins array */
       esbuildProblemMatcherPlugin
     ]

@@ -7,7 +7,7 @@ import svgr from "vite-plugin-svgr";
 export default defineConfig({
   plugins: [svgr(), react()],
   build: {
-    outDir: "vite-out",
+    outDir: "out",
     rollupOptions: {
       input: {
         client: fileURLToPath(new URL("./src/controls/index.tsx", import.meta.url)),
@@ -15,7 +15,7 @@ export default defineConfig({
       output: {
         entryFileNames: `src/[name].js`,
         chunkFileNames: `[name].js`,
-        assetFileNames: `assets/[name].[ext]`,
+        assetFileNames: `resource/[name].[ext]`,
       },
     },
     // bundle images < 100k
