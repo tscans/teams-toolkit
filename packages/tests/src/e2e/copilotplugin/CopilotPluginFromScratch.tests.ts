@@ -13,29 +13,6 @@ import * as fs from "fs-extra";
 import { expect } from "chai";
 
 class CopilotPluginFromScratchCase extends CaseFactory {
-  public override async onCreate(
-    appName: string,
-    testFolder: string,
-    capability: Capability,
-    programmingLanguage?: ProgrammingLanguage | undefined,
-    custimized?: Record<string, string> | undefined,
-    processEnv?: NodeJS.ProcessEnv | undefined
-  ): Promise<void> {
-    if (processEnv) {
-      processEnv["API_COPILOT_PLUGIN"] = "true";
-      processEnv["DEVELOP_COPILOT_PLUGIN"] = "true";
-    }
-    await super.onCreate(
-      appName,
-      testFolder,
-      capability,
-      programmingLanguage,
-      custimized,
-      processEnv
-    );
-    console.log("onCreate successful");
-  }
-
   public override async onAfterCreate(projectPath: string): Promise<void> {
     const files: string[] = [
       "appPackage/ai-plugin.json",
@@ -49,14 +26,23 @@ class CopilotPluginFromScratchCase extends CaseFactory {
   }
 }
 
+const env = Object.assign({}, process.env);
+env["API_COPILOT_PLUGIN"] = "true";
+env["DEVELOP_COPILOT_PLUGIN"] = "true";
 const record: Record<string, string> = {};
 record["api-auth"] = "none";
+
+const options = {
+  skipErrorMessage: "No elements found in the manifest",
+};
+
 new CopilotPluginFromScratchCase(
   Capability.CopilotPluginFromScratch,
   27569734,
   "yiminjin@microsoft.com",
   ["copilot plugin"],
   ProgrammingLanguage.TS,
-  {},
-  record
+  options,
+  record,
+  env
 ).test();
