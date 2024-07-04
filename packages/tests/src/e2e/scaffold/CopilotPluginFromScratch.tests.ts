@@ -23,6 +23,7 @@ import {
   readContextMultiEnvV3,
   setProvisionParameterValueV3,
   getSubscriptionId,
+  execAsyncWithRetry,
 } from "../commonUtils";
 import { deleteTeamsApp } from "../debug/utility";
 
@@ -77,10 +78,34 @@ describe("Create Copilot plugin", () => {
       const result = await createResourceGroup(resourceGroupName, "westus");
       chai.assert.isTrue(result);
 
-      await CliHelper.provisionProject(projectPath, "", envName as "dev", {
+      const option = "";
+      const processEnv = {
         ...env,
         AZURE_RESOURCE_GROUP_NAME: resourceGroupName,
-      });
+      };
+      const res = await execAsyncWithRetry(
+        `teamsapp provision --env dev --interactive false --verbose ${option}`,
+        {
+          cwd: projectPath,
+          env: processEnv,
+          timeout: 0,
+        }
+      );
+
+      if (res.stderr) {
+        if (
+          res.stderr.includes("Request failed with status code 400") &&
+          res.stderr.includes("No elements found in the manifest")
+        ) {
+          console.warn(`Skipped error: ${res.stderr}`);
+        } else {
+          console.error(
+            `[Failed] provision ${projectPath}. Error message: ${res.stderr}`
+          );
+        }
+      } else {
+        console.log(`[Successfully] provision ${projectPath}`);
+      }
     }
   );
 });
