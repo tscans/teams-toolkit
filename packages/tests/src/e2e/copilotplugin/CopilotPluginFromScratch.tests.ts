@@ -13,6 +13,29 @@ import * as fs from "fs-extra";
 import { expect } from "chai";
 
 class CopilotPluginFromScratchCase extends CaseFactory {
+  public override async onCreate(
+    appName: string,
+    testFolder: string,
+    capability: Capability,
+    programmingLanguage?: ProgrammingLanguage | undefined,
+    custimized?: Record<string, string> | undefined,
+    processEnv?: NodeJS.ProcessEnv | undefined
+  ): Promise<void> {
+    if (processEnv) {
+      processEnv["API_COPILOT_PLUGIN"] = "true";
+      processEnv["DEVELOP_COPILOT_PLUGIN"] = "true";
+    }
+    await super.onCreate(
+      appName,
+      testFolder,
+      capability,
+      programmingLanguage,
+      custimized,
+      processEnv
+    );
+    console.log("onCreate successful");
+  }
+
   public override async onAfterCreate(projectPath: string): Promise<void> {
     const files: string[] = [
       "appPackage/ai-plugin.json",
@@ -22,14 +45,12 @@ class CopilotPluginFromScratchCase extends CaseFactory {
       const filePath = path.join(projectPath, file);
       expect(fs.existsSync(filePath), `${filePath} must exist.`).to.eq(true);
     }
+    console.log("onAfterCreate successful");
   }
 }
 
-// OpenAI
 const record: Record<string, string> = {};
-record["custom-copilot-agent"] = "custom-copilot-agent-new";
-record["llm-service"] = "llm-service-openai";
-record["openai-key"] = "fake";
+record["api-auth"] = "none";
 new CopilotPluginFromScratchCase(
   Capability.CopilotPluginFromScratch,
   27569734,
