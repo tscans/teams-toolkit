@@ -44,6 +44,7 @@ export abstract class CaseFactory {
     | "function"
     | "spfx"
     | "tab & bot"
+    | "copilot plugin"
   )[] = [];
   public programmingLanguage?: ProgrammingLanguage;
   public options?: {
@@ -67,6 +68,7 @@ export abstract class CaseFactory {
       | "function"
       | "spfx"
       | "tab & bot"
+      | "copilot plugin"
     )[] = [],
     programmingLanguage?: ProgrammingLanguage,
     options: {
