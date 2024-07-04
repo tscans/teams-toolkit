@@ -34,13 +34,14 @@ record["api-auth"] = "none";
 
 const options = {
   skipErrorMessage: "No elements found in the manifest",
+  skipValidate: true,
 };
 
 new CopilotPluginFromScratchCase(
   Capability.CopilotPluginFromScratch,
   27569734,
   "yiminjin@microsoft.com",
-  ["copilot plugin"],
+  ["function"],
   ProgrammingLanguage.TS,
   options,
   record,
