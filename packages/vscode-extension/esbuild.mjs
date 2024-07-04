@@ -7,6 +7,26 @@ const outputDirectory = "out";
 const production = process.argv.includes('--production');
 const watch = process.argv.includes('--watch');
 
+let toolkitResolvePlugin = {
+  name: "toolkit dependency resolve",
+  setup(build) {
+    build.onLoad({ filter: /@jsdevtools[\/\\]ono[\/\\]esm[\/\\]index.js/ }, async (args) => {
+      // A workaround to fix runtime error caused by require.resolve.
+      const content = `
+      import { ono } from "./singleton";
+      export { Ono } from "./constructor";
+      export * from "./types";
+      export { ono };
+      export default ono;
+      `;
+      return {
+        contents: content,
+        loader: "js",
+      };
+    });
+  },
+};
+
 async function main() {
   const ctx = await esbuild.context({
     entryPoints: ['./src/extension.ts'],
@@ -18,8 +38,10 @@ async function main() {
     sourcesContent: false,
     platform: 'node',
     external: ['vscode'],
+    mainFields: ["module", "main"], // https://github.com/microsoft/node-jsonc-parser/issues/57
     // logLevel: 'silent',
     plugins: [
+      toolkitResolvePlugin,
       copyStaticFiles({
         src: "../fx-core/resource/",
         dest: path.join(outputDirectory, "resource"),
@@ -34,7 +56,7 @@ async function main() {
       }),
       copyStaticFiles({
         src: "./src/chat/cl100k_base.tiktoken",
-        dest: path.join(outputDirectory, "src", "chat", "cl100k_base.tiktoken"),
+        dest: path.join(outputDirectory, "src", "cl100k_base.tiktoken"),
       }),
       copyStaticFiles({
         src: "./CHANGELOG.md",
@@ -59,6 +81,14 @@ async function main() {
       copyStaticFiles({
         src: "./node_modules/mermaid/dist/mermaid.min.js",
         dest: path.join(outputDirectory, "resource", "mermaid.min.js"),
+      }),
+      copyStaticFiles({
+        src: "./vite-out/src/",
+        dest: path.join(outputDirectory, "src"),
+      }),
+      copyStaticFiles({
+        src: "./vite-out/assets/client.css",
+        dest: path.join(outputDirectory, "resource", "client.css"),
       }),
       /* add to the end of plugins array */
       esbuildProblemMatcherPlugin
