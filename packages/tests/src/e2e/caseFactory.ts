@@ -52,8 +52,10 @@ export abstract class CaseFactory {
     skipDeploy?: boolean;
     skipValidate?: boolean;
     skipPackage?: boolean;
+    skipErrorMessage?: string;
   };
   public custimized?: Record<string, string>;
+  public processEnv?: NodeJS.ProcessEnv;
 
   public constructor(
     capability: Capability,
@@ -76,8 +78,10 @@ export abstract class CaseFactory {
       skipDeploy?: boolean;
       skipValidate?: boolean;
       skipPackage?: boolean;
+      skipErrorMessage?: string;
     } = {},
-    custimized?: Record<string, string>
+    custimized?: Record<string, string>,
+    processEnv?: NodeJS.ProcessEnv
   ) {
     this.capability = capability;
     this.testPlanCaseId = testPlanCaseId;
@@ -86,6 +90,7 @@ export abstract class CaseFactory {
     this.programmingLanguage = programmingLanguage;
     this.options = options;
     this.custimized = custimized;
+    this.processEnv = processEnv;
   }
 
   public onBefore(): Promise<void> {
@@ -105,14 +110,16 @@ export abstract class CaseFactory {
     testFolder: string,
     capability: Capability,
     programmingLanguage?: ProgrammingLanguage,
-    custimized?: Record<string, string>
+    custimized?: Record<string, string>,
+    processEnv?: NodeJS.ProcessEnv
   ): Promise<void> {
     await Executor.createProject(
       testFolder,
       appName,
       capability,
       programmingLanguage ? programmingLanguage : ProgrammingLanguage.TS,
-      custimized
+      custimized,
+      processEnv
     );
   }
 
@@ -129,6 +136,7 @@ export abstract class CaseFactory {
       programmingLanguage,
       options,
       custimized,
+      processEnv,
       onBefore,
       onAfter,
       onAfterCreate,
@@ -155,7 +163,8 @@ export abstract class CaseFactory {
           testFolder,
           capability,
           programmingLanguage,
-          custimized
+          custimized,
+          processEnv
         );
         expect(fs.pathExistsSync(projectPath)).to.be.true;
 
@@ -175,7 +184,12 @@ export abstract class CaseFactory {
           expect(result).to.be.true;
           process.env["AZURE_RESOURCE_GROUP_NAME"] = appName + "-rg";
 
-          const { success } = await Executor.provision(projectPath);
+          const { success } = await Executor.provision(
+            projectPath,
+            "dev",
+            true,
+            options?.skipErrorMessage
+          );
           expect(success).to.be.true;
 
           // Validate Provision

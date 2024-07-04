@@ -96,14 +96,15 @@ export class Executor {
     appName: string,
     capability: Capability,
     language: ProgrammingLanguage,
-    customized: Record<string, string> = {}
+    customized: Record<string, string> = {},
+    processEnv?: NodeJS.ProcessEnv
   ) {
     const command =
       `teamsapp new --interactive false --app-name ${appName} --capability ${capability} --programming-language ${language} ` +
       Object.entries(customized)
         .map(([key, value]) => "--" + key + " " + value)
         .join(" ");
-    return this.execute(command, workspace);
+    return this.execute(command, workspace, processEnv);
   }
 
   static async addEnv(workspace: string, newEnv: string, env = "dev") {
@@ -152,8 +153,21 @@ export class Executor {
     );
   }
 
-  static async provision(workspace: string, env = "dev", isV3 = true) {
-    return this.executeCmd(workspace, "provision", env, undefined, false, isV3);
+  static async provision(
+    workspace: string,
+    env = "dev",
+    isV3 = true,
+    skipErrorMessage?: string
+  ) {
+    return this.executeCmd(
+      workspace,
+      "provision",
+      env,
+      undefined,
+      false,
+      isV3,
+      skipErrorMessage
+    );
   }
 
   static async provisionWithCustomizedProcessEnv(
