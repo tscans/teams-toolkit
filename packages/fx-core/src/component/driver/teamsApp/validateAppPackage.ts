@@ -7,8 +7,12 @@
 
 import { hooks } from "@feathersjs/hooks/lib";
 import {
+  AppPackageFolderName,
+  BuildFolderName,
   Colors,
+  DiagnosticSeverity,
   FxError,
+  IDiagnosticInfo,
   LogLevel,
   ManifestUtil,
   Platform,
@@ -38,6 +42,7 @@ import { AppStudioError } from "./errors";
 import { ValidateAppPackageArgs } from "./interfaces/ValidateAppPackageArgs";
 import { AppStudioResultFactory } from "./results";
 import { TelemetryPropertyKey } from "./utils/telemetry";
+import { IAppValidationIssue } from "./interfaces/appdefinitions/IValidationResult";
 
 const actionName = "teamsApp/validateAppPackage";
 
@@ -302,6 +307,38 @@ export class ValidateAppPackageDriver implements StepDriver {
           "driver.teamsApp.validate.result.display",
           summaryStr.join(", ")
         );
+
+        const defaultManifestFilePath = path.join(
+          context.projectPath,
+          AppPackageFolderName,
+          Constants.MANIFEST_FILE
+        );
+        if (context.platform === Platform.VSCode && errors.length > 0) {
+          if (
+            path.dirname(args.appPackagePath) ===
+              path.join(context.projectPath, AppPackageFolderName, BuildFolderName) &&
+            (await fs.pathExists(defaultManifestFilePath))
+          ) {
+            // TODO: check env, file name, manifest.{env}.json exists, and manifest.{env}.json equals to manifest.json in the zip
+            // const fileName = path.basename(args.appPackagePath);
+            // const pattern = new RegExp("appPackage.*.json");
+
+            const deafultManifest = await fs.readFile(defaultManifestFilePath, "utf-8");
+            console.log(EOL);
+            const lines = deafultManifest.split("\n");
+            const diagnostics: IDiagnosticInfo[] = validationResult.errors
+              .map((error) =>
+                this.convertValidationIssueToDiagnostic(
+                  error,
+                  zipEntries,
+                  context.projectPath,
+                  lines
+                )
+              )
+              .filter((x) => x !== undefined) as IDiagnosticInfo[];
+            context.ui?.showDiagnosticInfo!(diagnostics);
+          }
+        }
         if (args.showMessage) {
           // For non-lifecycle commands, just show the message
           if (validationResult.errors.length > 0) {
@@ -352,5 +389,60 @@ export class ValidateAppPackageDriver implements StepDriver {
       );
     }
     return ok(undefined);
+  }
+
+  private convertValidationIssueToDiagnostic(
+    result: IAppValidationIssue,
+    zipEntries: AdmZip.IZipEntry[],
+    projectPath: string,
+    lines: string[]
+  ): IDiagnosticInfo | undefined {
+    const manifestFile = zipEntries.find((x) => x.entryName === Constants.MANIFEST_FILE);
+    const manifest = manifestFile?.getData().toString();
+    const defaultManifestFilePath = path.join(
+      projectPath,
+      AppPackageFolderName,
+      Constants.MANIFEST_FILE
+    );
+    let startLine = 0;
+    let startIndex = 0;
+    let endLine = 0;
+    let endIndex = 0;
+    let diagnostic: IDiagnosticInfo | undefined = undefined;
+
+    // if(result.filePath == "manifest.json") {
+
+    if (result.title.toLowerCase() === "ShortNameEqualsReservedName".toLowerCase() && manifest) {
+      lines.forEach((line, idx) => {
+        const search = 'name":';
+        if (line.includes(search)) {
+          startLine = idx;
+          startIndex = line.indexOf(search);
+          endLine = idx;
+          endIndex = startIndex + search.length;
+        }
+      });
+    }
+
+    diagnostic = {
+      message: result.content,
+      severity: DiagnosticSeverity.Error,
+      startIndex: startIndex,
+      startLine: startLine,
+      endIndex: endIndex,
+      endLine: endLine,
+      filePath: defaultManifestFilePath,
+      source: "Teams Toolkit",
+    };
+
+    if (result.helpUrl && result.validationCategory) {
+      diagnostic.code = {
+        value: result.validationCategory,
+        link: result.helpUrl,
+      };
+    }
+    //}
+
+    return diagnostic;
   }
 }

@@ -488,6 +488,10 @@ export interface IDiagnosticInfo {
    */
   severity: DiagnosticSeverity;
   /**
+   * Source.
+   */
+  source?: string;
+  /**
    * A code or identifier for this diagnostic.
    */
   code?: {

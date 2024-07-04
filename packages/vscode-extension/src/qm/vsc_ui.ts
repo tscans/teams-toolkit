@@ -10,6 +10,7 @@ import {
   Range,
   Position,
   languages,
+  window,
 } from "vscode";
 
 import {

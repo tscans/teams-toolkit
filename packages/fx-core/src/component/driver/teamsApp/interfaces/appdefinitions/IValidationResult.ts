@@ -20,6 +20,8 @@ export interface IAppValidationIssue {
   shortCodeNumber: number;
   title: string;
   validationCategory: string;
+  line?: number;
+  column?: number;
 }
 
 export interface IAppValidationNote {
