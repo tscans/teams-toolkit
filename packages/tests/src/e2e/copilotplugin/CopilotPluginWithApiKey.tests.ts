@@ -14,12 +14,16 @@ import { expect } from "chai";
 
 class CopilotPluginWithApiKeyCase extends CaseFactory {
   public override async onAfterCreate(projectPath: string): Promise<void> {
+    let keyGenFile = "keyGen file";
+    if (fs.existsSync(path.join(projectPath, "src/keyGen.js"))) {
+      keyGenFile = "src/keyGen.js";
+    } else if (fs.existsSync(path.join(projectPath, "src/keyGen.ts"))) {
+      keyGenFile = "src/keyGen.ts";
+    }
     const files: string[] = [
       "appPackage/ai-plugin.json",
       "appPackage/manifest.json",
-      this.programmingLanguage === ProgrammingLanguage.TS
-        ? "src/keyGen.ts"
-        : "src/keyGen.js",
+      keyGenFile,
     ];
     for (const file of files) {
       const filePath = path.join(projectPath, file);
