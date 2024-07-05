@@ -10,22 +10,7 @@ import { exec, spawn, SpawnOptionsWithoutStdio } from "child_process";
 import { promisify } from "util";
 import { Executor } from "./executor";
 
-// export const execAsync = promisify(exec);
-export const execAsync = async (command: string, options?: any) => {
-  const execPromisified = promisify(exec);
-
-  try {
-    const { stdout, stderr } = await execPromisified(command, options);
-
-    if (stderr) {
-      throw { message: stderr.toString() };
-    }
-
-    return { stdout: stdout.toString(), stderr: "" };
-  } catch (error) {
-    return { stdout: "", stderr: error.message };
-  }
-};
+export const execAsync = promisify(exec);
 
 export async function execAsyncWithRetry(
   command: string,
