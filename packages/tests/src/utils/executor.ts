@@ -53,7 +53,7 @@ export class Executor {
         }
       } catch (e: any) {
         if (skipErrorMessage && e.message.includes(skipErrorMessage)) {
-          console.log(`[Skip Warning] ${e.message}`);
+          console.log(`[Skip Warning2] ${e.message}`);
           return { success: true, ...e };
         }
         if (e.killed && e.signal == "SIGTERM") {
