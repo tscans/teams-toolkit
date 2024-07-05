@@ -71,7 +71,7 @@
         "type": "None"
       },
       "spec": {
-        "url": "apiSpecificationFile/repair.yml"
+        "url": "apiSpecificationFile/repair.yml",
         "progress_style": "ShowUsageWithInputAndOutput"
       },
       "run_for_functions": ["listRepairs"]
