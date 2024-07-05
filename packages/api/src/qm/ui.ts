@@ -409,7 +409,7 @@ export interface UserInteraction {
   /**
    * Supports in VSC only for now. Show diagnostic message in editor.
    */
-  showDiagnosticInfo?(diagnostics: IDiagnosticInfo[]): void;
+  showDiagnosticInfo?(diagnostics: IDiagnosticInfo[]): Promise<void>;
 }
 
 export interface IProgressHandler {
@@ -504,4 +504,6 @@ export interface IDiagnosticInfo {
      */
     link: string;
   };
+  startOffset?: number;
+  endOffset?: number;
 }

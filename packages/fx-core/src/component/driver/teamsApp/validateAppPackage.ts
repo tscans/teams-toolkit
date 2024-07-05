@@ -43,6 +43,7 @@ import { ValidateAppPackageArgs } from "./interfaces/ValidateAppPackageArgs";
 import { AppStudioResultFactory } from "./results";
 import { TelemetryPropertyKey } from "./utils/telemetry";
 import { IAppValidationIssue } from "./interfaces/appdefinitions/IValidationResult";
+import * as parser from "jsonc-parser";
 
 const actionName = "teamsApp/validateAppPackage";
 
@@ -336,7 +337,7 @@ export class ValidateAppPackageDriver implements StepDriver {
                 )
               )
               .filter((x) => x !== undefined) as IDiagnosticInfo[];
-            context.ui?.showDiagnosticInfo!(diagnostics);
+            await context.ui?.showDiagnosticInfo!(diagnostics);
           }
         }
         if (args.showMessage) {
@@ -402,7 +403,8 @@ export class ValidateAppPackageDriver implements StepDriver {
     const defaultManifestFilePath = path.join(
       projectPath,
       AppPackageFolderName,
-      Constants.MANIFEST_FILE
+      BuildFolderName,
+      "manifest.dev.json"
     );
     let startLine = 0;
     let startIndex = 0;
@@ -411,6 +413,24 @@ export class ValidateAppPackageDriver implements StepDriver {
     let diagnostic: IDiagnosticInfo | undefined = undefined;
 
     // if(result.filePath == "manifest.json") {
+
+    let startOffset = 0;
+    let endOffset = 0;
+    const nodes = parser.parseTree(manifest!);
+    if (nodes) {
+      //let node = parser.findNodeAtLocation(nodes, ["name"]);
+      if (nodes) {
+        // console.log(nodes);
+        // startOffset = nodes.offset;
+        // endOffset = nodes.offset + 4;
+        nodes.children?.forEach((node) => {
+          if (node.children && node.children[0] && node.children[0].value === "name") {
+            startOffset = node.children[0].offset;
+            endOffset = node.children[0].offset + 4;
+          }
+        });
+      }
+    }
 
     if (result.title.toLowerCase() === "ShortNameEqualsReservedName".toLowerCase() && manifest) {
       lines.forEach((line, idx) => {
@@ -433,6 +453,8 @@ export class ValidateAppPackageDriver implements StepDriver {
       endLine: endLine,
       filePath: defaultManifestFilePath,
       source: "Teams Toolkit",
+      startOffset: startOffset,
+      endOffset: endOffset,
     };
 
     if (result.helpUrl && result.validationCategory) {

@@ -11,6 +11,8 @@ import {
   Position,
   languages,
   window,
+  Location,
+  workspace,
 } from "vscode";
 
 import {
@@ -41,6 +43,7 @@ import {
 import { diagnosticCollection, setDiagnosticCollection } from "../globalVariables";
 import { featureFlagManager } from "@microsoft/teamsfx-core";
 import { FeatureFlags } from "@microsoft/teamsfx-core";
+import path = require("path");
 
 export class TTKLocalizer implements Localizer {
   loadingOptionsPlaceholder(): string {
@@ -151,7 +154,7 @@ export class VsCodeUI extends VSCodeUI {
     return res;
   }
 
-  showDiagnosticInfo(diagnostics: IDiagnosticInfo[]): void {
+  async showDiagnosticInfo(diagnostics: IDiagnosticInfo[]): Promise<void> {
     if (!featureFlagManager.getBooleanValue(FeatureFlags.ShowDiagnostics)) {
       return;
     }
@@ -169,14 +172,31 @@ export class VsCodeUI extends VSCodeUI {
         diagnosticMap.set(diagnostic.filePath, diagnosticsOfFile);
       }
 
-      const diagnosticInVSC = new Diagnostic(
-        new Range(
+      let range: Range;
+      if (diagnostic.startOffset !== undefined && diagnostic.endOffset !== undefined) {
+        const document = await workspace.openTextDocument(diagnostic.filePath);
+        range = new Range(
+          document.positionAt(diagnostic.startOffset),
+          document.positionAt(diagnostic.endOffset)
+        );
+      } else {
+        range = new Range(
           new Position(diagnostic.startLine, diagnostic.startIndex),
           new Position(diagnostic.endLine, diagnostic.endIndex)
-        ),
-        diagnostic.message,
-        diagnostic.severity
-      );
+        );
+      }
+
+      const diagnosticInVSC = new Diagnostic(range, diagnostic.message, diagnostic.severity);
+      diagnosticInVSC.source = diagnostic.source;
+      diagnosticInVSC.relatedInformation = [
+        {
+          location: new Location(
+            Uri.file(path.join(path.dirname(path.dirname(diagnostic.filePath)), "ai-plugin.json")),
+            new Range(new Position(0, 0), new Position(0, 0))
+          ),
+          message: "ai-plugin.json is invalid",
+        },
+      ];
       if (diagnostic.code) {
         diagnosticInVSC.code = {
           value: diagnostic.code.value,
