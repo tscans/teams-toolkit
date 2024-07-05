@@ -5,7 +5,8 @@ import fetch from "node-fetch";
 import { Issue } from "./types";
 
 export interface GithubIssue {
-  search(repo: string, q: string): Promise<GithubIssueSearchResult>;
+  search(repo: string, query: string): Promise<GithubIssueSearchResult>;
+  retrieve(repo: string, queries: string[]): Promise<GithubIssueSearchResult>;
 }
 
 export interface GithubIssueSearchResult {
@@ -86,5 +87,17 @@ class GithubIssueRetriever implements GithubIssue {
     }
 
     return data;
+  }
+
+  async retrieve(repo: string, queries: string[]): Promise<GithubIssueSearchResult> {
+    const result: GithubIssueSearchResult = { items: [] };
+    for (const query of queries) {
+      const res = await this.search(repo, query);
+      if (res.items.length > 0) {
+        result.items.push(...res.items);
+      }
+    }
+
+    return result;
   }
 }

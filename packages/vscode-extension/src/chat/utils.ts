@@ -98,10 +98,8 @@ export function ChatResponseToString(response: ChatResponseTurn): string {
 }
 
 export async function myAzureOpenaiRequest(
-  messages: { role: string; content: { type: string; text: string }[] }[],
-  response: ChatResponseStream,
-  token: CancellationToken
-) {
+  messages: { role: string; content: { type: string; text: string }[] }[]
+): Promise<string> {
   const headers = {
     "Content-Type": "application/json",
     "api-key": process.env.OPENAI_API_KEY || "",
@@ -110,28 +108,25 @@ export async function myAzureOpenaiRequest(
     messages: messages,
     temperature: 0.5,
     top_p: 0.95,
-    max_tokens: 4096,
-    stream: true,
   };
 
-  const GPT4O_ENDPOINT =
-    "https://teams-agent-ai-wu3.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview";
-  const stream = await fetch(GPT4O_ENDPOINT, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(payload),
-  });
+  const GPT4O_ENDPOINT = process.env.OPENAI_ENDPOINT || "";
 
-  if (stream.body != null) {
-    const reader = stream.body.getReader();
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) {
-        break;
-      }
-      const json = JSON.parse(new TextDecoder().decode(value));
-      const text = json.data.choices[0].delta.content;
-      response.markdown(text);
+  try {
+    const stream = await fetch(GPT4O_ENDPOINT, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+    const json = await stream.json();
+    if (json.choices.length > 0) {
+      return json.choices[0].message.content;
     }
+
+    return "";
+  } catch (error) {
+    throw new Error(
+      `Error in sending request to Azure OpenAI endpoint: ${(error as Error).message}`
+    );
   }
 }

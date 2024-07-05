@@ -3,7 +3,7 @@
 import * as util from "util";
 import * as vscode from "vscode";
 
-import { FxError, Result, SystemError, err, ok } from "@microsoft/teamsfx-api";
+import { FxError, Result, SystemError, UserError, err, ok } from "@microsoft/teamsfx-api";
 import { assembleError } from "@microsoft/teamsfx-core";
 import { UserCancelError, sleep } from "@microsoft/vscode-ui";
 import VsCodeLogInstance from "../commonlib/log";
@@ -193,9 +193,22 @@ export async function invokeTeamsParticipantFix(args?: any[]): Promise<Result<nu
   const triggerFromProperty = getTriggerFromProperty(args);
   ExtTelemetry.sendTelemetryEvent(eventName, triggerFromProperty);
 
-  const query = "@teams /fix ";
-  let res;
+  let query = "@teams /fix ";
+  if (args && args.length > 1) {
+    const error = args[1] as SystemError | UserError;
+    const errorContext = {
+      errorCode: error.source + "." + error.name,
+      message: error.message,
+      stack: error.stack,
+      helpLink:
+        "helpLink" in error && error.helpLink && typeof error.helpLink != "undefined"
+          ? error.helpLink
+          : "",
+    };
+    query += JSON.stringify(errorContext);
+  }
 
+  let res;
   const isExtensionInstalled = githubCopilotInstalled();
   if (isExtensionInstalled) {
     res = await openGithubCopilotChat(query, false);
