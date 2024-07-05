@@ -41,7 +41,7 @@ new CopilotPluginWithNoneAuthCase(
   Capability.CopilotPluginFromScratch,
   27569734,
   "yiminjin@microsoft.com",
-  ["function"],
+  ["copilot plugin"],
   ProgrammingLanguage.TS,
   options,
   record,
