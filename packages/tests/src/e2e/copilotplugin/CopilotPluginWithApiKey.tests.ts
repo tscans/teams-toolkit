@@ -17,7 +17,9 @@ class CopilotPluginWithApiKeyCase extends CaseFactory {
     const files: string[] = [
       "appPackage/ai-plugin.json",
       "appPackage/manifest.json",
-      "src/keyGen.ts",
+      this.programmingLanguage === ProgrammingLanguage.TS
+        ? "src/keyGen.ts"
+        : "src/keyGen.js",
     ];
     for (const file of files) {
       const filePath = path.join(projectPath, file);

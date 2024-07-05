@@ -184,8 +184,6 @@ export abstract class CaseFactory {
           expect(result).to.be.true;
           process.env["AZURE_RESOURCE_GROUP_NAME"] = appName + "-rg";
 
-          console.log("this.options: " + this.options);
-
           const { success } = await Executor.provision(
             projectPath,
             "dev",
