@@ -98,17 +98,23 @@ export function ChatResponseToString(response: ChatResponseTurn): string {
 }
 
 export async function myAzureOpenaiRequest(
-  messages: { role: string; content: { type: string; text: string }[] }[]
+  messages: { role: string; content: { type: string; text: string }[] }[],
+  response_format: { [key: string]: string } | undefined = undefined
 ): Promise<string> {
   const headers = {
     "Content-Type": "application/json",
     "api-key": process.env.OPENAI_API_KEY || "",
   };
+
   const payload = {
     messages: messages,
     temperature: 0.5,
     top_p: 0.95,
   };
+
+  if (response_format) {
+    (payload as any)["response_format"] = response_format;
+  }
 
   const GPT4O_ENDPOINT = process.env.OPENAI_ENDPOINT || "";
 
@@ -119,7 +125,7 @@ export async function myAzureOpenaiRequest(
       body: JSON.stringify(payload),
     });
     const json = await stream.json();
-    if (json.choices.length > 0) {
+    if ((json.choices as any[]).length > 0) {
       return json.choices[0].message.content;
     }
 

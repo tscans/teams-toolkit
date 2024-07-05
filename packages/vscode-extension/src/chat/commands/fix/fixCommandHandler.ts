@@ -44,6 +44,7 @@ export default async function fixCommandHandler(
   ExtTelemetry.sendTelemetryEvent(TelemetryEvent.CopilotChatStart, chatTelemetryData.properties);
 
   try {
+    let query = request.prompt;
     // 1. Get error context, helplink if available
     response.progress("Parsing error context...");
     // const errorContext = {
@@ -52,6 +53,10 @@ export default async function fixCommandHandler(
     //     "Teams Toolkit has completed checking your app package against validation rules. 2 failed, 1 warning, 50 passed. Check Output panel for details.",
     // };
     const errorContext = parseErrorContext(request.prompt);
+    console.log("ErrorContext: ", errorContext);
+    if (errorContext != "") {
+      query = "How to fix the error?";
+    }
 
     // 2. Get Output panel log
     response.progress("Retrieving output panel log...");
@@ -94,20 +99,16 @@ export default async function fixCommandHandler(
               text: RephraseQueryPrompt.replace(
                 "{{ chat_history }}",
                 JSON.stringify(chatHistory)
-              ).replace("{{ chat_input }}", request.prompt),
+              ).replace("{{ chat_input }}", query),
             },
           ],
         },
       ];
       rephrasedQuery = await myAzureOpenaiRequest(rephraseMessages);
     } else {
-      if (request.prompt === "") {
-        rephrasedQuery = "How to fix the error?";
-      } else {
-        rephrasedQuery = request.prompt;
-      }
+      rephrasedQuery = query;
     }
-    console.log(rephrasedQuery);
+    console.log("RephrasedQuery: ", rephrasedQuery);
 
     // 4. get search patterns
     response.progress("Extracting search patterns...");
@@ -130,17 +131,18 @@ export default async function fixCommandHandler(
         content: [
           {
             type: "text",
-            text: GetSearchPatternsPrompt.replace(
-              "{{errorContext}}",
-              JSON.stringify(errorContext)
-            ).replace("{{outputLog}}", outputLog),
+            text: GetSearchPatternsPrompt.replace("{{errorContext}}", JSON.stringify(errorContext))
+              .replace("{{outputLog}}", outputLog)
+              .replace("{{userInput}}", rephrasedQuery),
           },
         ],
       },
     ];
-    const searchPatternsString = await myAzureOpenaiRequest(searchMessages);
-    console.log("Search patterns: ", searchPatternsString);
-    const searchPatterns = JSON.parse(searchPatternsString.split("```json")[1].split("```")[0]);
+    const searchPatternsString = await myAzureOpenaiRequest(searchMessages, {
+      type: "json_object",
+    });
+    console.log("Search patterns: \n", searchPatternsString);
+    const searchPatterns = JSON.parse(searchPatternsString);
 
     // 5. retrieve search results
     response.progress("Retrieving search results...");
@@ -216,7 +218,7 @@ export default async function fixCommandHandler(
 
     // 7. summarize the each result
     const washedResults = await Promise.all(
-      filteredRerankedResults.map((element) => async () => {
+      filteredRerankedResults.map(async (element) => {
         // const msg = [
         //   LanguageModelChatMessage.User(
         //     "Summarize the following content:\n" + JSON.stringify(element)
