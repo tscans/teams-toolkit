@@ -54,3 +54,14 @@ new CopilotPluginWithApiKeyCase(
   record,
   env
 ).test();
+
+new CopilotPluginWithApiKeyCase(
+  Capability.CopilotPluginFromScratch,
+  27569734,
+  "yiminjin@microsoft.com",
+  ["copilot plugin"],
+  ProgrammingLanguage.JS,
+  options,
+  record,
+  env
+).test();
