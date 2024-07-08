@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import { ProgrammingLanguage } from "@microsoft/teamsfx-core";
+// eslint-disable-next-line import/no-cycle
 import { execAsync, editDotEnvFile } from "./commonUtils";
 import {
   TemplateProjectFolder,
@@ -53,7 +54,7 @@ export class Executor {
         }
       } catch (e: any) {
         if (skipErrorMessage && e.message.includes(skipErrorMessage)) {
-          console.log(`[Skip Warning2] ${e.message}`);
+          console.log(`[Skip Warning] ${e.message}`);
           return { success: true, ...e };
         }
         if (e.killed && e.signal == "SIGTERM") {
