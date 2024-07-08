@@ -14,7 +14,7 @@ class CopilotPluginWithNoneAuthForCsharpCase extends CopilotPluginCommonTest {
       "TeamsApp/appPackage/ai-plugin.json",
       "TeamsApp/appPackage/manifest.json",
     ];
-    validateFiles(projectPath, files);
+    await validateFiles(projectPath, files);
   }
 }
 

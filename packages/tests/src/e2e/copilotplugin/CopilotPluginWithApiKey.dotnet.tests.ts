@@ -17,7 +17,7 @@ class CopilotPluginWithNoneAuthForJsCase extends CopilotPluginCommonTest {
       "TeamsApp/appPackage/manifest.json",
       "TeamsApp/GenerateApiKey.ps1",
     ];
-    validateFiles(projectPath, files);
+    await validateFiles(projectPath, files);
 
     const userFile = path.resolve(
       projectPath,
@@ -25,7 +25,7 @@ class CopilotPluginWithNoneAuthForJsCase extends CopilotPluginCommonTest {
       "env",
       `.env.dev.user`
     );
-    replaceSecretKey(userFile);
+    await replaceSecretKey(userFile);
   }
 }
 

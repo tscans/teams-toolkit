@@ -15,7 +15,7 @@ class CopilotPluginOAuthForJsTestCase extends CopilotPluginCommonTest {
       "appPackage/ai-plugin.json",
       "appPackage/manifest.json",
     ];
-    validateFiles(projectPath, files);
+    await validateFiles(projectPath, files);
   }
 }
 
