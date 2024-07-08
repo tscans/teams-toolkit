@@ -8,21 +8,15 @@
 import { Capability } from "../../utils/constants";
 import { CaseFactory } from "../caseFactory";
 import { ProgrammingLanguage } from "@microsoft/teamsfx-core";
-import * as path from "path";
-import * as fs from "fs-extra";
-import { expect } from "chai";
+import { validateFiles } from "./validator";
 
-class CopilotPluginFromScratchCase extends CaseFactory {
+class CopilotPluginWithNoneAuthForTsCase extends CaseFactory {
   public override async onAfterCreate(projectPath: string): Promise<void> {
     const files: string[] = [
       "appPackage/ai-plugin.json",
       "appPackage/manifest.json",
     ];
-    for (const file of files) {
-      const filePath = path.join(projectPath, file);
-      expect(fs.existsSync(filePath), `${filePath} must exist.`).to.eq(true);
-    }
-    console.log("onAfterCreate successful");
+    validateFiles(projectPath, files);
   }
 }
 
@@ -37,11 +31,11 @@ const options = {
   skipValidate: true,
 };
 
-new CopilotPluginFromScratchCase(
+new CopilotPluginWithNoneAuthForTsCase(
   Capability.CopilotPluginFromScratch,
   27569734,
   "yiminjin@microsoft.com",
-  ["function"],
+  ["copilot plugin"],
   ProgrammingLanguage.TS,
   options,
   record,

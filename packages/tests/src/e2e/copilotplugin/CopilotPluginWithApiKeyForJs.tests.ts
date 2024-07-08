@@ -10,27 +10,18 @@ import { CaseFactory } from "../caseFactory";
 import { ProgrammingLanguage } from "@microsoft/teamsfx-core";
 import * as path from "path";
 import * as fs from "fs-extra";
-import { expect } from "chai";
+import { validateFiles } from "./validator";
 
-class CopilotPluginWithApiKeyCase extends CaseFactory {
+class CopilotPluginWithApiKeyForJsCase extends CaseFactory {
   public override async onAfterCreate(projectPath: string): Promise<void> {
-    let keyGenFile = "keyGen file";
-    if (fs.existsSync(path.join(projectPath, "src/keyGen.js"))) {
-      keyGenFile = "src/keyGen.js";
-    } else if (fs.existsSync(path.join(projectPath, "src/keyGen.ts"))) {
-      keyGenFile = "src/keyGen.ts";
-    }
     const files: string[] = [
       "appPackage/ai-plugin.json",
       "appPackage/manifest.json",
-      keyGenFile,
+      "src/keyGen.js",
     ];
-    for (const file of files) {
-      const filePath = path.join(projectPath, file);
-      expect(fs.existsSync(filePath), `${filePath} must exist.`).to.eq(true);
-    }
-    console.log("Start replace secret key in .env.dev.user file");
+    validateFiles(projectPath, files);
 
+    console.log("Start replace secret key in .env.dev.user file");
     const userFile = path.resolve(projectPath, "env", `.env.dev.user`);
     const newSecretKey = 'SECRET_API_KEY="test-secret-api-key"';
     let fileContent = fs.readFileSync(userFile, "utf8");
@@ -51,21 +42,9 @@ const options = {
   skipValidate: true,
 };
 
-new CopilotPluginWithApiKeyCase(
+new CopilotPluginWithApiKeyForJsCase(
   Capability.CopilotPluginFromScratch,
-  27569734,
-  "yiminjin@microsoft.com",
-  ["function"],
-  ProgrammingLanguage.TS,
-  options,
-  record,
-  env
-).test();
-
-console.log(`Start validate JS language test case`);
-new CopilotPluginWithApiKeyCase(
-  Capability.CopilotPluginFromScratch,
-  27569734,
+  28640069,
   "yiminjin@microsoft.com",
   ["copilot plugin"],
   ProgrammingLanguage.JS,

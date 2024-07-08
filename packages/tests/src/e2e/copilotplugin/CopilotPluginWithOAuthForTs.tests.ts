@@ -3,8 +3,17 @@
 import { Capability } from "../../utils/constants";
 import { CaseFactory } from "../caseFactory";
 import { ProgrammingLanguage } from "@microsoft/teamsfx-core";
+import { validateFiles } from "./validator";
 
-class CopilotPluginOAuthTestCase extends CaseFactory {}
+class CopilotPluginOAuthTestForTsCase extends CaseFactory {
+  public override async onAfterCreate(projectPath: string): Promise<void> {
+    const files: string[] = [
+      "appPackage/ai-plugin.json",
+      "appPackage/manifest.json",
+    ];
+    validateFiles(projectPath, files);
+  }
+}
 
 const copilotPluginOAuth: Record<string, string> = {};
 copilotPluginOAuth["api-auth"] = "oauth";
@@ -17,7 +26,7 @@ const options = {
   skipErrorMessage: "No elements found in the manifest",
 };
 
-new CopilotPluginOAuthTestCase(
+new CopilotPluginOAuthTestForTsCase(
   Capability.CopilotPluginFromScratch,
   27569691,
   "huimiao@microsoft.com",
