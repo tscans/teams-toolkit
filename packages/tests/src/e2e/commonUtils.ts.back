@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import MockAzureAccountProvider from "@microsoft/teamsapp-cli/src/commonlib/azureLoginUserPassword";
+import m365Login from "@microsoft/teamsapp-cli/src/commonlib/m365Login";
 import {
   AppPackageFolderName,
   ConfigFolderName,
@@ -19,8 +21,6 @@ import path from "path";
 import { promisify } from "util";
 import { v4 as uuidv4 } from "uuid";
 import { YAMLMap, YAMLSeq, parseDocument } from "yaml";
-import MockAzureAccountProvider from "@microsoft/teamsapp-cli/src/commonlib/azureLoginUserPassword";
-import m365Login from "@microsoft/teamsapp-cli/src/commonlib/m365Login";
 import {
   AadManager,
   AadValidator,
@@ -41,8 +41,7 @@ import {
 import { getWebappServicePlan } from "../commonlib/utilities";
 
 export const TEN_MEGA_BYTE = 1024 * 1024 * 10;
-// export const execAsync = promisify(exec);
-
+//export const execAsync = promisify(exec);
 export async function execAsync(
   cmd: string,
   opts?: {

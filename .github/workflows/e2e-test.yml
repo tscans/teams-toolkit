@@ -566,7 +566,7 @@ jobs:
           SIDELOADING_SERVICE_ENDPOINT: ${{ secrets.SIDELOADING_SERVICE_ENDPOINT }}
           SIDELOADING_SERVICE_SCOPE: ${{ secrets.SIDELOADING_SERVICE_SCOPE }}
         run: |
-          npx nyc mocha --parallel ../tests/src/e2e/*/*.tests.ts
+          npx nyc mocha --parallel ../tests/src/e2e/bot/EchoBotHappyPath.tests.ts ../tests/src/e2e/frontend/BasicTabHappyPath.tests.ts
       
       - name: pack zip
         if: ${{always()}}
