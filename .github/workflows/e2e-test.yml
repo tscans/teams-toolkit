@@ -538,14 +538,14 @@ jobs:
         run: |
           npm run setup
 
-      - name: Download samples(daily)
-        working-directory: packages/tests/src/e2e
-        run: |
-          mkdir resource && cd resource
-          wget https://github.com/OfficeDev/TeamsFx-Samples/archive/refs/heads/dev.zip
-          unzip dev.zip -d .
-          mv TeamsFx-Samples-dev/* .
-          rm -rf dev.zip TeamsFx-Samples-dev
+      # - name: Download samples(daily)
+      #   working-directory: packages/tests/src/e2e
+      #   run: |
+      #     mkdir resource && cd resource
+      #     wget https://github.com/OfficeDev/TeamsFx-Samples/archive/refs/heads/dev.zip
+      #     unzip dev.zip -d .
+      #     mv TeamsFx-Samples-dev/* .
+      #     rm -rf dev.zip TeamsFx-Samples-dev
 
       - name: run test for coverage
         working-directory: packages/fx-core
