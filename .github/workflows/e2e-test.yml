@@ -536,7 +536,8 @@ jobs:
       
       - name: setup
         run: |
-          npm run setup
+          pnpm --filter=@microsoft/teamsfx-test install
+          pnpm --filter=@microsoft/teamsfx-test run build
 
       - name: Download samples(daily)
         working-directory: packages/tests/src/e2e
