@@ -1,6 +1,24 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+export const ParseErrorContextPrompt = `
+<Instruction>
+1. From the given conversation history and the user input below, extract the error context information.
+2. You answer should be in json format string, for example, '{"errorCode": "XXXX.XXXX", "message": "error message", "stack": "error stack", "helpLink": "https://docs.microsoft.com/teams"}'. Don't ouput any other characters other than json object quoted by '{}'.
+3. If the error context information cannot be extracted, output an empty json object: '{}'.
+4. The errorCode is a string that follows the pattern of "XXXX.XXXX", for example, "armDeploy.DeploymentError", "script.ScriptExecutionError", "teamsApp.MissingEnvironmentVariablesError" etc. The errorCode is usually quoted by square brackets "[]".
+5. The message is the error message that describes the error in detail.
+6. The stack is the source code stack trace when the error happens.
+7. The helpLink is the hyperlink to the documentation that may provide the solution to the error.
+</Instruction>
+
+chat history:
+{{ chat_history }}
+
+Follow up Input: {{ chat_input }}
+Error Context:
+`;
+
 export const RephraseQueryPrompt = `
 system: 
 * Given the following conversation history and the users next question,rephrase the question to be a stand alone question.

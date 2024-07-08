@@ -7,3 +7,10 @@ export interface ErrorContext {
   stack: string;
   helpLink: string;
 }
+
+export interface ChatTurn {
+  user: string;
+  assistant: string;
+}
+
+export type ChatHistory = ChatTurn[];

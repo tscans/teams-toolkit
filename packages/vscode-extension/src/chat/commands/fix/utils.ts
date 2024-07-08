@@ -2,8 +2,27 @@
 // Licensed under the MIT license.
 
 import * as fs from "fs-extra";
-import { ErrorContext } from "./types";
+import { ErrorContext, ChatHistory } from "./types";
 import VsCodeLogInstance from "../../../commonlib/log";
+import { ChatContext, ChatRequestTurn, ChatResponseTurn } from "vscode";
+import { ChatResponseToString } from "../../utils";
+
+export function wrapChatHistory(context: ChatContext): ChatHistory {
+  const chatHistory: ChatHistory = [];
+  for (let i = 0; i < context.history.length - 1; i += 2) {
+    if (
+      context.history[i] instanceof ChatRequestTurn &&
+      context.history[i + 1] instanceof ChatResponseTurn
+    ) {
+      chatHistory.push({
+        user: (context.history[i] as ChatRequestTurn).prompt,
+        assistant: ChatResponseToString(context.history[i + 1] as ChatResponseTurn),
+      });
+    }
+  }
+
+  return chatHistory;
+}
 
 export function parseErrorContext(query: string): ErrorContext | "" {
   try {

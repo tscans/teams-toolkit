@@ -22,6 +22,7 @@ import {
 } from "../../utils";
 import {
   GetSearchPatternsPrompt,
+  ParseErrorContextPrompt,
   RephraseQueryPrompt,
   RerankSearchResultsPrompt,
   TroubleShootingSystemPrompt,
@@ -29,7 +30,7 @@ import {
 import * as vscode from "vscode";
 import { UserError } from "@microsoft/teamsfx-api";
 import { GithubRetriever } from "../../retriever/github/retrieve";
-import { getOutputLog, parseErrorContext } from "./utils";
+import { getOutputLog, parseErrorContext, wrapChatHistory } from "./utils";
 
 export default async function fixCommandHandler(
   request: ChatRequest,
@@ -44,19 +45,33 @@ export default async function fixCommandHandler(
   ExtTelemetry.sendTelemetryEvent(TelemetryEvent.CopilotChatStart, chatTelemetryData.properties);
 
   try {
-    let query = request.prompt;
+    const query = request.prompt;
+    const chatHistory = wrapChatHistory(context);
+    let errorContext = {};
+
     // 1. Get error context, helplink if available
     response.progress("Parsing error context...");
-    // const errorContext = {
-    //   errorCode: "[AppStudioPlugin.ManifestValidationFailed]",
-    //   displayMessage:
-    //     "Teams Toolkit has completed checking your app package against validation rules. 2 failed, 1 warning, 50 passed. Check Output panel for details.",
-    // };
-    const errorContext = parseErrorContext(request.prompt);
-    console.log("ErrorContext: ", errorContext);
-    if (errorContext != "") {
-      query = "How to fix the error?";
+    errorContext = parseErrorContext(query);
+    if (errorContext === "") {
+      const parsedErrorContextMessages = [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: ParseErrorContextPrompt.replace(
+                "{{ chat_history }}",
+                JSON.stringify(chatHistory).replace("{{ chat_input }}", query)
+              ),
+            },
+          ],
+        },
+      ];
+      const parsedErrorContext = await myAzureOpenaiRequest(parsedErrorContextMessages);
+      console.log("ParsedErrorContext: ", parsedErrorContext);
+      errorContext = JSON.parse(parsedErrorContext);
     }
+    console.log("ErrorContext: ", errorContext);
 
     // 2. Get Output panel log
     response.progress("Retrieving output panel log...");
@@ -66,30 +81,6 @@ export default async function fixCommandHandler(
     response.progress("Rephrasing query...");
     let rephrasedQuery = "";
     if (context.history.length > 0) {
-      const chatHistory: { user: string; assistant: string }[] = [];
-      for (let i = 0; i < context.history.length - 1; i += 2) {
-        if (
-          context.history[i] instanceof ChatRequestTurn &&
-          context.history[i + 1] instanceof ChatResponseTurn
-        ) {
-          chatHistory.push({
-            user: (context.history[i] as ChatRequestTurn).prompt,
-            assistant: ChatResponseToString(context.history[i + 1] as ChatResponseTurn),
-          });
-        }
-      }
-
-      // const rephraseMessages = [
-      //   LanguageModelChatMessage.User(
-      //     RephraseQueryPrompt.replace("{{ chat_history }}", JSON.stringify(chatHistory)).replace(
-      //       "{{ chat_input }}",
-      //       request.prompt
-      //     )
-      //   ),
-      //   LanguageModelChatMessage.User(request.prompt),
-      // ];
-      // console.log(JSON.stringify(rephraseMessages, null, 2));
-      // rephrasedQuery = await getCopilotResponseAsString("copilot-gpt-4", rephraseMessages, token);
       const rephraseMessages = [
         {
           role: "user",
@@ -112,19 +103,6 @@ export default async function fixCommandHandler(
 
     // 4. get search patterns
     response.progress("Extracting search patterns...");
-    // const searchMessages = [
-    //   LanguageModelChatMessage.User(
-    //     GetSearchPatternsPrompt.replace("{{errorContext}}", JSON.stringify(errorContext)).replace(
-    //       "{{outputLog}}",
-    //       outputLog
-    //     )
-    //   ),
-    // ];
-    // const searchPatternsString = await getCopilotResponseAsString(
-    //   "copilot-gpt-4",
-    //   searchMessages,
-    //   token
-    // );
     const searchMessages = [
       {
         role: "user",
@@ -183,16 +161,6 @@ export default async function fixCommandHandler(
       return arr.filter((_v, index) => results[index]);
     };
     const filteredRerankedResults = await asyncFilter(rerankedResults, async (element: any) => {
-      // const rerankMessages = [
-      //   LanguageModelChatMessage.User(
-      //     RerankSearchResultsPrompt.replace("{{searchResult}}", JSON.stringify(element)).replace(
-      //       "{{question}}",
-      //       rephrasedQuery
-      //     )
-      //   ),
-      // ];
-      // await new Promise((resolve) => setTimeout(resolve, 1500));
-      // const res = await getCopilotResponseAsString("copilot-gpt-4", rerankMessages, token);
       const rerankMessages = [
         {
           role: "user",
@@ -219,13 +187,6 @@ export default async function fixCommandHandler(
     // 7. summarize the each result
     const washedResults = await Promise.all(
       filteredRerankedResults.map(async (element) => {
-        // const msg = [
-        //   LanguageModelChatMessage.User(
-        //     "Summarize the following content:\n" + JSON.stringify(element)
-        //   ),
-        // ];
-        // await new Promise((resolve) => setTimeout(resolve, 1500));
-        // const res = await getCopilotResponseAsString("copilot-gpt-4", msg, token);
         const msg = [
           {
             role: "user",
@@ -245,27 +206,6 @@ export default async function fixCommandHandler(
 
     // 8. generate response
     response.progress("Generating response...");
-    // const messages = [
-    //   LanguageModelChatMessage.User(
-    //     TroubleShootingSystemPrompt.replace("{{errorContext}}", JSON.stringify(errorContext))
-    //       .replace("{{outputLog}}", outputLog)
-    //       .replace("{{searchResults}}", JSON.stringify(washedResults))
-    //       .replace("{{rephrasedQuery}}", rephrasedQuery)
-    //   ),
-    // ];
-    // const messages = [
-    //   LanguageModelChatMessage.User(
-    //     TroubleShootingSystemPrompt.replace("{{errorContext}}", JSON.stringify(errorContext))
-    //       .replace("{{outputLog}}", outputLog)
-    //       .replace("{{rephrasedQuery}}", rephrasedQuery)
-    //   ),
-    //   LanguageModelChatMessage.User(
-    //     SearchResultsPrompt.replace("{{searchResults}}", JSON.stringify(rerankedResults))
-    //   ),
-    // ];
-    // console.log(JSON.stringify(messages, null, 2));
-    // await new Promise((resolve) => setTimeout(resolve, 1500));
-    // await verbatimCopilotInteraction("copilot-gpt-4", messages, response, token);
     const messages = [
       {
         role: "user",
