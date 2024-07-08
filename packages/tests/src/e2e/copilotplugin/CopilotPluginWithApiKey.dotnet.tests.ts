@@ -6,12 +6,14 @@
  */
 
 import { ProgrammingLanguage } from "@microsoft/teamsfx-core";
-import { replaceSecretKey, validateFiles } from "./helper";
+import { replaceSecretKey, validateFiles, listFiles } from "./helper";
 import { CopilotPluginCommonTest } from "./copilotPluginCommonTest";
 import * as path from "path";
 
 class CopilotPluginWithNoneAuthForJsCase extends CopilotPluginCommonTest {
   public override async onAfterCreate(projectPath: string): Promise<void> {
+    console.log(listFiles(projectPath));
+
     const files: string[] = [
       "TeamsApp/appPackage/ai-plugin.json",
       "TeamsApp/appPackage/manifest.json",
