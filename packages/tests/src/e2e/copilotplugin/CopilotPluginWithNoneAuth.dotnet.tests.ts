@@ -6,27 +6,21 @@
  */
 
 import { ProgrammingLanguage } from "@microsoft/teamsfx-core";
-import { replaceSecretKey, validateFiles } from "./helper";
+import { validateFiles } from "./helper";
 import { CopilotPluginCommonTest } from "./copilotPluginCommonTest";
-import * as path from "path";
-
-class CopilotPluginWithNoneAuthForTsCase extends CopilotPluginCommonTest {
+class CopilotPluginWithNoneAuthForCsharpCase extends CopilotPluginCommonTest {
   public override async onAfterCreate(projectPath: string): Promise<void> {
     const files: string[] = [
-      "appPackage/ai-plugin.json",
-      "appPackage/manifest.json",
-      "src/keyGen.ts",
+      "TeamsApp/appPackage/ai-plugin.json",
+      "TeamsApp/appPackage/manifest.json",
     ];
     validateFiles(projectPath, files);
-
-    const userFile = path.resolve(projectPath, "env", `.env.dev.user`);
-    replaceSecretKey(userFile);
   }
 }
 
-new CopilotPluginWithNoneAuthForTsCase(
-  28640069,
+new CopilotPluginWithNoneAuthForCsharpCase(
+  28641262,
   "yimin@microsoft.com",
-  "api-key",
-  ProgrammingLanguage.TS
+  "none",
+  ProgrammingLanguage.CSharp
 ).test();

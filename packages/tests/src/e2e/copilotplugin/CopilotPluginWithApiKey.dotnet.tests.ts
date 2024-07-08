@@ -10,23 +10,28 @@ import { replaceSecretKey, validateFiles } from "./helper";
 import { CopilotPluginCommonTest } from "./copilotPluginCommonTest";
 import * as path from "path";
 
-class CopilotPluginWithNoneAuthForTsCase extends CopilotPluginCommonTest {
+class CopilotPluginWithNoneAuthForJsCase extends CopilotPluginCommonTest {
   public override async onAfterCreate(projectPath: string): Promise<void> {
     const files: string[] = [
-      "appPackage/ai-plugin.json",
-      "appPackage/manifest.json",
-      "src/keyGen.ts",
+      "TeamsApp/appPackage/ai-plugin.json",
+      "TeamsApp/appPackage/manifest.json",
+      "TeamsApp/GenerateApiKey.ps1",
     ];
     validateFiles(projectPath, files);
 
-    const userFile = path.resolve(projectPath, "env", `.env.dev.user`);
+    const userFile = path.resolve(
+      projectPath,
+      "TeamsApp",
+      "env",
+      `.env.dev.user`
+    );
     replaceSecretKey(userFile);
   }
 }
 
-new CopilotPluginWithNoneAuthForTsCase(
-  28640069,
+new CopilotPluginWithNoneAuthForJsCase(
+  28641218,
   "yimin@microsoft.com",
   "api-key",
-  ProgrammingLanguage.TS
+  ProgrammingLanguage.CSharp
 ).test();
