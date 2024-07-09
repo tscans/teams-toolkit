@@ -15,9 +15,9 @@ class CopilotPluginWithNoneAuthForJsCase extends CopilotPluginCommonTest {
     console.log(listFiles(projectPath));
 
     const files: string[] = [
-      "TeamsApp/appPackage/ai-plugin.json",
-      "TeamsApp/appPackage/manifest.json",
-      "TeamsApp/GenerateApiKey.ps1",
+      "appPackage/ai-plugin.json",
+      "appPackage/manifest.json",
+      "GenerateApiKey.ps1",
     ];
     await validateFiles(projectPath, files);
 
