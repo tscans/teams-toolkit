@@ -54,7 +54,6 @@ export class M365ProviderUserPassword extends BasicLogin implements M365TokenPro
    */
   async getAccessToken(tokenRequest: TokenRequest): Promise<Result<string, FxError>> {
     const pca = new msal.PublicClientApplication(msalConfig);
-
     const usernamePasswordRequest = {
       scopes: tokenRequest.scopes,
       username: user!,
