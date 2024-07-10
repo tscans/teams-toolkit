@@ -125,11 +125,7 @@ export async function myAzureOpenaiRequest(
       body: JSON.stringify(payload),
     });
     const json = await stream.json();
-    if ((json.choices as any[]).length > 0) {
-      return json.choices[0].message.content;
-    }
-
-    return "";
+    return json.choices[0]?.message?.content ?? "";
   } catch (error) {
     throw new Error(
       `Error in sending request to Azure OpenAI endpoint: ${(error as Error).message}`
