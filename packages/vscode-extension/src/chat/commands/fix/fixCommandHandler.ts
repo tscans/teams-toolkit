@@ -54,18 +54,12 @@ export default async function fixCommandHandler(
     errorContext = parseErrorContext(query);
     if (errorContext === "") {
       const parsedErrorContextMessages = [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: ParseErrorContextPrompt.replace(
-                "{{ chat_history }}",
-                JSON.stringify(chatHistory).replace("{{ chat_input }}", query)
-              ),
-            },
-          ],
-        },
+        LanguageModelChatMessage.User(
+          ParseErrorContextPrompt.replace("{{chat_history}}", JSON.stringify(chatHistory)).replace(
+            "{{chat_input}}",
+            query
+          )
+        ),
       ];
       const parsedErrorContext = await myAzureOpenaiRequest(parsedErrorContextMessages);
       console.log("ParsedErrorContext: ", parsedErrorContext);
@@ -82,18 +76,12 @@ export default async function fixCommandHandler(
     let rephrasedQuery = "";
     if (context.history.length > 0) {
       const rephraseMessages = [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: RephraseQueryPrompt.replace(
-                "{{ chat_history }}",
-                JSON.stringify(chatHistory)
-              ).replace("{{ chat_input }}", query),
-            },
-          ],
-        },
+        LanguageModelChatMessage.User(
+          RephraseQueryPrompt.replace("{{chat_history}}", JSON.stringify(chatHistory)).replace(
+            "{{chat_input}}",
+            query
+          )
+        ),
       ];
       rephrasedQuery = await myAzureOpenaiRequest(rephraseMessages);
     } else {
@@ -104,17 +92,11 @@ export default async function fixCommandHandler(
     // 4. get search patterns
     response.progress("Extracting search patterns...");
     const searchMessages = [
-      {
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: GetSearchPatternsPrompt.replace("{{errorContext}}", JSON.stringify(errorContext))
-              .replace("{{outputLog}}", outputLog)
-              .replace("{{userInput}}", rephrasedQuery),
-          },
-        ],
-      },
+      LanguageModelChatMessage.User(
+        GetSearchPatternsPrompt.replace("{{errorContext}}", JSON.stringify(errorContext))
+          .replace("{{outputLog}}", outputLog)
+          .replace("{{userInput}}", rephrasedQuery)
+      ),
     ];
     const searchPatternsString = await myAzureOpenaiRequest(searchMessages, {
       type: "json_object",
@@ -162,17 +144,11 @@ export default async function fixCommandHandler(
     };
     const filteredRerankedResults = await asyncFilter(rerankedResults, async (element: any) => {
       const rerankMessages = [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: RerankSearchResultsPrompt.replace("{{searchResult}}", JSON.stringify(element))
-                .replace("{{errorContext}}", JSON.stringify(errorContext))
-                .replace("{{question}}", rephrasedQuery),
-            },
-          ],
-        },
+        LanguageModelChatMessage.User(
+          RerankSearchResultsPrompt.replace("{{searchResult}}", JSON.stringify(element))
+            .replace("{{errorContext}}", JSON.stringify(errorContext))
+            .replace("{{question}}", rephrasedQuery)
+        ),
       ];
       const res = await myAzureOpenaiRequest(rerankMessages);
       console.log(res);
@@ -188,15 +164,9 @@ export default async function fixCommandHandler(
     const washedResults = await Promise.all(
       filteredRerankedResults.map(async (element) => {
         const msg = [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: "Summarize the following content:\n" + JSON.stringify(element),
-              },
-            ],
-          },
+          LanguageModelChatMessage.User(
+            "Summarize the following content:\n" + JSON.stringify(element)
+          ),
         ];
         const res = await myAzureOpenaiRequest(msg);
         console.log(res);
@@ -207,21 +177,12 @@ export default async function fixCommandHandler(
     // 8. generate response
     response.progress("Generating response...");
     const messages = [
-      {
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: TroubleShootingSystemPrompt.replace(
-              "{{errorContext}}",
-              JSON.stringify(errorContext)
-            )
-              .replace("{{outputLog}}", outputLog)
-              .replace("{{searchResults}}", JSON.stringify(washedResults))
-              .replace("{{rephrasedQuery}}", rephrasedQuery),
-          },
-        ],
-      },
+      LanguageModelChatMessage.User(
+        TroubleShootingSystemPrompt.replace("{{errorContext}}", JSON.stringify(errorContext))
+          .replace("{{outputLog}}", outputLog)
+          .replace("{{searchResults}}", JSON.stringify(washedResults))
+          .replace("{{rephrasedQuery}}", rephrasedQuery)
+      ),
     ];
     const result = await myAzureOpenaiRequest(messages);
     response.markdown(result);

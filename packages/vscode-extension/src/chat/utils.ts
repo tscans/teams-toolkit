@@ -7,6 +7,7 @@ import {
   ChatResponseStream,
   ChatResponseTurn,
   LanguageModelChatMessage,
+  LanguageModelChatMessageRole,
   lm,
 } from "vscode";
 
@@ -98,7 +99,7 @@ export function ChatResponseToString(response: ChatResponseTurn): string {
 }
 
 export async function myAzureOpenaiRequest(
-  messages: { role: string; content: { type: string; text: string }[] }[],
+  messages: LanguageModelChatMessage[],
   response_format: { [key: string]: string } | undefined = undefined
 ): Promise<string> {
   const headers = {
@@ -107,7 +108,12 @@ export async function myAzureOpenaiRequest(
   };
 
   const payload = {
-    messages: messages,
+    messages: messages.map((message) => {
+      return {
+        role: message.role === LanguageModelChatMessageRole.User ? "user" : "system",
+        content: message.content,
+      };
+    }),
     temperature: 0.5,
     top_p: 0.95,
   };
