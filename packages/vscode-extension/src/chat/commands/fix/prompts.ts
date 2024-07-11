@@ -13,22 +13,22 @@ export const ParseErrorContextPrompt = `
 </Instruction>
 
 chat history:
-{{ chat_history }}
+{{chat_history}}
 
-Follow up Input: {{ chat_input }}
+Follow up Input: {{chat_input}}
 Error Context:
 `;
 
 export const RephraseQueryPrompt = `
 system: 
 * Given the following conversation history and the users next question,rephrase the question to be a stand alone question.
-If the conversation is irrelevant or empty, just restate the original question.
-Do not add more details than necessary to the question.
+* If the conversation is irrelevant or empty, just restate the original question.
+* Do not add more details than necessary to the question.
 
 chat history: 
-{{ chat_history }} 
+{{chat_history}} 
 
-Follow up Input: {{ chat_input }} 
+Follow up Input: {{chat_input}} 
 Standalone Question: 
 `;
 
@@ -41,6 +41,7 @@ export const GetSearchPatternsPrompt = `
 5. Always include the ErrorCode in the search patterns if it exists in the error context and output log.
 6. Your answer should be in json format string, for example, '{"errorCode": "XXXX.XXXX", "searchPatterns": ["search pattern 1", "search pattern 2", "search pattern 3"]}'. Don't ouput any other characters other than json object quoted by '{}'. 
 7. If no information can be extracted, output this json object: '{"errorCode": "", "searchPatterns": []}'.
+8. Limit the maximum number of search patterns to 4.
 </Instruction>
 
 <Error Context>

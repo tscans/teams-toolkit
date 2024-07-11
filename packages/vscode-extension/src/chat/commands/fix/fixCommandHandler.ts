@@ -32,6 +32,14 @@ import { UserError } from "@microsoft/teamsfx-api";
 import { GithubRetriever } from "../../retriever/github/retrieve";
 import { getOutputLog, parseErrorContext, wrapChatHistory } from "./utils";
 
+function parseJson(input: string): any {
+  try {
+    return JSON.parse(input);
+  } catch (error) {
+    return {};
+  }
+}
+
 export default async function fixCommandHandler(
   request: ChatRequest,
   context: ChatContext,
@@ -43,6 +51,8 @@ export default async function fixCommandHandler(
     TeamsChatCommand.Fix
   );
   ExtTelemetry.sendTelemetryEvent(TelemetryEvent.CopilotChatStart, chatTelemetryData.properties);
+  let promptTokens = 0,
+    completionTokens = 0;
 
   try {
     const query = request.prompt;
@@ -61,9 +71,11 @@ export default async function fixCommandHandler(
           )
         ),
       ];
-      const parsedErrorContext = await myAzureOpenaiRequest(parsedErrorContextMessages);
+      const [parsedErrorContext, p, c] = await myAzureOpenaiRequest(parsedErrorContextMessages);
+      promptTokens += p;
+      completionTokens += c;
       console.log("ParsedErrorContext: ", parsedErrorContext);
-      errorContext = JSON.parse(parsedErrorContext);
+      errorContext = parseJson(parsedErrorContext);
     }
     console.log("ErrorContext: ", errorContext);
 
@@ -83,7 +95,10 @@ export default async function fixCommandHandler(
           )
         ),
       ];
-      rephrasedQuery = await myAzureOpenaiRequest(rephraseMessages);
+      let p, c;
+      [rephrasedQuery, p, c] = await myAzureOpenaiRequest(rephraseMessages);
+      promptTokens += p;
+      completionTokens += c;
     } else {
       rephrasedQuery = query;
     }
@@ -98,11 +113,13 @@ export default async function fixCommandHandler(
           .replace("{{userInput}}", rephrasedQuery)
       ),
     ];
-    const searchPatternsString = await myAzureOpenaiRequest(searchMessages, {
+    const [searchPatternsString, p, c] = await myAzureOpenaiRequest(searchMessages, {
       type: "json_object",
     });
+    promptTokens += p;
+    completionTokens += c;
     console.log("Search patterns: \n", searchPatternsString);
-    const searchPatterns = JSON.parse(searchPatternsString);
+    const searchPatterns = parseJson(searchPatternsString);
 
     // 5. retrieve search results
     response.progress("Retrieving search results...");
@@ -116,7 +133,8 @@ export default async function fixCommandHandler(
     const retriever = GithubRetriever.getInstance(githubToken.accessToken);
     const searchResults = await retriever.issue.retrieve(
       "OfficeDev/teams-toolkit",
-      searchPatterns.searchPatterns
+      searchPatterns?.searchPatterns ?? [],
+      3
     );
 
     // 6. search result reranking
@@ -150,8 +168,10 @@ export default async function fixCommandHandler(
             .replace("{{question}}", rephrasedQuery)
         ),
       ];
-      const res = await myAzureOpenaiRequest(rerankMessages);
-      console.log(res);
+      const [res, p, c] = await myAzureOpenaiRequest(rerankMessages);
+      promptTokens += p;
+      completionTokens += c;
+      // console.log(res);
       if (res === "0") {
         return false;
       } else {
@@ -168,8 +188,10 @@ export default async function fixCommandHandler(
             "Summarize the following content:\n" + JSON.stringify(element)
           ),
         ];
-        const res = await myAzureOpenaiRequest(msg);
-        console.log(res);
+        const [res, p, c] = await myAzureOpenaiRequest(msg);
+        promptTokens += p;
+        completionTokens += c;
+        // console.log(res);
         return res;
       })
     );
@@ -184,7 +206,9 @@ export default async function fixCommandHandler(
           .replace("{{rephrasedQuery}}", rephrasedQuery)
       ),
     ];
-    const result = await myAzureOpenaiRequest(messages);
+    const [result, p1, c1] = await myAzureOpenaiRequest(messages);
+    promptTokens += p1;
+    completionTokens += c1;
     response.markdown(result);
   } catch (error) {
     console.error(error);
@@ -192,6 +216,11 @@ export default async function fixCommandHandler(
   }
 
   chatTelemetryData.markComplete();
+  chatTelemetryData.extendBy(
+    {},
+    { prompt_tokens: promptTokens, completion_tokens: completionTokens }
+  );
+  console.log("measurements:\n", chatTelemetryData.measurements);
   ExtTelemetry.sendTelemetryEvent(
     TelemetryEvent.CopilotChat,
     chatTelemetryData.properties,

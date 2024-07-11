@@ -6,7 +6,7 @@ import { Issue } from "./types";
 
 export interface GithubIssue {
   search(repo: string, query: string): Promise<GithubIssueSearchResult>;
-  retrieve(repo: string, queries: string[]): Promise<GithubIssueSearchResult>;
+  retrieve(repo: string, queries: string[], threshold?: number): Promise<GithubIssueSearchResult>;
 }
 
 export interface GithubIssueSearchResult {
@@ -84,17 +84,19 @@ class GithubIssueRetriever implements GithubIssue {
       if (commentsResponse.ok) {
         issue.fetchedComments = await commentsResponse.json();
       }
+
+      issue.fetchedComments = issue.fetchedComments.slice(-5);
     }
 
     return data;
   }
 
-  async retrieve(repo: string, queries: string[]): Promise<GithubIssueSearchResult> {
+  async retrieve(repo: string, queries: string[], threshold = 3): Promise<GithubIssueSearchResult> {
     const result: GithubIssueSearchResult = { items: [] };
     for (const query of queries) {
       const res = await this.search(repo, query);
       if (res.items.length > 0) {
-        result.items.push(...res.items);
+        result.items.push(...res.items.slice(0, threshold));
       }
     }
 

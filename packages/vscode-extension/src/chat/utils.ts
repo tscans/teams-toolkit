@@ -14,6 +14,7 @@ import {
 import { sampleProvider } from "@microsoft/teamsfx-core";
 import { BaseTokensPerCompletion, BaseTokensPerMessage, BaseTokensPerName } from "./consts";
 import { Tokenizer } from "./tokenizer";
+import { max } from "lodash";
 
 export async function verbatimCopilotInteraction(
   model: "copilot-gpt-3.5-turbo" | "copilot-gpt-4",
@@ -101,7 +102,7 @@ export function ChatResponseToString(response: ChatResponseTurn): string {
 export async function myAzureOpenaiRequest(
   messages: LanguageModelChatMessage[],
   response_format: { [key: string]: string } | undefined = undefined
-): Promise<string> {
+): Promise<[string, number, number]> {
   const headers = {
     "Content-Type": "application/json",
     "api-key": process.env.OPENAI_API_KEY || "",
@@ -116,6 +117,7 @@ export async function myAzureOpenaiRequest(
     }),
     temperature: 0.5,
     top_p: 0.95,
+    // max_tokens: 4096,
   };
 
   if (response_format) {
@@ -131,7 +133,15 @@ export async function myAzureOpenaiRequest(
       body: JSON.stringify(payload),
     });
     const json = await stream.json();
-    return json.choices[0]?.message?.content ?? "";
+    if (json?.choices?.length > 0) {
+      return [
+        json.choices[0]?.message?.content ?? "",
+        json.usage?.prompt_tokens ?? 0,
+        json.usage?.completion_tokens ?? 0,
+      ];
+    } else {
+      return ["", json?.usage?.prompt_tokens ?? 0, json?.usage?.completion_tokens ?? 0];
+    }
   } catch (error) {
     throw new Error(
       `Error in sending request to Azure OpenAI endpoint: ${(error as Error).message}`
