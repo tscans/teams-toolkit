@@ -45,8 +45,9 @@ export class CopilotPluginCommonTest extends CaseFactory {
       authOptions,
       env
     );
-    this.validateFileList = validateFileList;
     console.log("Constructor this.validateFileList:", this.validateFileList);
+    this.validateFileList = validateFileList;
+    this.onAfterCreate = this.onAfterCreate.bind(this);
   }
 
   public override async onAfterCreate(projectPath: string): Promise<void> {
