@@ -23,7 +23,11 @@ new CopilotPluginWithApiAuthCase(
   "yimin@microsoft.com",
   "api-key",
   ProgrammingLanguage.JS,
-  ["appPackage/ai-plugin.json", "appPackage/manifest.json", "src/keyGen.js"]
+  [
+    "appPackage/ai-plugin.json",
+    "appPackage/manifest.json",
+    "src/keyGen.js-fake",
+  ]
 ).test();
 
 new CopilotPluginWithApiAuthCase(
