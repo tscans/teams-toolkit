@@ -53,7 +53,7 @@ export class CopilotPluginCommonTest extends CaseFactory {
 
   public override async onAfterCreate(projectPath: string): Promise<void> {
     await validateFiles(projectPath, this.validateFileList || []);
-    if (this.authOption?.["api-auth"] === "api-key") {
+    if (this.authOption === "api-key") {
       const userFile = path.resolve(projectPath, "env", `.env.dev.user`);
       await replaceSecretKey(userFile);
     }
