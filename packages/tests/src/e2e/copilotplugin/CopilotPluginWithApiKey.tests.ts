@@ -7,37 +7,68 @@
 
 import { ProgrammingLanguage } from "@microsoft/teamsfx-core";
 import { CopilotPluginCommonTest } from "./copilotPluginCommonTest";
+import { replaceSecretKey, validateFiles } from "./helper";
+import * as path from "path";
 
-class CopilotPluginWithApiAuthCase extends CopilotPluginCommonTest {}
+class CopilotPluginWithNoneAuthForJsCase extends CopilotPluginCommonTest {
+  public override async onAfterCreate(projectPath: string): Promise<void> {
+    const files: string[] = [
+      "appPackage/ai-plugin.json",
+      "appPackage/manifest.json",
+      "src/keyGen.js",
+    ];
+    await validateFiles(projectPath, files);
 
-new CopilotPluginWithApiAuthCase(
+    const userFile = path.resolve(projectPath, "env", `.env.dev.user`);
+    await replaceSecretKey(userFile);
+  }
+}
+
+class CopilotPluginWithNoneAuthForTsCase extends CopilotPluginCommonTest {
+  public override async onAfterCreate(projectPath: string): Promise<void> {
+    const files: string[] = [
+      "appPackage/ai-plugin.json",
+      "appPackage/manifest.json",
+      "src/keyGen.ts",
+    ];
+    await validateFiles(projectPath, files);
+
+    const userFile = path.resolve(projectPath, "env", `.env.dev.user`);
+    await replaceSecretKey(userFile);
+  }
+}
+
+class CopilotPluginWithNoneAuthForDotnetCase extends CopilotPluginCommonTest {
+  public override async onAfterCreate(projectPath: string): Promise<void> {
+    const files: string[] = [
+      "appPackage/ai-plugin.json",
+      "appPackage/manifest.json",
+      "GenerateApiKey.ps1",
+    ];
+    await validateFiles(projectPath, files);
+
+    const userFile = path.resolve(projectPath, "env", `.env.dev.user`);
+    await replaceSecretKey(userFile);
+  }
+}
+
+new CopilotPluginWithNoneAuthForJsCase(
   28640069,
   "yimin@microsoft.com",
   "api-key",
-  ProgrammingLanguage.TS,
-  ["appPackage/ai-plugin.json", "appPackage/manifest.json", "src/keyGen.ts"]
+  ProgrammingLanguage.JS
 ).test();
 
-new CopilotPluginWithApiAuthCase(
+new CopilotPluginWithNoneAuthForTsCase(
   28640069,
   "yimin@microsoft.com",
   "api-key",
-  ProgrammingLanguage.JS,
-  [
-    "appPackage/ai-plugin.json",
-    "appPackage/manifest.json",
-    "src/keyGen.js-fake",
-  ]
+  ProgrammingLanguage.TS
 ).test();
 
-new CopilotPluginWithApiAuthCase(
-  28640069,
+new CopilotPluginWithNoneAuthForDotnetCase(
+  28641218,
   "yimin@microsoft.com",
   "api-key",
-  ProgrammingLanguage.CSharp,
-  [
-    "appPackage/ai-plugin.json",
-    "appPackage/manifest.json",
-    "GenerateApiKey.ps1",
-  ]
+  ProgrammingLanguage.CSharp
 ).test();
