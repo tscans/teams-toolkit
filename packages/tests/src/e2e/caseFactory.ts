@@ -54,7 +54,7 @@ export abstract class CaseFactory {
     skipPackage?: boolean;
     skipErrorMessage?: string;
   };
-  public custimized?: Record<string, string>;
+  public customized?: Record<string, string>;
   public processEnv?: NodeJS.ProcessEnv;
 
   public constructor(
@@ -80,7 +80,7 @@ export abstract class CaseFactory {
       skipPackage?: boolean;
       skipErrorMessage?: string;
     } = {},
-    custimized?: Record<string, string>,
+    customized?: Record<string, string>,
     processEnv?: NodeJS.ProcessEnv
   ) {
     this.capability = capability;
@@ -89,7 +89,7 @@ export abstract class CaseFactory {
     this.validate = validate;
     this.programmingLanguage = programmingLanguage;
     this.options = options;
-    this.custimized = custimized;
+    this.customized = customized;
     this.processEnv = processEnv;
   }
 
@@ -110,7 +110,7 @@ export abstract class CaseFactory {
     testFolder: string,
     capability: Capability,
     programmingLanguage?: ProgrammingLanguage,
-    custimized?: Record<string, string>,
+    customized?: Record<string, string>,
     processEnv?: NodeJS.ProcessEnv
   ): Promise<void> {
     await Executor.createProject(
@@ -118,7 +118,7 @@ export abstract class CaseFactory {
       appName,
       capability,
       programmingLanguage ? programmingLanguage : ProgrammingLanguage.TS,
-      custimized,
+      customized,
       processEnv
     );
   }
@@ -135,7 +135,7 @@ export abstract class CaseFactory {
       validate,
       programmingLanguage,
       options,
-      custimized,
+      customized,
       processEnv,
       onBefore,
       onAfter,
@@ -163,7 +163,7 @@ export abstract class CaseFactory {
           testFolder,
           capability,
           programmingLanguage,
-          custimized,
+          customized,
           processEnv
         );
         expect(fs.pathExistsSync(projectPath)).to.be.true;

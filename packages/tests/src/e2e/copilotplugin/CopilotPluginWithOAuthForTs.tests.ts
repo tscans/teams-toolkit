@@ -12,7 +12,7 @@ import { validateFiles } from "./helper";
 class CopilotPluginOAuthForTsTestCase extends CopilotPluginCommonTest {
   public override async onAfterCreate(projectPath: string): Promise<void> {
     const files: string[] = [
-      "appPackage/ai-plugin.json",
+      "appPackage/ai-plugin.dev.json",
       "appPackage/manifest.json",
     ];
     await validateFiles(projectPath, files);
