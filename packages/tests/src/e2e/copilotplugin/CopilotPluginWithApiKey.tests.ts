@@ -9,13 +9,29 @@ import { ProgrammingLanguage } from "@microsoft/teamsfx-core";
 import { CopilotPluginCommonTest } from "./copilotPluginCommonTest";
 
 class CopilotPluginWithApiKeyCase extends CopilotPluginCommonTest {}
-
+const validateFiles = {
+  [ProgrammingLanguage.JS]: [
+    "appPackage/ai-plugin.json",
+    "appPackage/manifest.json",
+    "src/keyGen.js",
+  ],
+  [ProgrammingLanguage.TS]: [
+    "appPackage/ai-plugin.json",
+    "appPackage/manifest.json",
+    "src/keyGen.ts",
+  ],
+  [ProgrammingLanguage.CSharp]: [
+    "appPackage/ai-plugin.json",
+    "appPackage/manifest.json",
+    "GenerateApiKey.ps1",
+  ],
+};
 new CopilotPluginWithApiKeyCase(
   28640069,
   "yimin@microsoft.com",
   "api-key",
   ProgrammingLanguage.JS,
-  ["appPackage/ai-plugin.json", "appPackage/manifest.json", "src/keyGen.js"]
+  validateFiles[ProgrammingLanguage.JS]
 ).test();
 
 new CopilotPluginWithApiKeyCase(
@@ -23,5 +39,13 @@ new CopilotPluginWithApiKeyCase(
   "yimin@microsoft.com",
   "api-key",
   ProgrammingLanguage.TS,
-  ["appPackage/ai-plugin.json", "appPackage/manifest.json", "src/keyGen.js"]
+  validateFiles[ProgrammingLanguage.TS]
+).test();
+
+new CopilotPluginWithApiKeyCase(
+  28640069,
+  "yimin@microsoft.com",
+  "api-key",
+  ProgrammingLanguage.CSharp,
+  validateFiles[ProgrammingLanguage.CSharp]
 ).test();
