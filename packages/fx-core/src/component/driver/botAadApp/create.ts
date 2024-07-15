@@ -107,6 +107,12 @@ export class CreateBotAadAppDriver implements StepDriver {
         botAadAppState.botPassword = await aadAppClient.generateClientSecret(aadApp.id!);
         context.logProvider?.info(getLocalizedString(logMessageKeys.successCreateBotAadApp));
       } else {
+        // In case of reusing existing bot aad app, generate a new client secret if it's empty
+        if (!botAadAppState.botPassword) {
+          botAadAppState.botPassword = await aadAppClient.generateClientSecret(
+            botAadAppState.botId
+          );
+        }
         context.logProvider?.info(getLocalizedString(logMessageKeys.skipCreateBotAadApp));
       }
       const durationMilliSeconds = performance.now() - startTime;
