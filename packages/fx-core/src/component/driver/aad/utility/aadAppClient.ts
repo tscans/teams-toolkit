@@ -100,6 +100,12 @@ export class AadAppClient {
   }
 
   @hooks([ErrorContextMW({ source: "Graph", component: "AadAppClient" })])
+  public async queryByAadClientId(clientId: string): Promise<string> {
+    const res = await this.axios.delete(`applications(appId='${clientId}')?$select=id`);
+    return res.data.id;
+  }
+
+  @hooks([ErrorContextMW({ source: "Graph", component: "AadAppClient" })])
   public async generateClientSecret(
     objectId: string,
     clientSecretExpireDays = 180, // Recommended lifetime from Azure Portal

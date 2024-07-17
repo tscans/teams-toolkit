@@ -26,6 +26,7 @@ import { UnexpectedEmptyBotPasswordError } from "./error/unexpectedEmptyBotPassw
 import { CreateBotAadAppArgs } from "./interface/createBotAadAppArgs";
 import { CreateBotAadAppOutput } from "./interface/createBotAadAppOutput";
 import { logMessageKeys, progressBarKeys } from "./utility/constants";
+import { GraphScopes } from "../../../common/constants";
 
 const actionName = "botAadApp/create"; // DO NOT MODIFY the name
 const helpLink = "https://aka.ms/teamsfx-actions/botaadapp-create";
@@ -91,9 +92,18 @@ export class CreateBotAadAppDriver implements StepDriver {
       const botAadAppState: CreateBotAadAppOutput = loadStateFromEnv(outputEnvVarNames);
       const isReusingExisting = !(!botAadAppState.botId || !botAadAppState.botPassword);
 
+      const accountJsonRes = await context.m365TokenProvider.getJsonObject({ scopes: GraphScopes });
       // If it's the case of a valid bot id with an empty bot password, then throw an error
       if (botAadAppState.botId && !botAadAppState.botPassword) {
-        throw new UnexpectedEmptyBotPasswordError(actionName, helpLink);
+        if (
+          !(
+            accountJsonRes.isOk() &&
+            accountJsonRes.value["unique_name"] &&
+            (accountJsonRes.value["unique_name"] as string).includes("@microsoft.com")
+          )
+        ) {
+          throw new UnexpectedEmptyBotPasswordError(actionName, helpLink);
+        }
       }
 
       const startTime = performance.now();
@@ -109,8 +119,9 @@ export class CreateBotAadAppDriver implements StepDriver {
       } else {
         // In case of reusing existing bot aad app, generate a new client secret if it's empty
         if (!botAadAppState.botPassword) {
+          const aadAppId = await aadAppClient.queryByAadClientId(botAadAppState.botId);
           botAadAppState.botPassword = await aadAppClient.generateClientSecret(
-            botAadAppState.botId
+            botAadAppState.aadAppId
           );
         }
         context.logProvider?.info(getLocalizedString(logMessageKeys.skipCreateBotAadApp));
