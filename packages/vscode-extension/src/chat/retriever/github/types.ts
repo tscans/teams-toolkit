@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+/*
+ * Basic API protocal of github issue
+ */
 export interface User {
   login: string;
   id: number;
@@ -71,7 +74,7 @@ export interface Issue {
   comments_url: string;
   events_url: string;
   html_url: string;
-  id: number;
+  id: number | string;
   node_id: string;
   number: number;
   title: string;
@@ -105,4 +108,24 @@ export interface Comment {
   author_association: string;
   body: string;
   reactions: Reactions;
+}
+
+/*
+ * index interface for Azure AI Search
+ */
+export interface IssueIndex extends Issue {
+  BodyVector: number[];
+  CommentVector: number[];
+}
+
+/*
+ * Unified interface for github issue retrieving
+ */
+export interface GithubIssueRetriever<T> {
+  retrieve(repo: string, query: string): Promise<T[]>;
+  batchRetrieve(repo: string, queries: string[]): Promise<T[]>;
+}
+
+export interface GithubRetriever<T> {
+  issue: GithubIssueRetriever<T>;
 }
