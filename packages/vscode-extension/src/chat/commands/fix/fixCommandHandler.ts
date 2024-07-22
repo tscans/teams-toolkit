@@ -29,8 +29,9 @@ import {
 } from "./prompts";
 import * as vscode from "vscode";
 import { UserError } from "@microsoft/teamsfx-api";
-import { GithubRetriever } from "../../retriever/github/retrieve";
+import { GithubRestRetriever } from "../../retriever/github/rest";
 import { getOutputLog, parseErrorContext, wrapChatHistory } from "./utils";
+import { GithubAasRetriever } from "../../retriever/github/azure-ai-search";
 
 function parseJson(input: string): any {
   try {
@@ -130,8 +131,9 @@ export default async function fixCommandHandler(
       throw new UserError("ChatParticipants", "FixCommand", "GithubToken Undefined");
     }
 
-    const retriever = GithubRetriever.getInstance(githubToken.accessToken);
-    const searchResults = await retriever.issue.retrieve(
+    //const retriever = GithubRestRetriever.getInstance(githubToken.accessToken);
+    const retriever = GithubAasRetriever.getInstance();
+    const searchResults = await retriever.issue.batchRetrieve(
       "OfficeDev/teams-toolkit",
       searchPatterns?.searchPatterns ?? [],
       3
@@ -139,7 +141,7 @@ export default async function fixCommandHandler(
 
     // 6. search result reranking
     response.progress("Reranking search results...");
-    const filteredResults = searchResults.items.filter((item) => item.score >= 1);
+    const filteredResults = searchResults.filter((item) => item.score >= 1);
     const rerankedResults = filteredResults.map((element) => {
       return {
         url: element.url,
