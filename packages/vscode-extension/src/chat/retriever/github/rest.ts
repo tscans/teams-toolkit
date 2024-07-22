@@ -83,9 +83,10 @@ class GithubIssueRestRetriever implements GithubIssueRetriever<Issue> {
     return data.items;
   }
 
-  async batchRetrieve(repo: string, queries: string[]): Promise<Issue[]> {
+  async batchRetrieve(repo: string, queries: string[], limit?: number): Promise<Issue[]> {
     const retrievePromises: Promise<Issue[]>[] = queries.map((q) => this.retrieve(repo, q));
     const responses = await Promise.all(retrievePromises);
-    return responses.reduce((acc, val) => acc.concat(val), []);
+    const result = responses.reduce((acc, val) => acc.concat(val), []);
+    return limit ? result.slice(0, limit) : result;
   }
 }

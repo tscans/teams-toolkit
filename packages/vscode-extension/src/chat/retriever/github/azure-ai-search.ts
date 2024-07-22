@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-import { SearchClient, AzureKeyCredential, SelectFields } from "@azure/search-documents";
+import { SearchClient, AzureKeyCredential } from "@azure/search-documents";
 import { GithubIssueRetriever, GithubRetriever, IssueIndex } from "./types";
 
 interface AzureAISearchConfig {
@@ -55,9 +55,10 @@ export class GithubIssueAasRetriever implements GithubIssueRetriever<IssueIndex>
     return issues;
   }
 
-  async batchRetrieve(repo: string, queries: string[]): Promise<IssueIndex[]> {
+  async batchRetrieve(repo: string, queries: string[], limit?: number): Promise<IssueIndex[]> {
     const retrievePromises: Promise<IssueIndex[]>[] = queries.map((q) => this.retrieve(repo, q));
     const responses = await Promise.all(retrievePromises);
-    return responses.reduce((acc, val) => acc.concat(val), []);
+    const result = responses.reduce((acc, val) => acc.concat(val), []);
+    return limit ? result.slice(0, limit) : result;
   }
 }

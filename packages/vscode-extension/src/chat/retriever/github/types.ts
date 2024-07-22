@@ -123,7 +123,7 @@ export interface IssueIndex extends Issue {
  */
 export interface GithubIssueRetriever<T> {
   retrieve(repo: string, query: string): Promise<T[]>;
-  batchRetrieve(repo: string, queries: string[]): Promise<T[]>;
+  batchRetrieve(repo: string, queries: string[], limit?: number): Promise<T[]>;
 }
 
 export interface GithubRetriever<T> {
