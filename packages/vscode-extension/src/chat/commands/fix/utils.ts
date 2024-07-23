@@ -52,7 +52,7 @@ export function parseErrorContext(query: string): ErrorContext | "" {
 }
 
 export async function getOutputLog(): Promise<string> {
-  const logFilePath = VsCodeLogInstance.getLogFilePath();
+  const logFilePath = VsCodeLogInstance.getPersistLogFilePath();
   if (!fs.existsSync(logFilePath)) {
     return "";
   }

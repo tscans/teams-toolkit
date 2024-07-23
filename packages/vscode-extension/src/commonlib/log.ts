@@ -15,6 +15,7 @@ export class VsCodeLogProvider implements LogProvider {
   logLevel: LogLevel = LogLevel.Info;
   outputChannel: vscode.OutputChannel;
   logFileName: string;
+  persistLogFileName: string;
 
   private static instance: VsCodeLogProvider;
 
@@ -27,6 +28,8 @@ export class VsCodeLogProvider implements LogProvider {
     // E.g. "Wed Oct 05 2011 22:48:00 GMT+0800 (China Standard Time)"
     // > "20230328T070957.log"
     this.logFileName = `${new Date().toISOString().replace(/-|:|\.\d+Z$/g, "")}.log`;
+
+    this.persistLogFileName = `persist-${this.logFileName}`;
   }
 
   /**
@@ -46,6 +49,10 @@ export class VsCodeLogProvider implements LogProvider {
    */
   getLogFilePath(): string {
     return `${defaultExtensionLogPath}/${this.logFileName}`;
+  }
+
+  getPersistLogFilePath(): string {
+    return `${defaultExtensionLogPath}/${this.persistLogFileName}`;
   }
 
   verbose(message: string): void {
@@ -86,6 +93,7 @@ export class VsCodeLogProvider implements LogProvider {
       const dateString = new Date().toJSON();
       const formattedMessage = `[${dateString}] [${LogLevel[logLevel]}] - ${message}`;
       this.outputChannel.appendLine(formattedMessage);
+      fs.appendFileSync(this.getPersistLogFilePath(), formattedMessage + "\n");
     } catch (e) {}
   }
 

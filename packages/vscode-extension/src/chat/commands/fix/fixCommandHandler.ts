@@ -25,6 +25,7 @@ import {
   ParseErrorContextPrompt,
   RephraseQueryPrompt,
   RerankSearchResultsPrompt,
+  SummarizeResultsPrompt,
   TroubleShootingSystemPrompt,
 } from "./prompts";
 import * as vscode from "vscode";
@@ -180,20 +181,20 @@ export default async function fixCommandHandler(
         return true;
       }
     });
-    // console.log(JSON.stringify(rerankedResults, null, 2));
+    console.log(JSON.stringify(rerankedResults, null, 2));
 
     // 7. summarize the each result
     const washedResults = await Promise.all(
       filteredRerankedResults.map(async (element) => {
         const msg = [
           LanguageModelChatMessage.User(
-            "Summarize the following content:\n" + JSON.stringify(element)
+            SummarizeResultsPrompt.replace("{{searchResult}}", JSON.stringify(element))
           ),
         ];
         const [res, p, c] = await myAzureOpenaiRequest(msg);
         promptTokens += p;
         completionTokens += c;
-        // console.log(res);
+        console.log("summarized result: ", res);
         return res;
       })
     );

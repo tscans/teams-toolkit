@@ -34,10 +34,10 @@ Standalone Question:
 
 export const GetSearchPatternsPrompt = `
 <Instruction>
-1. From the given Error Context, Output Panel Log and the user input below, analyze the error context, output log and user input carefully to understand the real problem.
-2. If the ErrorCode is existing in the given error context and output log, output the ErrorCode. The ErrorCode is a string that follows the pattern of "XXXX.XXXX", for example, "armDeploy.DeploymentError", "script.ScriptExecutionError", "teamsApp.MissingEnvironmentVariablesError" etc. The ErrorCode is usually quoted by square brackets "[]" in the error context and output log.
+1. From the given Error Context, Output Panel Log and the user input below, analyze them all carefully to understand the real problem.
+2. If the ErrorCode is existing in the given error context, output log and user input, output the ErrorCode. The ErrorCode is a string that follows the pattern of "XXXX.XXXX", for example, "armDeploy.DeploymentError", "script.ScriptExecutionError", "teamsApp.MissingEnvironmentVariablesError" etc. The ErrorCode is usually quoted by square brackets "[]" in the error context and output log.
 3. The Output Panel Log may contain irrelevant information. You need to filter out the irrelevant information and focus on the key information that helps to identify the problem.
-4. To find out the real solution to the problem, you need to extract some key search patterns from the error context and output log. The search patterns are usually the keywords or phrases that are related to the problem and can be used for web search.
+4. To find out the real solution to the problem, you need to extract some key search patterns from the error context, output log and user input. The search patterns are usually the keywords or phrases that are related to the problem and can be used for web search.
 5. Always include the ErrorCode in the search patterns if it exists in the error context and output log.
 6. Your answer should be in json format string, for example, '{"errorCode": "XXXX.XXXX", "searchPatterns": ["search pattern 1", "search pattern 2", "search pattern 3"]}'. Don't ouput any other characters other than json object quoted by '{}'. 
 7. If no information can be extracted, output this json object: '{"errorCode": "", "searchPatterns": []}'.
@@ -112,4 +112,18 @@ export const RerankSearchResultsPrompt = `
 </Question>
 
 Score:
+`;
+
+export const SummarizeResultsPrompt = `
+<Instruction>
+1. Summarize the search result content in a few sentences.
+2. Don't miss any key information in the each search result content that may help to provide solution to the problem.
+3. The search result may contain URLs or code snippets, you can include them in the summary if they are relevant.
+</Instruction>
+
+<Search Result>
+{{searchResult}}
+</Search Result>
+
+Your summary:
 `;
