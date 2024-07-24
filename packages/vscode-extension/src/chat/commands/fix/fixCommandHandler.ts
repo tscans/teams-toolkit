@@ -145,7 +145,7 @@ export default async function fixCommandHandler(
     const filteredResults = searchResults.filter((item) => item.score >= 1);
     const rerankedResults = filteredResults.map((element) => {
       return {
-        url: element.url,
+        url: element.html_url,
         repository_url: element.repository_url,
         title: element.title,
         body: element.body,

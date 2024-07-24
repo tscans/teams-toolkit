@@ -34,10 +34,10 @@ Standalone Question:
 
 export const GetSearchPatternsPrompt = `
 <Instruction>
-1. From the given Error Context, Output Panel Log and the user input below, analyze them all carefully to understand the real problem.
-2. If the ErrorCode is existing in the given error context, output log and user input, output the ErrorCode. The ErrorCode is a string that follows the pattern of "XXXX.XXXX", for example, "armDeploy.DeploymentError", "script.ScriptExecutionError", "teamsApp.MissingEnvironmentVariablesError" etc. The ErrorCode is usually quoted by square brackets "[]" in the error context and output log.
-3. The Output Panel Log may contain irrelevant information. You need to filter out the irrelevant information and focus on the key information that helps to identify the problem.
-4. To find out the real solution to the problem, you need to extract some key search patterns from the error context, output log and user input. The search patterns are usually the keywords or phrases that are related to the problem and can be used for web search.
+1. From the given user input, Error Context and Output Panel Log below, analyze them all carefully to understand the real problem.
+2. Give priority to the user input, then the error context, and think if the output panel log is relevant to the real problem. The Output Panel Log may contain irrelevant information. You need to filter out the irrelevant information and focus on the key information that helps to identify the problem.
+3. If the ErrorCode is existing in the given user input, Error Context and Output Panel Log, get the ErrorCode. The ErrorCode is a string that follows the pattern of "XXXX.XXXX", for example, "armDeploy.DeploymentError", "script.ScriptExecutionError", "teamsApp.MissingEnvironmentVariablesError" etc. The ErrorCode is usually quoted by square brackets "[]" in the error context and output log.
+4. To find out the real solution to the problem, you need to extract some key search patterns for the real problem that you concluded from the user input, the error context and the output panel log. The search patterns are usually the keywords or phrases that are related to the problem and can be used for web search.
 5. Always include the ErrorCode in the search patterns if it exists in the error context and output log.
 6. Your answer should be in json format string, for example, '{"errorCode": "XXXX.XXXX", "searchPatterns": ["search pattern 1", "search pattern 2", "search pattern 3"]}'. Don't ouput any other characters other than json object quoted by '{}'. 
 7. If no information can be extracted, output this json object: '{"errorCode": "", "searchPatterns": []}'.
