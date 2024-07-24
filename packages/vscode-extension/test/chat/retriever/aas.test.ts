@@ -14,6 +14,7 @@ describe("retriever test", () => {
     dotenv.config();
     const githubRetriever = GithubAasRetriever.getInstance();
     const resp = await githubRetriever.issue.retrieve("OfficeDev/teams-toolkit", "Code Error");
+    console.log(resp);
     chai.expect(resp).is.not.empty;
     return;
   });

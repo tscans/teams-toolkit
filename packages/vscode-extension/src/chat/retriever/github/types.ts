@@ -114,7 +114,7 @@ export interface Comment {
  * index interface for Azure AI Search
  */
 export interface IssueIndex extends Issue {
-  issueVector: number[];
+  issue_vector: number[];
 }
 
 /*

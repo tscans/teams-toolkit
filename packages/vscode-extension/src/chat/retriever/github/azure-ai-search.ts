@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 import { SearchClient, AzureKeyCredential } from "@azure/search-documents";
 import { GithubIssueRetriever, GithubRetriever, IssueIndex } from "./types";
+import { AzureOpenAI } from "openai";
 
 interface AzureAISearchConfig {
   Endpoint: string;
@@ -34,19 +35,41 @@ export class GithubAasRetriever implements GithubRetriever<IssueIndex> {
 
 export class GithubIssueAasRetriever implements GithubIssueRetriever<IssueIndex> {
   private client: SearchClient<IssueIndex>;
+  private azureOpenAIClient: AzureOpenAI;
 
   public constructor(config: AzureAISearchConfig) {
     this.client = new SearchClient<IssueIndex>(
       config.Endpoint,
-      "github-issue-index",
+      //"github-issue-index",
+      "cosmosdb-index",
       new AzureKeyCredential(config.ApiKey)
     );
+    this.azureOpenAIClient = new AzureOpenAI({
+      apiVersion: "2024-05-01-preview",
+      deployment: "text-embedding-3-large",
+    });
   }
 
   async retrieve(repo: string, query: string): Promise<IssueIndex[]> {
     const issues: IssueIndex[] = [];
 
-    const searchResults = await this.client.search(query, {});
+    const queryVector = await this.azureOpenAIClient.embeddings.create({
+      input: query,
+      model: "",
+    });
+
+    const searchResults = await this.client.search(query, {
+      vectorSearchOptions: {
+        queries: [
+          {
+            kind: "vector",
+            vector: queryVector.data[0].embedding,
+            fields: ["issue_vector"],
+            kNearestNeighborsCount: 3,
+          },
+        ],
+      },
+    });
 
     for await (const result of searchResults.results) {
       issues.push(result.document);
