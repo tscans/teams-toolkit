@@ -1536,7 +1536,7 @@ export async function grantPermission(env?: string): Promise<Result<any, FxError
     window.showInformationMessage(grantSucceededMsg);
     VsCodeLogInstance.info(grantSucceededMsg);
   } catch (e) {
-    result = wrapError(e);
+    result = wrapError(e as Error);
   }
 
   await processResult(TelemetryEvent.GrantPermission, result, inputs);
@@ -1565,7 +1565,7 @@ export async function listCollaborator(env?: string): Promise<Result<any, FxErro
     // TODO: For short-term workaround. Remove after webview is ready.
     VsCodeLogInstance.outputChannel.show();
   } catch (e) {
-    result = wrapError(e);
+    result = wrapError(e as Error);
   }
 
   await processResult(TelemetryEvent.ListCollaborator, result, inputs);
@@ -1611,7 +1611,7 @@ export async function manageCollaboratorHandler(env?: string): Promise<Result<an
         break;
     }
   } catch (e) {
-    result = wrapError(e);
+    result = wrapError(e as Error);
   }
 
   ExtTelemetry.sendTelemetryEvent(TelemetryEvent.ManageCollaborator);
@@ -2750,8 +2750,8 @@ export async function signinAzureCallback(...args: unknown[]): Promise<Result<nu
   try {
     await azureAccountManager.getIdentityCredentialAsync(true);
   } catch (error) {
-    if (!isUserCancelError(error)) {
-      return err(error);
+    if (!isUserCancelError(error as Error)) {
+      return err(error as FxError);
     }
   }
   return ok(null);

@@ -126,10 +126,10 @@ export class AzureAccountManager extends login implements AzureAccountProvider {
             }
           });
       }
-    } catch (e) {
+    } catch (e: any) {
       AzureAccountManager.currentStatus = loggedOut;
       void this.notifyStatus();
-      if (e?.message.includes("User did not consent ")) {
+      if (e.message.includes("User did not consent ")) {
         // throw user cancel error
         throw new UserError(
           "Login",
@@ -263,7 +263,7 @@ export class AzureAccountManager extends login implements AzureAccountProvider {
       return new Promise((resolve) => {
         resolve(true);
       });
-    } catch (e) {
+    } catch (e: any) {
       VsCodeLogInstance.error("[Logout Azure] " + (e.message as string));
       ExtTelemetry.sendTelemetryErrorEvent(TelemetryEvent.SignOut, e, {
         [TelemetryProperty.AccountType]: AccountType.Azure,

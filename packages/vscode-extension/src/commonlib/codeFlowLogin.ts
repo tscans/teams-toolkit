@@ -202,15 +202,15 @@ export class CodeFlowLogin {
       redirectPromise.then(cancelCodeTimer, cancelCodeTimer);
       accessToken = await redirectPromise;
     } catch (e) {
-      ExtTelemetry.sendTelemetryErrorEvent(TelemetryEvent.Login, e, {
+      ExtTelemetry.sendTelemetryErrorEvent(TelemetryEvent.Login, e as FxError, {
         [TelemetryProperty.AccountType]: this.accountName,
         [TelemetryProperty.Success]: TelemetrySuccess.No,
         [TelemetryProperty.UserId]: "",
         [TelemetryProperty.Internal]: "false",
         [TelemetryProperty.ErrorType]:
           e instanceof UserError ? TelemetryErrorType.UserError : TelemetryErrorType.SystemError,
-        [TelemetryProperty.ErrorCode]: `${e.source as string}.${e.name as string}`,
-        [TelemetryProperty.ErrorMessage]: `${e.message as string}`,
+        [TelemetryProperty.ErrorCode]: `${(e as FxError).source}.${(e as FxError).name}`,
+        [TelemetryProperty.ErrorMessage]: `${(e as FxError).message}`,
       });
       throw e;
     } finally {
@@ -297,14 +297,14 @@ export class CodeFlowLogin {
       });
       return true;
     } catch (e) {
-      VsCodeLogInstance.error("[Logout " + this.accountName + "] " + (e.message as string));
-      ExtTelemetry.sendTelemetryErrorEvent(TelemetryEvent.SignOut, e, {
+      VsCodeLogInstance.error("[Logout " + this.accountName + "] " + (e as FxError).message);
+      ExtTelemetry.sendTelemetryErrorEvent(TelemetryEvent.SignOut, e as FxError, {
         [TelemetryProperty.AccountType]: this.accountName,
         [TelemetryProperty.Success]: TelemetrySuccess.No,
         [TelemetryProperty.ErrorType]:
           e instanceof UserError ? TelemetryErrorType.UserError : TelemetryErrorType.SystemError,
-        [TelemetryProperty.ErrorCode]: `${e.source as string}.${e.name as string}`,
-        [TelemetryProperty.ErrorMessage]: `${e.message as string}`,
+        [TelemetryProperty.ErrorCode]: `${(e as FxError).source}.${(e as FxError).name}`,
+        [TelemetryProperty.ErrorMessage]: `${(e as FxError).message}`,
       });
       return false;
     }
@@ -353,10 +353,12 @@ export class CodeFlowLogin {
           });
       }
     } catch (error) {
-      VsCodeLogInstance.error("[Login] " + (error.message as string));
+      VsCodeLogInstance.error("[Login] " + (error as FxError).message);
       if (
-        error.name !== getDefaultString("teamstoolkit.codeFlowLogin.loginTimeoutTitle") &&
-        error.name !== getDefaultString("teamstoolkit.codeFlowLogin.loginPortConflictTitle")
+        (error as FxError).name !==
+          getDefaultString("teamstoolkit.codeFlowLogin.loginTimeoutTitle") &&
+        (error as FxError).name !==
+          getDefaultString("teamstoolkit.codeFlowLogin.loginPortConflictTitle")
       ) {
         throw LoginCodeFlowError(error);
       } else {
@@ -391,7 +393,7 @@ export class CodeFlowLogin {
             stringUtil.format(
               localize("teamstoolkit.codeFlowLogin.silentAcquireToken"),
               path.join(os.homedir(), ".fx", "account"),
-              error.message
+              (error as FxError).message
             )
         );
         if (!(await checkIsOnline())) {
