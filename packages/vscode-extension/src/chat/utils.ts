@@ -7,14 +7,12 @@ import {
   ChatResponseStream,
   ChatResponseTurn,
   LanguageModelChatMessage,
-  LanguageModelChatMessageRole,
   lm,
 } from "vscode";
 
 import { sampleProvider } from "@microsoft/teamsfx-core";
 import { BaseTokensPerCompletion, BaseTokensPerMessage, BaseTokensPerName } from "./consts";
 import { Tokenizer } from "./tokenizer";
-import { max } from "lodash";
 
 export async function verbatimCopilotInteraction(
   model: "copilot-gpt-3.5-turbo" | "copilot-gpt-4",
@@ -97,54 +95,4 @@ export function ChatResponseToString(response: ChatResponseTurn): string {
   }
 
   return result;
-}
-
-export async function myAzureOpenaiRequest(
-  messages: LanguageModelChatMessage[],
-  response_format: { [key: string]: string } | undefined = undefined
-): Promise<[string, number, number]> {
-  const headers = {
-    "Content-Type": "application/json",
-    "api-key": process.env.OPENAI_API_KEY || "",
-  };
-
-  const payload = {
-    messages: messages.map((message) => {
-      return {
-        role: message.role === LanguageModelChatMessageRole.User ? "user" : "system",
-        content: message.content,
-      };
-    }),
-    temperature: 0.5,
-    top_p: 0.95,
-    // max_tokens: 4096,
-  };
-
-  if (response_format) {
-    (payload as any)["response_format"] = response_format;
-  }
-
-  const GPT4O_ENDPOINT = process.env.OPENAI_ENDPOINT || "";
-
-  try {
-    const stream = await fetch(GPT4O_ENDPOINT, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(payload),
-    });
-    const json = await stream.json();
-    if (json?.choices?.length > 0) {
-      return [
-        json.choices[0]?.message?.content ?? "",
-        json.usage?.prompt_tokens ?? 0,
-        json.usage?.completion_tokens ?? 0,
-      ];
-    } else {
-      return ["", json?.usage?.prompt_tokens ?? 0, json?.usage?.completion_tokens ?? 0];
-    }
-  } catch (error) {
-    throw new Error(
-      `Error in sending request to Azure OpenAI endpoint: ${(error as Error).message}`
-    );
-  }
 }

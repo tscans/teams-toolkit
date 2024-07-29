@@ -3,6 +3,7 @@
 import { SearchClient, AzureKeyCredential } from "@azure/search-documents";
 import { GithubIssueRetriever, GithubRetriever, IssueIndex } from "./types";
 import { AzureOpenAI } from "openai";
+import { DefaultAzureCredential, getBearerTokenProvider } from "@azure/identity";
 
 interface AzureAISearchConfig {
   Endpoint: string;
@@ -44,9 +45,13 @@ export class GithubIssueAasRetriever implements GithubIssueRetriever<IssueIndex>
       "cosmosdb-index",
       new AzureKeyCredential(config.ApiKey)
     );
+    const credential = new DefaultAzureCredential();
+    const scope = "https://cognitiveservices.azure.com/.default";
+    const azureADTokenProvider = getBearerTokenProvider(credential, scope);
     this.azureOpenAIClient = new AzureOpenAI({
       apiVersion: "2024-05-01-preview",
       deployment: "text-embedding-3-large",
+      azureADTokenProvider: azureADTokenProvider,
     });
   }
 

@@ -4,8 +4,9 @@
 import * as fs from "fs-extra";
 import { ErrorContext, ChatHistory } from "./types";
 import VsCodeLogInstance from "../../../commonlib/log";
-import { ChatContext, ChatRequestTurn, ChatResponseTurn } from "vscode";
+import { ChatContext, ChatRequestTurn, ChatResponseTurn, LanguageModelChatMessage } from "vscode";
 import { ChatResponseToString } from "../../utils";
+import { Language } from "@microsoft/teamsfx-core/build/component/driver/teamsApp/interfaces/appdefinitions/language";
 
 export function wrapChatHistory(context: ChatContext): ChatHistory {
   const chatHistory: ChatHistory = [];

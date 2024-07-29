@@ -4,22 +4,14 @@ import {
   CancellationToken,
   ChatContext,
   ChatRequest,
-  ChatRequestTurn,
   ChatResponseStream,
-  ChatResponseTurn,
   LanguageModelChatMessage,
 } from "vscode";
 import { ICopilotChatResult } from "../../types";
 import { chatParticipantId, TeamsChatCommand } from "../../consts";
 import { ExtTelemetry } from "../../../telemetry/extTelemetry";
-import { TelemetryEvent, TelemetryTriggerFrom } from "../../../telemetry/extTelemetryEvents";
+import { TelemetryEvent } from "../../../telemetry/extTelemetryEvents";
 import { ChatTelemetryData } from "../../telemetry";
-import {
-  ChatResponseToString,
-  getCopilotResponseAsString,
-  myAzureOpenaiRequest,
-  verbatimCopilotInteraction,
-} from "../../utils";
 import {
   GetSearchPatternsPrompt,
   ParseErrorContextPrompt,
@@ -30,9 +22,9 @@ import {
 } from "./prompts";
 import * as vscode from "vscode";
 import { UserError } from "@microsoft/teamsfx-api";
-import { GithubRestRetriever } from "../../retriever/github/rest";
 import { getOutputLog, parseErrorContext, wrapChatHistory } from "./utils";
 import { GithubAasRetriever } from "../../retriever/github/azure-ai-search";
+import { CustomAI } from "./ai";
 
 function parseJson(input: string): any {
   try {
@@ -57,6 +49,10 @@ export default async function fixCommandHandler(
     completionTokens = 0;
 
   try {
+    const aiClient = new CustomAI(
+      process.env.OPENAI_ENDPOINT ?? "",
+      process.env.OPENAI_API_VERSION ?? ""
+    );
     const query = request.prompt;
     const chatHistory = wrapChatHistory(context);
     let errorContext = {};
@@ -73,7 +69,10 @@ export default async function fixCommandHandler(
           )
         ),
       ];
-      const [parsedErrorContext, p, c] = await myAzureOpenaiRequest(parsedErrorContextMessages);
+      const [parsedErrorContext, p, c] = await aiClient.getOpenaiResponseAsString(
+        "gpt-4o",
+        parsedErrorContextMessages
+      );
       promptTokens += p;
       completionTokens += c;
       console.log("ParsedErrorContext: ", parsedErrorContext);
@@ -98,7 +97,7 @@ export default async function fixCommandHandler(
         ),
       ];
       let p, c;
-      [rephrasedQuery, p, c] = await myAzureOpenaiRequest(rephraseMessages);
+      [rephrasedQuery, p, c] = await aiClient.getOpenaiResponseAsString("gpt-4o", rephraseMessages);
       promptTokens += p;
       completionTokens += c;
     } else {
@@ -115,9 +114,13 @@ export default async function fixCommandHandler(
           .replace("{{userInput}}", rephrasedQuery)
       ),
     ];
-    const [searchPatternsString, p, c] = await myAzureOpenaiRequest(searchMessages, {
-      type: "json_object",
-    });
+    const [searchPatternsString, p, c] = await aiClient.getOpenaiResponseAsString(
+      "gpt-4o",
+      searchMessages,
+      {
+        type: "json_object",
+      }
+    );
     promptTokens += p;
     completionTokens += c;
     console.log("Search patterns: \n", searchPatternsString);
@@ -171,7 +174,7 @@ export default async function fixCommandHandler(
             .replace("{{question}}", rephrasedQuery)
         ),
       ];
-      const [res, p, c] = await myAzureOpenaiRequest(rerankMessages);
+      const [res, p, c] = await aiClient.getOpenaiResponseAsString("gpt-4o", rerankMessages);
       promptTokens += p;
       completionTokens += c;
       // console.log(res);
@@ -191,7 +194,7 @@ export default async function fixCommandHandler(
             SummarizeResultsPrompt.replace("{{searchResult}}", JSON.stringify(element))
           ),
         ];
-        const [res, p, c] = await myAzureOpenaiRequest(msg);
+        const [res, p, c] = await aiClient.getOpenaiResponseAsString("gpt-4o", msg);
         promptTokens += p;
         completionTokens += c;
         console.log("summarized result: ", res);
@@ -209,10 +212,9 @@ export default async function fixCommandHandler(
           .replace("{{rephrasedQuery}}", rephrasedQuery)
       ),
     ];
-    const [result, p1, c1] = await myAzureOpenaiRequest(messages);
+    const [p1, c1] = await aiClient.verbatimOpenaiInteraction("gpt-4o", messages, response);
     promptTokens += p1;
     completionTokens += c1;
-    response.markdown(result);
   } catch (error) {
     console.error(error);
     response.markdown((error as Error).message);
