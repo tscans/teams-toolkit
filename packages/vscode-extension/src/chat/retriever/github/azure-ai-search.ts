@@ -64,13 +64,14 @@ export class GithubIssueAasRetriever implements GithubIssueRetriever<IssueIndex>
     });
 
     const searchResults = await this.client.search(query, {
+      top: 10,
       vectorSearchOptions: {
         queries: [
           {
             kind: "vector",
             vector: queryVector.data[0].embedding,
             fields: ["issue_vector"],
-            kNearestNeighborsCount: 3,
+            kNearestNeighborsCount: 10,
           },
         ],
       },
