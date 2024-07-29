@@ -143,52 +143,28 @@ export default async function fixCommandHandler(
       3
     );
 
-    // 6. search result reranking
     response.progress("Reranking search results...");
-    const filteredResults = searchResults.filter((item) => item.score >= 1);
-    const rerankedResults = filteredResults.map((element) => {
-      return {
-        url: element.html_url,
-        repository_url: element.repository_url,
-        title: element.title,
-        body: element.body,
-        fetchedComments: element.fetchedComments?.map((comment) => {
-          return {
-            user: comment.user.id,
-            body: comment.body,
-          };
-        }),
-        state: element.state,
-      };
-    });
+    const filteredResults = searchResults
+      .filter((item) => item.score >= 1)
+      .map((element) => {
+        return {
+          url: element.html_url,
+          repository_url: element.repository_url,
+          title: element.title,
+          body: element.body,
+          fetched_comments: element.fetched_comments?.map((comment) => {
+            return {
+              user: comment.user.id,
+              body: comment.body,
+            };
+          }),
+          state: element.state,
+        };
+      });
 
-    const asyncFilter = async (arr: any[], predicate: any) => {
-      const results = await Promise.all(arr.map(predicate));
-      return arr.filter((_v, index) => results[index]);
-    };
-    const filteredRerankedResults = await asyncFilter(rerankedResults, async (element: any) => {
-      const rerankMessages = [
-        LanguageModelChatMessage.User(
-          RerankSearchResultsPrompt.replace("{{searchResult}}", JSON.stringify(element))
-            .replace("{{errorContext}}", JSON.stringify(errorContext))
-            .replace("{{question}}", rephrasedQuery)
-        ),
-      ];
-      const [res, p, c] = await aiClient.getOpenaiResponseAsString("gpt-4o", rerankMessages);
-      promptTokens += p;
-      completionTokens += c;
-      // console.log(res);
-      if (res === "0") {
-        return false;
-      } else {
-        return true;
-      }
-    });
-    console.log(JSON.stringify(rerankedResults, null, 2));
-
-    // 7. summarize the each result
+    // 6. summarize the each result
     const washedResults = await Promise.all(
-      filteredRerankedResults.map(async (element) => {
+      filteredResults.map(async (element) => {
         const msg = [
           LanguageModelChatMessage.User(
             SummarizeResultsPrompt.replace("{{searchResult}}", JSON.stringify(element))
@@ -202,7 +178,7 @@ export default async function fixCommandHandler(
       })
     );
 
-    // 8. generate response
+    // 7. generate response
     response.progress("Generating response...");
     const messages = [
       LanguageModelChatMessage.User(

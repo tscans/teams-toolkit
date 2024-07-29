@@ -75,9 +75,9 @@ class GithubIssueRestRetriever implements GithubIssueRetriever<Issue> {
       });
 
       if (commentsResponse.ok) {
-        issue.fetchedComments = await commentsResponse.json();
+        issue.fetched_comments = await commentsResponse.json();
       }
-      issue.fetchedComments = issue.fetchedComments.slice(-5);
+      issue.fetched_comments = issue.fetched_comments.slice(-5);
     }
 
     return data.items;

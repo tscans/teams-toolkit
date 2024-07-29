@@ -86,7 +86,7 @@ export interface Issue {
   assignees: User[];
   milestone: Milestone;
   comments: number;
-  fetchedComments: Comment[];
+  fetched_comments: Comment[];
   created_at: string;
   updated_at: string;
   closed_at: null | string;
