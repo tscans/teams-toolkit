@@ -38,6 +38,7 @@ import { AppStudioError } from "./errors";
 import { ValidateAppPackageArgs } from "./interfaces/ValidateAppPackageArgs";
 import { AppStudioResultFactory } from "./results";
 import { TelemetryPropertyKey } from "./utils/telemetry";
+import { IAppValidationIssue } from "./interfaces/appdefinitions/IValidationResult";
 
 const actionName = "teamsApp/validateAppPackage";
 
@@ -212,13 +213,18 @@ export class ValidateAppPackageDriver implements StepDriver {
         // logs in output window
         const errors = validationResult.errors
           .map((error) => {
-            let message = `${SummaryConstant.Failed} ${error.content} \n${getLocalizedString(
-              "error.teamsApp.validate.details",
-              error.filePath,
-              error.title
-            )} \n`;
-            if (error.helpUrl) {
-              message += getLocalizedString("core.option.learnMore", error.helpUrl);
+            let message = "";
+            if (error.code?.startsWith("Invalid TypeB Plugin")) {
+              message = this.formatPluginErrors(error);
+            } else {
+              message = `${SummaryConstant.Failed} ${error.content} \n${getLocalizedString(
+                "error.teamsApp.validate.details",
+                error.filePath,
+                error.title
+              )} \n`;
+              if (error.helpUrl) {
+                message += getLocalizedString("core.option.learnMore", error.helpUrl);
+              }
             }
             return message;
           })
@@ -352,5 +358,10 @@ export class ValidateAppPackageDriver implements StepDriver {
       );
     }
     return ok(undefined);
+  }
+
+  private formatPluginErrors(error: IAppValidationIssue): string {
+    const content = error.code?.replace("TypeB", "API") ?? "";
+    return `${SummaryConstant.Failed} ${content} \n`;
   }
 }
