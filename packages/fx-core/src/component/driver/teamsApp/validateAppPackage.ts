@@ -214,7 +214,11 @@ export class ValidateAppPackageDriver implements StepDriver {
         const errors = validationResult.errors
           .map((error) => {
             let message = "";
-            if (error.code?.startsWith("Invalid TypeB Plugin")) {
+            if (
+              error.code?.startsWith("Invalid TypeB Plugin") ||
+              error.code?.startsWith("Invalid Declarative Copilot Document") ||
+              error.code?.startsWith("Invalid OpenApi specification")
+            ) {
               message = this.formatPluginErrors(error);
             } else {
               message = `${SummaryConstant.Failed} ${error.content} \n${getLocalizedString(
