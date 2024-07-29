@@ -41,8 +41,7 @@ export class GithubIssueAasRetriever implements GithubIssueRetriever<IssueIndex>
   public constructor(config: AzureAISearchConfig) {
     this.client = new SearchClient<IssueIndex>(
       config.Endpoint,
-      //"github-issue-index",
-      "cosmosdb-index",
+      "issue-semantic",
       new AzureKeyCredential(config.ApiKey)
     );
     const credential = new DefaultAzureCredential();
@@ -64,7 +63,11 @@ export class GithubIssueAasRetriever implements GithubIssueRetriever<IssueIndex>
     });
 
     const searchResults = await this.client.search(query, {
+      queryType: "semantic",
       top: 10,
+      semanticSearchOptions: {
+        configurationName: "issue-semantic",
+      },
       vectorSearchOptions: {
         queries: [
           {
