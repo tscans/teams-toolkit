@@ -143,7 +143,7 @@ export default async function fixCommandHandler(
       3
     );
 
-    response.progress("Reranking search results...");
+    response.progress("Summarizing search results...");
     const filteredResults = searchResults
       .filter((item) => item.score >= 1)
       .map((element) => {
