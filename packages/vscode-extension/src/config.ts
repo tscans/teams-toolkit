@@ -8,6 +8,20 @@ import { LogLevel } from "@microsoft/teamsfx-api";
 export class ConfigManager {
   registerConfigChangeCallback() {
     this.loadConfigs();
+    const value = this.getConfiguration(ConfigurationKey.CopilotPluginEnable, false).toString();
+    console.log(value);
+
+    // const value2 = this.getConfiguration(ConfigurationKey.CopilotExtensionEnable, "").toString() ;
+    // console.log(value2);
+    if (value === "true") {
+      const configuration: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration(CONFIGURATION_PREFIX);
+      const res = configuration.inspect(ConfigurationKey.CopilotPluginEnable);
+      console.log(res);
+      console.log(value === "true");
+      void configuration.update(ConfigurationKey.CopilotExtensionEnable, true, true);
+      void configuration.update(ConfigurationKey.CopilotPluginEnable, undefined, true);
+    }
     vscode.workspace.onDidChangeConfiguration?.(this.changeConfigCallback.bind(this));
   }
   loadConfigs() {
