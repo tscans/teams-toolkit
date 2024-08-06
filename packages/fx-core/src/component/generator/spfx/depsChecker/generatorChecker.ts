@@ -177,7 +177,7 @@ export class GeneratorChecker implements DependencyChecker {
       await cpUtils.executeCommand(
         undefined,
         this._logger,
-        { timeout: timeout, shell: false },
+        { timeout: timeout, shell: true },
         getExecCommand("npm"),
         "install",
         `${name}@${version}`,
