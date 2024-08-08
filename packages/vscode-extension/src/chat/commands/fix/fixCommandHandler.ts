@@ -25,6 +25,8 @@ import { UserError } from "@microsoft/teamsfx-api";
 import { getOutputLog, parseErrorContext, wrapChatHistory } from "./utils";
 import { GithubAasRetriever } from "../../retriever/github/azure-ai-search";
 import { CustomAI } from "./ai";
+import { StackOverFlowAasRetriever } from "../../retriever/stack-overflow/azure-ai-search";
+import { Body } from "node-fetch";
 
 function parseJson(input: string): any {
   try {
@@ -128,14 +130,6 @@ export default async function fixCommandHandler(
 
     // 5. retrieve search results
     response.progress("Retrieving search results...");
-    const githubToken = await vscode.authentication.getSession("github", ["public_repo"], {
-      createIfNone: true,
-    });
-    if (githubToken === undefined) {
-      throw new UserError("ChatParticipants", "FixCommand", "GithubToken Undefined");
-    }
-
-    //const retriever = GithubRestRetriever.getInstance(githubToken.accessToken);
     const retriever = GithubAasRetriever.getInstance();
     const searchResults = await retriever.issue.batchRetrieve(
       "OfficeDev/teams-toolkit",
@@ -143,27 +137,44 @@ export default async function fixCommandHandler(
       3
     );
 
-    response.progress("Summarizing search results...");
-    const filteredResults = searchResults
-      .filter((item) => item.score >= 1)
-      .map((element) => {
-        return {
-          url: element.html_url,
-          repository_url: element.repository_url,
-          title: element.title,
-          body: element.body,
-          fetched_comments: element.fetched_comments?.map((comment) => {
+    const stackoverflowRetriever = StackOverFlowAasRetriever.getInstance();
+    const stackoverflowResults = await stackoverflowRetriever.batchRetrieve(
+      searchPatterns?.searchPatterns ?? [],
+      3
+    );
+    const filteredResults = searchResults.map((element) => {
+      return {
+        url: element.html_url,
+        repository_url: element.repository_url,
+        title: element.title,
+        body: element.body,
+        fetched_comments: element.fetched_comments?.map((comment) => {
+          return {
+            user: comment.user.id,
+            body: comment.body,
+          };
+        }),
+        state: element.state,
+      };
+    });
+    const filteredStackOverflowResults = stackoverflowResults.map((element) => {
+      return {
+        url: element.question.link,
+        title: element.question.title,
+        answers: element.answers
+          .filter((item) => item.is_accepted)
+          .map((answer) => {
             return {
-              user: comment.user.id,
-              body: comment.body,
+              Body: answer.body,
             };
           }),
-          state: element.state,
-        };
-      });
+      };
+    });
 
     // 6. summarize the each result
-    const washedResults = await Promise.all(
+    response.progress("Summarizing search results...");
+    const washedResults: string[] = [];
+    await Promise.all(
       filteredResults.map(async (element) => {
         const msg = [
           LanguageModelChatMessage.User(
@@ -174,7 +185,22 @@ export default async function fixCommandHandler(
         promptTokens += p;
         completionTokens += c;
         console.log("summarized result: ", res);
-        return res;
+        washedResults.push(res);
+      })
+    );
+
+    await Promise.all(
+      filteredStackOverflowResults.map(async (element) => {
+        const msg = [
+          LanguageModelChatMessage.User(
+            SummarizeResultsPrompt.replace("{{searchResult}}", JSON.stringify(element))
+          ),
+        ];
+        const [res, p, c] = await aiClient.getOpenaiResponseAsString("gpt-4o", msg);
+        promptTokens += p;
+        completionTokens += c;
+        console.log("summarized result: ", res);
+        washedResults.push(res);
       })
     );
 
