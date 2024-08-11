@@ -25,7 +25,7 @@ export class StackOverFlowAasRetriever implements StackOverFlowRetriever {
         };
     this.azureAiSearchClient = new SearchClient<StackOverflowPost>(
       tmpConfig.Endpoint,
-      "cosmosdb-index-stack-overflow-with-body",
+      "stack-overflow-with-body",
       new AzureKeyCredential(tmpConfig.ApiKey)
     );
     const credential = new DefaultAzureCredential();
@@ -55,9 +55,9 @@ export class StackOverFlowAasRetriever implements StackOverFlowRetriever {
 
     const searchResults = await this.azureAiSearchClient.search(query, {
       queryType: "semantic",
-      top: 10,
+      top: 3,
       semanticSearchOptions: {
-        configurationName: "stack-overflow-semantic",
+        configurationName: "stack-overflow-semantic-conf",
       },
       vectorSearchOptions: {
         queries: [
