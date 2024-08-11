@@ -25,7 +25,7 @@ export class StackOverFlowAasRetriever implements StackOverFlowRetriever {
         };
     this.azureAiSearchClient = new SearchClient<StackOverflowPost>(
       tmpConfig.Endpoint,
-      "cosmosdb-index-stack-overflow",
+      "cosmosdb-index-stack-overflow-with-body",
       new AzureKeyCredential(tmpConfig.ApiKey)
     );
     const credential = new DefaultAzureCredential();
