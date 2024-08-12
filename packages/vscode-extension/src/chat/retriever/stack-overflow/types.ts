@@ -22,6 +22,7 @@ export interface Question {
   content_license: string;
   link: string;
   title: string;
+  body: string;
 }
 
 export interface Answer {

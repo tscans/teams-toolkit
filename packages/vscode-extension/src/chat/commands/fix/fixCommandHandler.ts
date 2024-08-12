@@ -16,17 +16,15 @@ import {
   GetSearchPatternsPrompt,
   ParseErrorContextPrompt,
   RephraseQueryPrompt,
-  RerankSearchResultsPrompt,
   SummarizeResultsPrompt,
   TroubleShootingSystemPrompt,
 } from "./prompts";
-import * as vscode from "vscode";
-import { UserError } from "@microsoft/teamsfx-api";
 import { getOutputLog, parseErrorContext, wrapChatHistory } from "./utils";
 import { GithubAasRetriever } from "../../retriever/github/azure-ai-search";
 import { CustomAI } from "./ai";
 import { StackOverFlowAasRetriever } from "../../retriever/stack-overflow/azure-ai-search";
-import { Body } from "node-fetch";
+import { IssueIndex } from "../../retriever/github/types";
+import { StackOverflowPost } from "../../retriever/stack-overflow/types";
 
 function parseJson(input: string): any {
   try {
@@ -131,18 +129,31 @@ export default async function fixCommandHandler(
     // 5. retrieve search results
     response.progress("Retrieving search results...");
     const retriever = GithubAasRetriever.getInstance();
-    const searchResults = await retriever.issue.batchRetrieve(
-      "OfficeDev/teams-toolkit",
-      searchPatterns?.searchPatterns ?? [],
-      3
-    );
+    let GHSearchResults: IssueIndex[] = [];
+    let stackoverflowResults: StackOverflowPost[] = [];
+    try {
+      const results = await retriever.issue.batchRetrieve(
+        "OfficeDev/teams-toolkit",
+        searchPatterns?.searchPatterns ?? [],
+        3
+      );
+      GHSearchResults = GHSearchResults.concat(results);
+    } catch (error) {
+      console.error(error);
+    }
 
     const stackoverflowRetriever = StackOverFlowAasRetriever.getInstance();
-    const stackoverflowResults = await stackoverflowRetriever.batchRetrieve(
-      searchPatterns?.searchPatterns ?? [],
-      3
-    );
-    const filteredResults = searchResults.map((element) => {
+    try {
+      const results = await stackoverflowRetriever.batchRetrieve(
+        searchPatterns?.searchPatterns ?? [],
+        3
+      );
+      stackoverflowResults = stackoverflowResults.concat(results);
+    } catch (error) {
+      console.error(error);
+    }
+
+    const filteredResults = GHSearchResults.map((element) => {
       return {
         url: element.html_url,
         repository_url: element.repository_url,
@@ -161,6 +172,7 @@ export default async function fixCommandHandler(
       return {
         url: element.question.link,
         title: element.question.title,
+        body: element.question.body,
         answers: element.answers
           .filter((item) => item.is_accepted)
           .map((answer) => {
