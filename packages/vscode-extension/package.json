@@ -60,7 +60,8 @@
     "onView:teamsfx-empty-project",
     "onUri",
     "workspaceContains:/**/manifest.json",
-    "workspaceContains:/manifest*.xml"
+    "workspaceContains:/manifest*.xml",
+    "onCommand:fx.extension.createprojectfromkiota"
   ],
   "enabledApiProposals": [
     "languageModelSystem"
@@ -930,6 +931,10 @@
         "title": "%teamstoolkit.commandsTreeViewProvider.getCopilotHelpTitle%",
         "category": "Teams",
         "enablement": "fx-extension.isChatParticipantEnabled"
+      },
+      {
+        "command": "fx-extension.createprojectfromkiota",
+        "title": "Create Project from Kiota"
       }
     ],
     "taskDefinitions": [

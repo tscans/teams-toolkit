@@ -457,6 +457,7 @@ export class SpecGenerator extends DefaultTemplateGenerator {
       const getTemplateInfosState = inputs.getTemplateInfosState as TemplateInfosState;
       const isDeclarativeCopilot =
         inputs[QuestionNames.Capabilities] === CapabilityOptions.declarativeCopilot().id;
+      const isFromKiota = inputs[QuestionNames.ApiPluginManifestPath] != undefined;
       // validate API spec
       const specParser = new SpecParser(
         getTemplateInfosState.url,
@@ -475,7 +476,10 @@ export class SpecGenerator extends DefaultTemplateGenerator {
       const validationRes = await specParser.validate();
       const warnings = validationRes.warnings;
       const operationIdWarning = warnings.find((w) => w.type === WarningType.OperationIdMissing);
-      const filters = inputs[QuestionNames.ApiOperation] as string[];
+      const operations = (await specParser.list()).APIs.filter((value) => value.isValid).map(
+        (apiInfo) => apiInfo.api
+      );
+      const filters = isFromKiota ? operations : (inputs[QuestionNames.ApiOperation] as string[]);
       if (operationIdWarning && operationIdWarning.data) {
         const apisMissingOperationId = (operationIdWarning.data as string[]).filter((api) =>
           filters.includes(api)
@@ -542,7 +546,8 @@ export class SpecGenerator extends DefaultTemplateGenerator {
           manifestPath,
           filters,
           openapiSpecPath,
-          pluginManifestPath
+          pluginManifestPath,
+          inputs[QuestionNames.ApiPluginManifestPath]
         );
       } else {
         const responseTemplateFolder = path.join(

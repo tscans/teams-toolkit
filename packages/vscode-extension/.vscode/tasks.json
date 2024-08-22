@@ -77,6 +77,27 @@
       "problemMatcher": [],
       "label": "npm: build:test",
       "detail": "tsc --project tsconfig.test.json --incremental"
+    },
+    {
+      "label": "Run Command From Kiota",
+      "type": "shell",
+      "command": "${fx-extension.createprojectfromkiota.run}",
+      // "args": [
+      //   "'C://Users//bowsong//TeamsApps//AKiotaBase//test2//test-openapi.yml'",
+      //   "'C://Users//bowsong//TeamsApps//AKiotaBase//test2//test-apiplugin.json'"
+      // ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Command From Kiota2",
+      "type": "shell",
+      "command": "workbench.action.tasks.runTask",
+      "args": [
+        "fx-extension.createprojectfromkiota",
+        "'C://Users//bowsong//TeamsApps//AKiotaBase//test2//test-openapi.yml'",
+        "'C://Users//bowsong//TeamsApps//AKiotaBase//test2//test-apiplugin.json'"
+      ],
+      "problemMatcher": []
     }
   ]
 }

@@ -197,6 +197,7 @@ import { ReleaseNote } from "./utils/releaseNote";
 import { ExtensionSurvey } from "./utils/survey";
 import { getSettingsVersion, projectVersionCheck } from "./utils/telemetryUtils";
 import { isVSCodeInsiderVersion } from "./utils/versionUtil";
+import { createProjectFromKiota } from "./handlers/kiota";
 
 export async function activate(context: vscode.ExtensionContext) {
   const value =
@@ -216,6 +217,12 @@ export async function activate(context: vscode.ExtensionContext) {
   const uriHandler = new UriHandler();
   setUriEventHandler(uriHandler);
   context.subscriptions.push(vscode.window.registerUriHandler(uriHandler));
+
+  const createFromKiota = vscode.commands.registerCommand(
+    "fx-extension.createprojectfromkiota",
+    createProjectFromKiota
+  );
+  context.subscriptions.push(createFromKiota);
 
   registerActivateCommands(context);
 
