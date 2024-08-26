@@ -262,6 +262,9 @@ devDependencies:
   '@types/validator':
     specifier: ^13.1.1
     version: 13.1.1
+  '@types/vscode':
+    specifier: ^1.66.0
+    version: 1.66.0
   '@types/xml2js':
     specifier: ^0.4.11
     version: 0.4.11
@@ -1341,6 +1344,10 @@ packages:
 
   /@types/validator@13.1.1:
     resolution: {integrity: sha512-/39uXOKe1KV4ElXb8cp0RVyeRn9X1QRwllComMMql+FQ9nhmTx0Yhw+kJtccPSShsjma+KXjW/TiXyGUNqNn+w==}
+    dev: true
+
+  /@types/vscode@1.66.0:
+    resolution: {integrity: sha512-ZfJck4M7nrGasfs4A4YbUoxis3Vu24cETw3DERsNYtDZmYSYtk6ljKexKFKhImO/ZmY6ZMsmegu2FPkXoUFImA==}
     dev: true
 
   /@types/xml2js@0.4.11:

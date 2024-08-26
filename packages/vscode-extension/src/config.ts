@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { CONFIGURATION_PREFIX, ConfigurationKey } from "./constants";
 import VsCodeLogInstance from "./commonlib/log";
 import { LogLevel } from "@microsoft/teamsfx-api";
+import { featureFlagManager, FeatureFlags } from "@microsoft/teamsfx-core";
 
 export class ConfigManager {
   registerConfigChangeCallback() {
@@ -21,6 +22,10 @@ export class ConfigManager {
     ).toString();
     process.env["DEVELOP_COPILOT_EXTENSION"] = this.getConfiguration(
       ConfigurationKey.CopilotExtensionEnable,
+      false
+    ).toString();
+    process.env[FeatureFlags.Kiota.name] = this.getConfiguration(
+      ConfigurationKey.EnableMicrosoftKiota,
       false
     ).toString();
   }

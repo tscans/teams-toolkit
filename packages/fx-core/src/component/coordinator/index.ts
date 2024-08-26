@@ -11,6 +11,7 @@ import {
   InputsWithProjectPath,
   Platform,
   Result,
+  UserError,
   err,
   ok,
 } from "@microsoft/teamsfx-api";
@@ -39,7 +40,9 @@ import {
 } from "../../error/common";
 import { LifeCycleUndefinedError } from "../../error/yml";
 import {
+  ApiPluginStartOptions,
   AppNamePattern,
+  KiotaSpecLocationOptions,
   ProjectTypeOptions,
   QuestionNames,
   ScratchOptions,
@@ -62,6 +65,7 @@ import { metadataUtil } from "../utils/metadataUtil";
 import { pathUtils } from "../utils/pathUtils";
 import { settingsUtil } from "../utils/settingsUtil";
 import { SummaryReporter } from "./summary";
+import * as vscode from "vscode";
 
 const M365Actions = [
   "botAadApp/create",
@@ -90,6 +94,39 @@ class Coordinator {
     inputs: Inputs,
     actionContext?: ActionContext
   ): Promise<Result<CreateProjectResult, FxError>> {
+    if (inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.fromKiota().id) {
+      if (inputs.platform !== Platform.VSCode) {
+        // TODO (kiota): return error
+        return err(new UserError("extension", "KiotaNotSupported", "Only support Kiota in VSCode"));
+      }
+
+      if (!vscode.extensions.getExtension("ms-graph.kiota")) {
+        // TODO (kiota): ask for install kiota
+        const selection = void vscode.window
+          .showInformationMessage(
+            "You need to install Kiota extension to use this feature.",
+            "Install Kiota",
+            "Cancel"
+          )
+          .then(async (selection) => {
+            if (selection === "Install Kiota") {
+              await vscode.commands.executeCommand("extension.open", "ms-graph.kiota");
+            } else {
+              // TODO (kiota): return error
+              return err(new UserError("extension", "KiotaNotInstalled", "Please install Kiota"));
+            }
+          });
+        context.logProvider?.error("[extension] Kiota is not installed.");
+        return ok({ projectPath: "mockpath" });
+      }
+
+      if (inputs[QuestionNames.KiotaSpecLocation] == KiotaSpecLocationOptions.search().id) {
+        void vscode.commands.executeCommand("kiota.searchApiDescription");
+      } else {
+        void vscode.commands.executeCommand("kiota.openApiExplorer.openDescription");
+      }
+      return ok({ projectPath: "mockpath" });
+    }
     let folder = inputs["folder"] as string;
     if (!folder) {
       return err(new MissingRequiredInputError("folder"));

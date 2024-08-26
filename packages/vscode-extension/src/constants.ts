@@ -5,6 +5,7 @@ export enum ConfigurationKey {
   BicepEnvCheckerEnable = "prerequisiteCheck.bicep",
   CopilotExtensionEnable = "developCopilotPlugin",
   LogLevel = "logLevel",
+  EnableMicrosoftKiota = "enableMicrosoftKiota",
 }
 
 export const AzurePortalUrl = "https://portal.azure.com";

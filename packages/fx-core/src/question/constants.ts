@@ -100,6 +100,8 @@ export enum QuestionNames {
   PluginAvailability = "plugin-availability",
   ApiPluginType = "api-plugin-type",
   WithPlugin = "with-plugin",
+
+  KiotaSpecLocation = "kiota-spec-location",
 }
 
 export const AppNamePattern =
@@ -1265,7 +1267,52 @@ export class ApiPluginStartOptions {
     };
   }
 
+  static fromKiota(): OptionItem {
+    return {
+      id: "from-kiota",
+      label: getLocalizedString(
+        "core.createProjectQuestion.capability.copilotPlugiFromKiotaOption.label"
+      ),
+      detail: getLocalizedString(
+        "core.createProjectQuestion.capability.copilotPlugiFromKiotaOption.detail"
+      ),
+    };
+  }
+
   static all(): OptionItem[] {
-    return [ApiPluginStartOptions.newApi(), ApiPluginStartOptions.apiSpec()];
+    // TODO (kiota): only show in vsc
+    return featureFlagManager.getBooleanValue(FeatureFlags.Kiota)
+      ? [ApiPluginStartOptions.newApi(), ApiPluginStartOptions.fromKiota()]
+      : [ApiPluginStartOptions.newApi(), ApiPluginStartOptions.apiSpec()];
+  }
+}
+
+export class KiotaSpecLocationOptions {
+  static search(): OptionItem {
+    return {
+      id: "search",
+      label: getLocalizedString(
+        "core.createProjectQuestion.capability.copilotPlugiKiotaSpecFromSearch.label"
+      ),
+      detail: getLocalizedString(
+        "core.createProjectQuestion.capability.copilotPlugiKiotaSpecFromSearch.detail"
+      ),
+    };
+  }
+
+  static browse(): OptionItem {
+    return {
+      id: "browse",
+      label: getLocalizedString(
+        "core.createProjectQuestion.capability.copilotPlugiKiotaSpecFromLocal.label"
+      ),
+      detail: getLocalizedString(
+        "core.createProjectQuestion.capability.copilotPlugiKiotaSpecFromLocal.detail"
+      ),
+    };
+  }
+
+  static all(): OptionItem[] {
+    return [KiotaSpecLocationOptions.search(), KiotaSpecLocationOptions.browse()];
   }
 }

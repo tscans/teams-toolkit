@@ -71,6 +71,8 @@ export interface CreateProjectInputs extends Inputs {
     | "custom-copilot-rag-azureAISearch"
     | "custom-copilot-rag-customApi"
     | "custom-copilot-rag-microsoft365";
+  /** @description Create API Plugin from an Existing API */
+  "kiota-spec-location"?: "search" | "browse";
   /** @description OpenAPI Description Document */
   "openapi-spec-location"?: string;
   /** @description Select Operation(s) Teams Can Interact with */

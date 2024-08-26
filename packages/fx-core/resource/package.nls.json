@@ -881,5 +881,13 @@
   "driver.oauth.log.skipUpdateOauth": "Skip updating OAuth registration as the same property exists.",
   "driver.oauth.confirm.update": "The following parameters will be updated:\n%s\nDo you want to continue?",
   "driver.oauth.log.successUpdateOauth": "OAuth registration updated successfully!",
-  "driver.oauth.info.update": "OAuth registration updated successfully! The following parameters have been updated:\n%s"
+  "driver.oauth.info.update": "OAuth registration updated successfully! The following parameters have been updated:\n%s",
+  "core.createProjectQuestion.capability.copilotPlugiFromKiotaOption.label": "Start with an Existing API",
+  "core.createProjectQuestion.capability.copilotPlugiFromKiotaOption.detail": "Create a plugin from a local OpenAPI description or search for public APIs",
+  "core.createProjectQuestion.capability.copilotPlugiKiotaSpecFromSearch.label": "Search for a Public API",
+  "core.createProjectQuestion.capability.copilotPlugiKiotaSpecFromSearch.detail": "Search",
+  "core.createProjectQuestion.capability.copilotPlugiKiotaSpecFromLocal.label": "Enter OpenAPI Description Document Location",
+  "core.createProjectQuestion.capability.copilotPlugiKiotaSpecFromLocal.detail": "Browse path",
+  "core.createProjectQuestion.kiotaSpecLocation.title": "Create API Plugin from an Existing API",
+  "core.createProjectQuestion.kiotaSpecLocation.placeholder": "Select an option"
 }

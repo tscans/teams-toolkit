@@ -143,6 +143,13 @@ export const CreateProjectOptions: CLICommandOption[] = [
     ],
   },
   {
+    name: "kiota-spec-location",
+    type: "string",
+    description: "Create API Plugin from an Existing API",
+    default: "search",
+    choices: ["search", "browse"],
+  },
+  {
     name: "openapi-spec-location",
     type: "string",
     shortName: "a",

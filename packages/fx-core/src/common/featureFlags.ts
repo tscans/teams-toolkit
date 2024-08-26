@@ -78,6 +78,7 @@ export class FeatureFlags {
     name: FeatureFlagName.DevTunnelTest,
     defaultValue: "false",
   };
+  static readonly Kiota = { name: "TEAMSFX_KIOTA", defaultValue: "false" };
 }
 
 export function isCopilotExtensionEnabled(): boolean {

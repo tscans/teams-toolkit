@@ -18,7 +18,7 @@ import {
 } from "@microsoft/teamsfx-api";
 import fs from "fs-extra";
 import * as jsonschema from "jsonschema";
-import { cloneDeep } from "lodash";
+import { cloneDeep, get } from "lodash";
 import * as os from "os";
 import * as path from "path";
 import { ConstantString } from "../common/constants";
@@ -61,6 +61,7 @@ import {
   CustomCopilotAssistantOptions,
   CustomCopilotRagOptions,
   DeclarativeCopilotTypeOptions,
+  KiotaSpecLocationOptions,
   MeArchitectureOptions,
   NotificationTriggerOptions,
   ProgrammingLanguage,
@@ -71,6 +72,7 @@ import {
   capabilitiesHavePythonOption,
   getRuntime,
 } from "./constants";
+import * as vscode from "vscode";
 
 export function projectTypeQuestion(): SingleSelectQuestion {
   const staticOptions: StaticOptions = [
@@ -1308,6 +1310,17 @@ function apiPluginStartQuestion(): SingleSelectQuestion {
   };
 }
 
+function kiotaSpecLocationQuestion(): SingleSelectQuestion {
+  return {
+    type: "singleSelect",
+    name: QuestionNames.KiotaSpecLocation,
+    title: getLocalizedString("core.createProjectQuestion.kiotaSpecLocation.title"),
+    staticOptions: KiotaSpecLocationOptions.all(),
+    default: KiotaSpecLocationOptions.search().id,
+    placeholder: getLocalizedString("core.createProjectQuestion.kiotaSpecLocation.placeholder"),
+  };
+}
+
 export function capabilitySubTree(): IQTreeNode {
   const node: IQTreeNode = {
     data: capabilityQuestion(),
@@ -1397,6 +1410,12 @@ export function capabilitySubTree(): IQTreeNode {
         data: customCopilotRagQuestion(),
       },
       {
+        condition: (inputs: Inputs) => {
+          return inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.fromKiota().id;
+        },
+        data: kiotaSpecLocationQuestion(),
+      },
+      {
         // from API spec
         condition: (inputs: Inputs) => {
           return (
@@ -1431,13 +1450,14 @@ export function capabilitySubTree(): IQTreeNode {
         data: programmingLanguageQuestion(),
         condition: (inputs: Inputs) => {
           return (
-            (!!inputs[QuestionNames.Capabilities] &&
+            ((!!inputs[QuestionNames.Capabilities] &&
               inputs[QuestionNames.WithPlugin] !== DeclarativeCopilotTypeOptions.noPlugin().id &&
               inputs[QuestionNames.ApiPluginType] !== ApiPluginStartOptions.apiSpec().id &&
               inputs[QuestionNames.MeArchitectureType] !== MeArchitectureOptions.apiSpec().id &&
               inputs[QuestionNames.Capabilities] !== CapabilityOptions.officeAddinImport().id &&
               inputs[QuestionNames.Capabilities] !== CapabilityOptions.outlookAddinImport().id) ||
-            getRuntime(inputs) === RuntimeOptions.DotNet().id
+              getRuntime(inputs) === RuntimeOptions.DotNet().id) &&
+            inputs[QuestionNames.ApiPluginType] !== ApiPluginStartOptions.fromKiota().id
           );
         },
       },
@@ -1490,10 +1510,16 @@ export function capabilitySubTree(): IQTreeNode {
       {
         // root folder
         data: folderQuestion(),
+        condition: (inputs: Inputs) => {
+          return inputs[QuestionNames.ApiPluginType] !== ApiPluginStartOptions.fromKiota().id;
+        },
       },
       {
         // app name
         data: appNameQuestion(),
+        condition: (inputs: Inputs) => {
+          return inputs[QuestionNames.ApiPluginType] !== ApiPluginStartOptions.fromKiota().id;
+        },
       },
     ],
     condition: (inputs: Inputs) => {
