@@ -1267,23 +1267,21 @@ export class ApiPluginStartOptions {
     };
   }
 
-  static fromKiota(): OptionItem {
-    return {
-      id: "from-kiota",
-      label: getLocalizedString(
-        "core.createProjectQuestion.capability.copilotPlugiFromKiotaOption.label"
-      ),
-      detail: getLocalizedString(
-        "core.createProjectQuestion.capability.copilotPlugiFromKiotaOption.detail"
-      ),
-    };
-  }
+  // static fromKiota(): OptionItem {
+  //   return {
+  //     id: "from-kiota",
+  //     label: getLocalizedString(
+  //       "core.createProjectQuestion.capability.copilotPlugiFromKiotaOption.label"
+  //     ),
+  //     detail: getLocalizedString(
+  //       "core.createProjectQuestion.capability.copilotPlugiFromKiotaOption.detail"
+  //     ),
+  //   };
+  // }
 
   static all(): OptionItem[] {
     // TODO (kiota): only show in vsc
-    return featureFlagManager.getBooleanValue(FeatureFlags.Kiota)
-      ? [ApiPluginStartOptions.newApi(), ApiPluginStartOptions.fromKiota()]
-      : [ApiPluginStartOptions.newApi(), ApiPluginStartOptions.apiSpec()];
+    return [ApiPluginStartOptions.newApi(), ApiPluginStartOptions.apiSpec()];
   }
 }
 

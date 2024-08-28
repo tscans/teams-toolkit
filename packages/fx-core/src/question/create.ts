@@ -1411,7 +1411,11 @@ export function capabilitySubTree(): IQTreeNode {
       },
       {
         condition: (inputs: Inputs) => {
-          return inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.fromKiota().id;
+          return (
+            featureFlagManager.getBooleanValue(FeatureFlags.Kiota) &&
+            inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id &&
+            !inputs[QuestionNames.ApiPluginManifestPath]
+          );
         },
         data: kiotaSpecLocationQuestion(),
       },
@@ -1457,7 +1461,8 @@ export function capabilitySubTree(): IQTreeNode {
               inputs[QuestionNames.Capabilities] !== CapabilityOptions.officeAddinImport().id &&
               inputs[QuestionNames.Capabilities] !== CapabilityOptions.outlookAddinImport().id) ||
               getRuntime(inputs) === RuntimeOptions.DotNet().id) &&
-            inputs[QuestionNames.ApiPluginType] !== ApiPluginStartOptions.fromKiota().id
+            featureFlagManager.getBooleanValue(FeatureFlags.Kiota) &&
+            inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id
           );
         },
       },
@@ -1511,14 +1516,20 @@ export function capabilitySubTree(): IQTreeNode {
         // root folder
         data: folderQuestion(),
         condition: (inputs: Inputs) => {
-          return inputs[QuestionNames.ApiPluginType] !== ApiPluginStartOptions.fromKiota().id;
+          return (
+            featureFlagManager.getBooleanValue(FeatureFlags.Kiota) &&
+            inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id
+          );
         },
       },
       {
         // app name
         data: appNameQuestion(),
         condition: (inputs: Inputs) => {
-          return inputs[QuestionNames.ApiPluginType] !== ApiPluginStartOptions.fromKiota().id;
+          return (
+            featureFlagManager.getBooleanValue(FeatureFlags.Kiota) &&
+            inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id
+          );
         },
       },
     ],

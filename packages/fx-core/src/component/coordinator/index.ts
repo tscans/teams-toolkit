@@ -66,6 +66,7 @@ import { pathUtils } from "../utils/pathUtils";
 import { settingsUtil } from "../utils/settingsUtil";
 import { SummaryReporter } from "./summary";
 import * as vscode from "vscode";
+import { featureFlagManager, FeatureFlags } from "../../common/featureFlags";
 
 const M365Actions = [
   "botAadApp/create",
@@ -94,7 +95,11 @@ class Coordinator {
     inputs: Inputs,
     actionContext?: ActionContext
   ): Promise<Result<CreateProjectResult, FxError>> {
-    if (inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.fromKiota().id) {
+    if (
+      featureFlagManager.getBooleanValue(FeatureFlags.Kiota) &&
+      inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id &&
+      !inputs[QuestionNames.ApiPluginManifestPath]
+    ) {
       if (inputs.platform !== Platform.VSCode) {
         // TODO (kiota): return error
         return err(new UserError("extension", "KiotaNotSupported", "Only support Kiota in VSCode"));
