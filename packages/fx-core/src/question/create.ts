@@ -1423,9 +1423,10 @@ export function capabilitySubTree(): IQTreeNode {
         // from API spec
         condition: (inputs: Inputs) => {
           return (
-            inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id ||
-            inputs[QuestionNames.MeArchitectureType] === MeArchitectureOptions.apiSpec().id ||
-            inputs[QuestionNames.CustomCopilotRag] === CustomCopilotRagOptions.customApi().id
+            !inputs[QuestionNames.KiotaSpecLocation] &&
+            (inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id ||
+              inputs[QuestionNames.MeArchitectureType] === MeArchitectureOptions.apiSpec().id ||
+              inputs[QuestionNames.CustomCopilotRag] === CustomCopilotRagOptions.customApi().id)
           );
         },
         data: { type: "group", name: QuestionNames.FromExistingApi },
@@ -1517,6 +1518,7 @@ export function capabilitySubTree(): IQTreeNode {
         data: folderQuestion(),
         condition: (inputs: Inputs) => {
           return (
+            !inputs[QuestionNames.KiotaSpecLocation] &&
             featureFlagManager.getBooleanValue(FeatureFlags.Kiota) &&
             inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id
           );
@@ -1527,6 +1529,7 @@ export function capabilitySubTree(): IQTreeNode {
         data: appNameQuestion(),
         condition: (inputs: Inputs) => {
           return (
+            !inputs[QuestionNames.KiotaSpecLocation] &&
             featureFlagManager.getBooleanValue(FeatureFlags.Kiota) &&
             inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id
           );
