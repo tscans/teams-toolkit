@@ -219,7 +219,7 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.window.registerUriHandler(uriHandler));
 
   const createFromKiota = vscode.commands.registerCommand(
-    "fx-extension.createprojectfromkiota",
+    "fx-extension.createPluginFromManifest",
     createProjectFromKiota
   );
   context.subscriptions.push(createFromKiota);
