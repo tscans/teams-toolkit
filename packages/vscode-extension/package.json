@@ -933,7 +933,7 @@
         "enablement": "fx-extension.isChatParticipantEnabled"
       },
       {
-        "command": "fx-extension.createPluginFromManifest",
+        "command": "fx-extension.createprojectfromkiota",
         "title": "Create Project from Kiota"
       }
     ],

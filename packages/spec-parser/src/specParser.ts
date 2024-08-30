@@ -285,7 +285,6 @@ export class SpecParser {
     filter: string[],
     outputSpecPath: string,
     pluginFilePath: string,
-    existingPluginFilePath?: string,
     signal?: AbortSignal
   ): Promise<GenerateResult> {
     const result: GenerateResult = {
@@ -319,14 +318,6 @@ export class SpecParser {
       result.warnings.push(...warnings);
 
       await fs.outputJSON(manifestPath, updatedManifest, { spaces: 4 });
-      if (existingPluginFilePath) {
-        const apiPluginOriginal = (await fs.readJSON(
-          existingPluginFilePath
-        )) as PluginManifestSchema;
-        // TODO (kiota): refactor
-        apiPluginOriginal.functions = apiPlugin.functions;
-        await fs.outputJSON(pluginFilePath, apiPluginOriginal, { spaces: 4 });
-      }
       await fs.outputJSON(pluginFilePath, apiPlugin, { spaces: 4 });
     } catch (err) {
       if (err instanceof SpecParserError) {

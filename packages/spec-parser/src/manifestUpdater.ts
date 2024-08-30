@@ -52,7 +52,7 @@ export class ManifestUpdater {
 
     const appName = this.removeEnvs(manifest.name.short);
 
-    const specRelativePath = ManifestUpdater.getRelativePath(manifestPath, outputSpecPath);
+    const specRelativePath = ManifestUpdater.getRelativePath(apiPluginFilePath, outputSpecPath);
     const [apiPlugin, warnings] = await ManifestUpdater.generatePluginManifestSchema(
       spec,
       specRelativePath,

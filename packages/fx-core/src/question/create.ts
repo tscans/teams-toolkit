@@ -722,7 +722,7 @@ export function appNameQuestion(): TextInputQuestion {
           if (folder) {
             const projectPath = path.resolve(folder, appName);
             const exists = await fs.pathExists(projectPath);
-            if (exists)
+            if (exists && !previousInputs[QuestionNames.ApiPluginManifestPath])
               return getLocalizedString("core.QuestionAppName.validation.pathExist", projectPath);
           }
         }
@@ -1410,20 +1410,10 @@ export function capabilitySubTree(): IQTreeNode {
         data: customCopilotRagQuestion(),
       },
       {
-        condition: (inputs: Inputs) => {
-          return (
-            featureFlagManager.getBooleanValue(FeatureFlags.Kiota) &&
-            inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id &&
-            !inputs[QuestionNames.ApiPluginManifestPath]
-          );
-        },
-        data: kiotaSpecLocationQuestion(),
-      },
-      {
         // from API spec
         condition: (inputs: Inputs) => {
           return (
-            !inputs[QuestionNames.KiotaSpecLocation] &&
+            !featureFlagManager.getBooleanValue(FeatureFlags.Kiota) &&
             (inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id ||
               inputs[QuestionNames.MeArchitectureType] === MeArchitectureOptions.apiSpec().id ||
               inputs[QuestionNames.CustomCopilotRag] === CustomCopilotRagOptions.customApi().id)
@@ -1517,8 +1507,8 @@ export function capabilitySubTree(): IQTreeNode {
         // root folder
         data: folderQuestion(),
         condition: (inputs: Inputs) => {
-          return (
-            !inputs[QuestionNames.KiotaSpecLocation] &&
+          return !(
+            !inputs[QuestionNames.ApiPluginManifestPath] &&
             featureFlagManager.getBooleanValue(FeatureFlags.Kiota) &&
             inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id
           );
@@ -1528,8 +1518,8 @@ export function capabilitySubTree(): IQTreeNode {
         // app name
         data: appNameQuestion(),
         condition: (inputs: Inputs) => {
-          return (
-            !inputs[QuestionNames.KiotaSpecLocation] &&
+          return !(
+            !inputs[QuestionNames.ApiPluginManifestPath] &&
             featureFlagManager.getBooleanValue(FeatureFlags.Kiota) &&
             inputs[QuestionNames.ApiPluginType] === ApiPluginStartOptions.apiSpec().id
           );

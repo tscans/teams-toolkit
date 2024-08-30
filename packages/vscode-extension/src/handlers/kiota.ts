@@ -7,6 +7,7 @@ import { ApiPluginStartOptions, CapabilityOptions, QuestionNames } from "@micros
 import { runCommand } from "./sharedOpts";
 import * as vscode from "vscode";
 import { openFolder } from "../utils/workspaceUtils";
+import * as path from "path";
 
 export async function createProjectFromKiota(args?: any[]) {
   if (!args || args.length < 2) {
@@ -15,7 +16,7 @@ export async function createProjectFromKiota(args?: any[]) {
 
   const specPath = args[0];
   const pluginManifestPath = args[1];
-  const scaffoldNew = args[2];
+  const filePath = args[2];
   if (!specPath || !pluginManifestPath) {
     // TODO (kiota): throw error
     throw new UserError("extension", "missingParameterInDeeplink", "missing parameter");
@@ -28,6 +29,10 @@ export async function createProjectFromKiota(args?: any[]) {
   inputs[QuestionNames.ApiPluginType] = ApiPluginStartOptions.apiSpec().id;
   inputs[QuestionNames.ApiOperation] = pluginManifestPath;
   inputs[QuestionNames.ProjectType] = "copilot-extension-type";
+  if (filePath) {
+    inputs[QuestionNames.Folder] = path.join(filePath, "../");
+    inputs[QuestionNames.AppName] = path.basename(filePath);
+  }
   // TODO (kiota): handle scaffold directly scenario
   const result = await runCommand(Stage.create, inputs);
 

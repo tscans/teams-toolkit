@@ -125,11 +125,13 @@ class Coordinator {
         return ok({ projectPath: "mockpath" });
       }
 
-      if (inputs[QuestionNames.KiotaSpecLocation] == KiotaSpecLocationOptions.search().id) {
-        void vscode.commands.executeCommand("kiota.searchApiDescription");
-      } else {
-        void vscode.commands.executeCommand("kiota.openApiExplorer.openDescription");
-      }
+      void vscode.commands.executeCommand("kiota.openApiExplorer.searchOrOpenApiDescription", [
+        {
+          kind: "Plugin",
+          type: "ApiPlugin", //Only useful when kind is plugin
+          source: "ttk",
+        },
+      ]);
       return ok({ projectPath: "mockpath" });
     }
     let folder = inputs["folder"] as string;
