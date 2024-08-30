@@ -51,6 +51,9 @@ export async function createNewProjectHandler(...args: any[]): Promise<Result<an
   }
 
   const res = result.value as CreateProjectResult;
+  if (res.projectPath === "mockpath") {
+    return result;
+  }
   if (res.shouldInvokeTeamsAgent) {
     await invokeTeamsAgent([TelemetryTriggerFrom.CreateAppQuestionFlow]);
     return result;
