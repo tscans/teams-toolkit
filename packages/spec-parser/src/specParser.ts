@@ -285,6 +285,7 @@ export class SpecParser {
     filter: string[],
     outputSpecPath: string,
     pluginFilePath: string,
+    existingPluginFilePath?: string,
     signal?: AbortSignal
   ): Promise<GenerateResult> {
     const result: GenerateResult = {
@@ -318,7 +319,13 @@ export class SpecParser {
       result.warnings.push(...warnings);
 
       await fs.outputJSON(manifestPath, updatedManifest, { spaces: 4 });
-      await fs.outputJSON(pluginFilePath, apiPlugin, { spaces: 4 });
+      if (existingPluginFilePath) {
+        const existingPlugin = await fs.readJSON(existingPluginFilePath);
+        existingPlugin.functions = apiPlugin.functions;
+        await fs.outputJSON(pluginFilePath, existingPlugin, { spaces: 4 });
+      } else {
+        await fs.outputJSON(pluginFilePath, apiPlugin, { spaces: 4 });
+      }
     } catch (err) {
       if (err instanceof SpecParserError) {
         throw err;

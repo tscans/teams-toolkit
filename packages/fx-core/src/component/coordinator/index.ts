@@ -125,13 +125,11 @@ class Coordinator {
         return ok({ projectPath: "mockpath" });
       }
 
-      void vscode.commands.executeCommand("kiota.openApiExplorer.searchOrOpenApiDescription", [
-        {
-          kind: "Plugin",
-          type: "ApiPlugin", //Only useful when kind is plugin
-          source: "ttk",
-        },
-      ]);
+      void vscode.commands.executeCommand("kiota.openApiExplorer.searchOrOpenApiDescription", {
+        kind: "Plugin",
+        type: "ApiPlugin", //Only useful when kind is plugin
+        source: "ttk",
+      });
       return ok({ projectPath: "mockpath" });
     }
     let folder = inputs["folder"] as string;

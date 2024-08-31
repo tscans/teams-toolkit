@@ -529,26 +529,25 @@ export class SpecGenerator extends DefaultTemplateGenerator {
       const openapiSpecFileName = getTemplateInfosState.isYaml
         ? defaultApiSpecYamlFileName
         : defaultApiSpecJsonFileName;
-      const openapiSpecPath = inputs[QuestionNames.ApiPluginManifestPath]
-        ? inputs[QuestionNames.ApiSpecLocation]
-        : path.join(apiSpecFolderPath, openapiSpecFileName);
+      const openapiSpecPath = path.join(apiSpecFolderPath, openapiSpecFileName);
       // generate files
-      if (!inputs[QuestionNames.ApiPluginManifestPath]) {
-        await fs.ensureDir(apiSpecFolderPath);
-      }
+      await fs.ensureDir(apiSpecFolderPath);
 
       let generateResult;
       let pluginManifestPath: string | undefined;
 
       if (getTemplateInfosState.isPlugin) {
-        pluginManifestPath = !inputs[QuestionNames.ApiPluginManifestPath]
-          ? path.join(destinationPath, AppPackageFolderName, defaultPluginManifestFileName)
-          : inputs[QuestionNames.ApiPluginManifestPath];
+        pluginManifestPath = path.join(
+          destinationPath,
+          AppPackageFolderName,
+          defaultPluginManifestFileName
+        );
         generateResult = await specParser.generateForCopilot(
           manifestPath,
           filters,
           openapiSpecPath,
-          pluginManifestPath!
+          pluginManifestPath,
+          inputs[QuestionNames.ApiPluginManifestPath]
         );
       } else {
         const responseTemplateFolder = path.join(

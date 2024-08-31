@@ -16,7 +16,8 @@ export async function createProjectFromKiota(args?: any[]) {
 
   const specPath = args[0];
   const pluginManifestPath = args[1];
-  const filePath = args[2];
+  const fromScratch = args[2];
+  const filePath = args[3];
   if (!specPath || !pluginManifestPath) {
     // TODO (kiota): throw error
     throw new UserError("extension", "missingParameterInDeeplink", "missing parameter");
@@ -29,6 +30,7 @@ export async function createProjectFromKiota(args?: any[]) {
   inputs[QuestionNames.ApiPluginType] = ApiPluginStartOptions.apiSpec().id;
   inputs[QuestionNames.ApiOperation] = pluginManifestPath;
   inputs[QuestionNames.ProjectType] = "copilot-extension-type";
+  inputs[QuestionNames.KiotaFromScratch] = fromScratch;
   if (filePath) {
     inputs[QuestionNames.Folder] = path.join(filePath, "../");
     inputs[QuestionNames.AppName] = path.basename(filePath);

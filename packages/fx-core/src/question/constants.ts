@@ -102,6 +102,7 @@ export enum QuestionNames {
   WithPlugin = "with-plugin",
 
   KiotaSpecLocation = "kiota-spec-location",
+  KiotaFromScratch = "kiota-from-scratch",
 }
 
 export const AppNamePattern =
