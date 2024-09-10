@@ -39,7 +39,10 @@ export async function syncManifestHandler(...args: any[]): Promise<Result<null, 
   ExtTelemetry.sendTelemetryEvent(TelemetryEvent.SyncManifestStart, getTriggerFromProperty(args));
   const inputs: SyncManifestInputs = {
     platform: Platform.VSCode,
+    projectPath: workspaceUri?.fsPath,
   };
+  // set default value for teams-app-id.
+  inputs["teams-app-id"] = "";
   if (args.length > 0) {
     inputs["teams-app-id"] = args[0];
   }
