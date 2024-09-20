@@ -547,7 +547,7 @@ export async function createNewProject(
     lang?: "JavaScript" | "TypeScript" | "Python";
     spfxFrameworkType?: "React" | "None" | "Minimal";
     aiType?: "Azure OpenAI" | "OpenAI";
-    aiManagement?: "Build from Scratch" | "Build with Assistants API";
+    aiManagement?: "Build New" | "Build with Assistants API";
     testRootFolder?: string;
     appNameCopySuffix?: string;
     dataOption?:
@@ -875,10 +875,6 @@ export async function createNewProject(
       await driver.sleep(Timeout.input);
       // Choose programming language
       await input.selectQuickPick(lang);
-      await driver.sleep(Timeout.input);
-      await input.setText(aiType);
-      await driver.sleep(Timeout.input);
-      await input.confirm();
       await driver.sleep(Timeout.input);
       await input.confirm();
       await driver.sleep(Timeout.input);

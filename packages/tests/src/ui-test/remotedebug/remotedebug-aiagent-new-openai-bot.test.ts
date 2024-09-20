@@ -70,7 +70,7 @@ describe("Remote debug Tests", function () {
       const driver = VSBrowser.instance.driver;
       await createNewProject("aiagentnew", appName, {
         aiType: "OpenAI",
-        aiManagement: "Build from Scratch",
+        aiManagement: "Build New",
       });
       validateFileExist(projectPath, "src/index.js");
       const envPath = path.resolve(projectPath, "env", ".env.dev.user");

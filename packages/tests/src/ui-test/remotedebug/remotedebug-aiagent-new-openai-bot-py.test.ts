@@ -72,7 +72,7 @@ describe("Remote debug Tests", function () {
       await createNewProject("aiagentnew", appName, {
         lang: "Python",
         aiType: "OpenAI",
-        aiManagement: "Build from Scratch",
+        aiManagement: "Build New",
       });
       validateFileExist(projectPath, "src/app.py");
       const envPath = path.resolve(projectPath, "env", ".env.dev.user");
