@@ -101,12 +101,8 @@ async function updateTeamsManifest(context: DeclarativeAgentBotContext): Promise
 }
 
 async function provisionBot(context: DeclarativeAgentBotContext): Promise<void> {
-  const copilotGptManifestPath = path.join(
-    context.projectPath,
-    context.declarativeAgentManifestPath
-  );
   const copilotGptManifest = await copilotGptManifestUtils.readCopilotGptManifestFile(
-    copilotGptManifestPath
+    context.declarativeAgentManifestPath
   );
   if (copilotGptManifest.isErr()) {
     return;
