@@ -23,14 +23,14 @@ export async function create(context: DeclarativeAgentBotContext): Promise<void>
 
 async function wrapExecution(context: DeclarativeAgentBotContext): Promise<void> {
   try {
-    await process(context);
+    await doTasks(context);
   } catch (error: any) {
     await rollbackExecution(context);
     throw error;
   }
 }
 
-async function process(context: DeclarativeAgentBotContext): Promise<void> {
+async function doTasks(context: DeclarativeAgentBotContext): Promise<void> {
   await updateLaunchJson(context);
   await uppdateManifest(context);
   await provisionBot(context);
@@ -41,7 +41,7 @@ async function process(context: DeclarativeAgentBotContext): Promise<void> {
 async function updateLaunchJson(context: DeclarativeAgentBotContext): Promise<void> {
   const launchJsonPath = path.join(context.projectPath, launchJsonFile);
   if (await fs.pathExists(launchJsonPath)) {
-    await context.backup(launchJsonPath);
+    await context.backup(launchJsonFile);
     let launchJsonContent = await fs.readFile(launchJsonPath, "utf8");
 
     const jsonObject = JSON.parse(launchJsonContent);

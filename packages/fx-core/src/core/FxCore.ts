@@ -2029,13 +2029,6 @@ export class FxCore {
       throw new Error("projectPath is undefined");
     }
     const context = createContext();
-    const teamsManifestPath = inputs[QuestionNames.ManifestPath];
-
-    // validate the project is valid for creating declarative agent bot
-    const manifestRes = await manifestUtils._readAppManifest(teamsManifestPath);
-    if (manifestRes.isErr()) {
-      return err(manifestRes.error);
-    }
 
     // read declarative agent manifest
     const declarativeAgentManifestPath = inputs[QuestionNames.DeclarativeAgentFilePath];
