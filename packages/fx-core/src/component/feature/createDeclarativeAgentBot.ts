@@ -32,7 +32,7 @@ async function wrapExecution(context: DeclarativeAgentBotContext): Promise<void>
 
 async function doTasks(context: DeclarativeAgentBotContext): Promise<void> {
   await updateLaunchJson(context);
-  await uppdateManifest(context);
+  await updateTeamsManifest(context);
   await provisionBot(context);
   await getBotId(context);
   await updateEnv(context);
@@ -74,14 +74,14 @@ async function updateLaunchJson(context: DeclarativeAgentBotContext): Promise<vo
       },
     });
     launchJsonContent = JSON.stringify(jsonObject, null, 4);
-    await context.fsWriteFile(launchJsonPath, launchJsonContent, "utf8");
+    await context.fsWriteFile(launchJsonFile, launchJsonContent, "utf8");
   }
 }
 
-async function uppdateManifest(context: DeclarativeAgentBotContext): Promise<void> {
-  const manifestPath = path.join(AppPackageFolderName, MetadataV3.teamsManifestFileName);
-  if (await fs.pathExists(manifestPath)) {
-    await context.backup(manifestPath);
+async function updateTeamsManifest(context: DeclarativeAgentBotContext): Promise<void> {
+  const manifestFile = path.join(AppPackageFolderName, MetadataV3.teamsManifestFileName);
+  if (await fs.pathExists(path.join(context.projectPath, manifestFile))) {
+    await context.backup(manifestFile);
     const manifestContent = await manifestUtils.readAppManifest(context.projectPath);
     if (manifestContent.isErr()) {
       return;
@@ -96,7 +96,7 @@ async function uppdateManifest(context: DeclarativeAgentBotContext): Promise<voi
       supportsFiles: false,
       isNotificationOnly: false,
     });
-    await context.fsWriteFile(manifestPath, manifest);
+    await context.fsWriteFile(manifestFile, JSON.stringify(manifest, undefined, 4));
   }
 }
 
