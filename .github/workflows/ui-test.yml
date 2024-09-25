@@ -110,13 +110,6 @@ jobs:
       
       - uses: pnpm/action-setup@v4
 
-      - name: create pvt file (random platform/node)
-        if: ${{ github.event.schedule == '0 18 * * *' }} || ${{ github.event.inputs.test-case }} == ''
-        working-directory: ./packages/tests
-        run: |
-          pnpm --filter=@microsoft/teamsfx-test install
-          npx ts-node ./scripts/createRandomPVT.ts
-
       - name: setup matrix
         id: setup-matrix
         working-directory: ./packages/tests
@@ -208,7 +201,6 @@ jobs:
 
       TEAMSFX_DEV_TUNNEL_TEST: true
       TEAMSFX_TELEMETRY_TEST: true
-      TEAMSFX_TEMPLATE_PRERELEASE: "rc"
     strategy:
       fail-fast: false
       max-parallel: 50
