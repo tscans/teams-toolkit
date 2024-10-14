@@ -16,6 +16,7 @@ import {
   Timeout,
   LocalDebugTaskLabel,
   LocalDebugError,
+  LocalDebugTaskResult,
 } from "../../utils/constants";
 import { Env } from "../../utils/env";
 import { it } from "../../utils/it";
@@ -60,12 +61,12 @@ describe("Local Debug M365 Tests", function () {
       try {
         await waitForTerminal(
           LocalDebugTaskLabel.StartBackend,
-          "Worker process started and initialized"
+          LocalDebugTaskResult.FunctionStarted
         );
 
         await waitForTerminal(
           LocalDebugTaskLabel.StartFrontend,
-          "Compiled successfully!"
+          LocalDebugTaskResult.FrontendNoIssue
         );
       } catch (error) {
         const errorMsg = error.toString();
@@ -94,6 +95,20 @@ describe("Local Debug M365 Tests", function () {
       await page.goto(
         `https://outlook.office.com/host/${m365AppId}/index?login_hint=${Env.username}`
       );
+      try {
+        const addBtn = await page?.waitForSelector(
+          "button>span:has-text('Add')"
+        );
+        await addBtn?.click();
+      } catch {
+        console.log("no add button has span in outlook");
+        try {
+          const addBtn = await page?.waitForSelector("button:has-text('Add')");
+          await addBtn?.click();
+        } catch {
+          console.log("no add button has text in outlook");
+        }
+      }
       await validateReactOutlookTab(page, Env.displayName, true);
     }
   );
