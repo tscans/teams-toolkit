@@ -3,12 +3,6 @@
 import { useEffect, useState } from "react";
 import { unstable_batchedUpdates as batchedUpdates } from "react-dom";
 import { app, pages } from "@microsoft/teams-js";
-import {
-  teamsLightTheme,
-  teamsDarkTheme,
-  teamsHighContrastTheme,
-  Theme,
-} from "@fluentui/react-components";
 const getTheme = (): string | undefined => {
   const urlParams = new URLSearchParams(window.location.search);
   const theme = urlParams.get("theme");
@@ -34,46 +28,21 @@ export function useTeams(options?: {
   {
     inTeams?: boolean;
     fullScreen?: boolean;
-    theme: Theme;
     themeString: string;
     context?: app.Context;
     loading?: boolean;
-  },
-  {
-    setTheme: (theme: string | undefined) => void;
   }
 ] {
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
   const [inTeams, setInTeams] = useState<boolean | undefined>(undefined);
   const [fullScreen, setFullScreen] = useState<boolean | undefined>(undefined);
-  const [theme, setTheme] = useState<Theme>(teamsLightTheme);
   const [themeString, setThemeString] = useState<string>("default");
   const [initialTheme] = useState<string | undefined>(
     options && options.initialTheme ? options.initialTheme : getTheme()
   );
   const [context, setContext] = useState<app.Context | undefined>(undefined);
-  const themeChangeHandler = (theme: string | undefined) => {
-    setThemeString(theme || "default");
-    switch (theme) {
-      case "dark":
-        setTheme(teamsDarkTheme);
-        break;
-      case "contrast":
-        setTheme(teamsHighContrastTheme);
-        break;
-      case "default":
-      default:
-        setTheme(teamsLightTheme);
-    }
-  };
-  const overrideThemeHandler = options?.setThemeHandler
-    ? options.setThemeHandler
-    : themeChangeHandler;
+
   useEffect(() => {
-    // set initial theme based on options or query string
-    if (initialTheme) {
-      overrideThemeHandler(initialTheme);
-    }
 
     app
       .initialize()
@@ -86,8 +55,6 @@ export function useTeams(options?: {
               setContext(context);
               setFullScreen(context.page.isFullScreen);
             });
-            overrideThemeHandler(context.app.theme);
-            app.registerOnThemeChangeHandler(overrideThemeHandler);
             pages.registerFullScreenHandler((isFullScreen) => {
               setFullScreen(isFullScreen);
             });
@@ -105,7 +72,6 @@ export function useTeams(options?: {
   }, []);
 
   return [
-    { inTeams, fullScreen, theme, context, themeString, loading },
-    { setTheme: overrideThemeHandler },
+    { inTeams, fullScreen, context, themeString, loading },
   ];
 }

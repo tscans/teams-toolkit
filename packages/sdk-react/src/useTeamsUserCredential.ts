@@ -9,7 +9,6 @@ import {
   TeamsUserCredential,
 } from "@microsoft/teamsfx";
 import { useTeams } from "./useTeams";
-import { Theme } from "@fluentui/react-components";
 import { useData } from "./useData";
 
 export type TeamsContextWithCredential = {
@@ -29,10 +28,6 @@ export type TeamsContextWithCredential = {
    * Indicates that current environment is in Teams
    */
   inTeams?: boolean;
-  /**
-   * Teams theme.
-   */
-  theme: Theme;
   /**
    * Teams theme string.
    */

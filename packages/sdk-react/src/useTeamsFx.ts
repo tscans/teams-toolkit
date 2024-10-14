@@ -3,7 +3,6 @@
 
 import { LogLevel, setLogLevel, setLogFunction, TeamsFx, IdentityType } from "@microsoft/teamsfx";
 import { useTeams } from "./useTeams";
-import { Theme } from "@fluentui/react-components";
 import { useData } from "./useData";
 
 export type TeamsFxContext = {
@@ -23,10 +22,6 @@ export type TeamsFxContext = {
    * Indicates that current environment is in Teams
    */
   inTeams?: boolean;
-  /**
-   * Teams theme.
-   */
-  theme: Theme;
   /**
    * Teams theme string.
    */
