@@ -22,6 +22,7 @@ import { Env } from "../../utils/env";
 import { it } from "../../utils/it";
 import { validateFileExist } from "../../utils/commonUtils";
 import { expect } from "chai";
+import { getPlaywrightScreenshotPath } from "../../utils/nameUtil";
 
 describe("Local Debug M365 Tests", function () {
   this.timeout(Timeout.testCase);
@@ -109,6 +110,15 @@ describe("Local Debug M365 Tests", function () {
           console.log("no add button has text in outlook");
         }
       }
+      await page.screenshot({
+        path: getPlaywrightScreenshotPath("mail1"),
+        fullPage: true,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 60 * 1000));
+      await page.screenshot({
+        path: getPlaywrightScreenshotPath("mail2"),
+        fullPage: true,
+      });
       await validateReactOutlookTab(page, Env.displayName, true);
     }
   );
